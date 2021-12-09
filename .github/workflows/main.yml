@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: Cache VCPKG
+        id: vcpkg-cache
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-vcpkg-cache
+          path: |
+            build/vcpkg_installed
+            vcpkg_installed
+            thirdparty/vcpkg/packages
+            /home/runner/.cache/vcpkg/archives
+
+      - name: Configure CMake
+        run: cmake . -DVCPKG_TARGET_TRIPLET=x64-linux
+        env:
+          ADB_APP_ID: ${{ secrets.ADB_APP_ID }}
+          ADB_BOT_TOKEN: ${{ secrets.ADB_BOT_TOKEN }}
+          ADB_CLIENT_ID: ${{ secrets.ADB_CLIENT_ID }}
+          ADB_CLIENT_SECRET: ${{ secrets.ADB_CLIENT_SECRET }}
+          ADB_PUBLIC_KEY: ${{ secrets.ADB_PUBLIC_KEY }}
+          CC: gcc-10
+          CXX: g++-10
+
+      - name: Build
+        run: cmake --build .
+        env:
+          ADB_APP_ID: ${{ secrets.ADB_APP_ID }}
+          ADB_BOT_TOKEN: ${{ secrets.ADB_BOT_TOKEN }}
+          ADB_CLIENT_ID: ${{ secrets.ADB_CLIENT_ID }}
+          ADB_CLIENT_SECRET: ${{ secrets.ADB_CLIENT_SECRET }}
+          ADB_PUBLIC_KEY: ${{ secrets.ADB_PUBLIC_KEY }}
+      
+      - name: Collect Artfacts
+        uses: actions/upload-artifact@v2.3.0
+        with:
+          name: Artfacts
+          path: bin

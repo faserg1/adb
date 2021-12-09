@@ -1,0 +1,17 @@
+{
+  "name": "adb",
+  "version-string": "0.0.1",
+  "dependencies": [
+    "cpr",
+    "toml11",
+    "fmt",
+    "nlohmann-json",
+    "usockets",
+    "uwebsockets",
+    "websocketpp",
+    "openssl",
+    "boost-random",
+    "date"
+  ]
+}
+
