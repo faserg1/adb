@@ -24,7 +24,7 @@ namespace adb::api
 
     struct SendMessageParams
     {
-        std::string content;
+        std::optional<std::string> content;
         std::optional<bool> tts;
         std::optional<std::vector<Embed>> embeds;
         std::optional<AllowedMentions> allowedMentions;

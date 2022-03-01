@@ -5,6 +5,8 @@
 #include <api/gateway/gateway.hpp>
 #include <api/gateway/gateway-retrive.hpp>
 #include <api/channel/channel-api.hpp>
+#include <api/guild/guild-api.hpp>
+#include <api/interactions/interactions-api.hpp>
 
 using namespace adb::api;
 
@@ -32,4 +34,14 @@ std::unique_ptr<Gateway> DiscordApi::CreateGateway()
 std::unique_ptr<ChannelApi> DiscordApi::CreateChannelApi()
 {
     return std::unique_ptr<ChannelApi>(new ChannelApi(baseUrl_));
+}
+
+std::unique_ptr<GuildApi> DiscordApi::CreateGuildApi()
+{
+    return std::unique_ptr<GuildApi>(new GuildApi(baseUrl_));
+}
+
+std::unique_ptr<InteractionsApi> DiscordApi::CreateInteractionsApi()
+{
+    return std::unique_ptr<InteractionsApi>(new InteractionsApi(baseUrl_));
 }

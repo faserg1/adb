@@ -4,6 +4,7 @@ namespace adb::api
 {
     struct Guild
     {
+    public:
 
     };
 }

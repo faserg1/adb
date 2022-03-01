@@ -23,10 +23,8 @@ void adb::api::from_json(const nlohmann::json& j, MessageReference& mention)
 
 void adb::api::to_json(nlohmann::json& j, const SendMessageParams& params)
 {
-    j = nlohmann::json
-    {
-        {"content", params.content},
-    };
+    j = nlohmann::json {};
+    map_to_json(j, "content", params.content);
     map_to_json(j, "tts", params.tts);
     map_to_json(j, "embeds", params.embeds);
     map_to_json(j, "allowed_mentions", params.allowedMentions);

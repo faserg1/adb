@@ -17,7 +17,10 @@ namespace nlohmann
 
         static void from_json(const json& obj, std::optional<OptType> &value)
         {
-            value = obj.is_null() ? value = std::nullopt : obj.get<OptType>();
+            if (obj.is_null())
+                value = std::nullopt;
+            else
+                value = obj.get<OptType>();
         }
     };
 }

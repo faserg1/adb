@@ -5,33 +5,11 @@
 #include <vector>
 #include <api/emoji/data/emoji.hpp>
 #include <api/message/data/select-option.hpp>
+#include <api/message/data/message-component-type.hpp>
+#include <api/message/data/button-style.hpp>
 
 namespace adb::api
 {
-    /**
-     * @brief Component Type
-     * @details https://discord.com/developers/docs/interactions/message-components#component-object-component-types
-     */
-    enum MessageComponentType : uint32_t
-    {
-        ActionRow = 1,
-        Button = 2,
-        SelectMenu = 3
-    };
-
-    /**
-     * @brief Button Style
-     * @details https://discord.com/developers/docs/interactions/message-components#button-object-button-styles
-     */
-    enum ButtonStyle : uint32_t
-    {
-        Primary = 1,
-        Secondary = 2,
-        Success = 3,
-        Danger = 4,
-        Link = 5
-    };
-
     /**
      * @brief Component Object
      * @details https://discord.com/developers/docs/interactions/message-components#component-object
