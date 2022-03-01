@@ -33,7 +33,7 @@ namespace adb::types
     static void map_to_json(nlohmann::json &j, const std::string &key, const adb::types::Nullable<OptType> &value)
     {
         if (value)
-            j[key] = value.value();
+            j[key] = *value;
         else
             j[key] = nullptr;
     }
@@ -43,9 +43,7 @@ namespace adb::types
     {
         if (j.contains(key) && !j.at(key).is_null())
         {
-            OptType v {};
-            j.at(key).get_to(v);
-            value = std::move(v);
+            j.at(key).get_to(value);
         }
     }
 }

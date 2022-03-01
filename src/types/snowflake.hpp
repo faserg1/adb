@@ -17,6 +17,8 @@ namespace adb::types
         SFID(uint64_t id);
         SFID(const std::string &strId);
 
+        SFID(const SFID &other) = default;
+
         SFID create();
 
         inline operator uint64_t() const { return id_; }

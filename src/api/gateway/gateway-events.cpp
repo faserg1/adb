@@ -1,5 +1,6 @@
 #include "gateway-events.hpp"
 #include <api/gateway/data/dispatch.hpp>
+#include <iostream>
 using namespace adb::api;
 using namespace adb::types;
 
@@ -66,6 +67,8 @@ std::unique_ptr<Subscription> GatewayEvents::subscribe(Event ev, Subscriber sub)
 
 void GatewayEvents::onDispatch(const Dispatch &dispatch)
 {
+    std::cout << to_string(dispatch.event) << std::endl;
+
     auto eventSub = subs_->eventSubscribers.find(dispatch.event);
     if (eventSub == subs_->eventSubscribers.end())
         return;

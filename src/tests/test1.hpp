@@ -8,4 +8,4 @@ namespace adb::api
     class Gateway;
 }
 
-void checkSmth(adb::api::DiscordApi &api, adb::api::Gateway &gateway);
+void checkSmth(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);

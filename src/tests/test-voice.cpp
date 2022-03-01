@@ -5,6 +5,7 @@
 #include <ranges>
 #include <api/api.hpp>
 #include <api/gateway/gateway.hpp>
+#include <api/voice/gateway.hpp>
 #include <api/gateway/gateway-events.hpp>
 #include <api/message/data/message.hpp>
 #include <api/channel/channel-api.hpp>
@@ -17,9 +18,10 @@
 using namespace adb::api;
 using namespace adb::types;
 
-TestVoice::TestVoice(adb::api::DiscordApi &api, adb::api::Gateway &gateway) :
+TestVoice::TestVoice(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway) :
     api_(api), gateway_(gateway), channelApi_(api_.CreateChannelApi())
 {
+    voiceGateway_ = api.GetVoiceGateway(adb::types::SFID{"918981635918159943"});
     init();
 }
 
@@ -27,15 +29,16 @@ TestVoice::~TestVoice() = default;
 
 void TestVoice::init()
 {
-    subs_.emplace_back(gateway_.events()->subscribe<adb::api::Message>(adb::api::Event::MESSAGE_CREATE, [this](auto ev, auto &msg)
+    subs_.emplace_back(gateway_->events()->subscribe<adb::api::Message>(adb::api::Event::MESSAGE_CREATE, [this](auto ev, auto &msg)
 	{
         if (msg.author.bot && msg.author.bot.value())
 			return;
-        if (msg.content != "!ts-bridge")
-            return;
-        onMessageChoose(msg.channelId);
+        if (msg.content == "!ts-bridge")
+            onMessageChoose(msg.channelId);
+        if (msg.content == "!ts-bridge stop")
+            onDisconnect();
     }));
-    subs_.emplace_back(gateway_.events()->subscribe(adb::api::Event::INTERACTION_CREATE, [this](auto ev, auto &msg)
+    subs_.emplace_back(gateway_->events()->subscribe(adb::api::Event::INTERACTION_CREATE, [this](auto ev, auto &msg)
 	{
         auto act = api_.CreateInteractionsApi();
         std::string token;
@@ -101,5 +104,10 @@ void TestVoice::onMessageChoose(adb::types::SFID channelId)
 
 void TestVoice::onMessageConnect(adb::types::SFID channelId)
 {
+    voiceGateway_->connect(channelId, false, false);
+}
 
+void TestVoice::onDisconnect()
+{
+    voiceGateway_->disconnect();
 }

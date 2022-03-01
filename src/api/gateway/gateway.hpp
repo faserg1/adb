@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include <api/gateway/data/intents.hpp>
 #include <nlohmann/json_fwd.hpp>
 
 namespace adb::api
@@ -26,15 +27,18 @@ namespace adb::api
 
         bool connect();
         void run();
+        void send(const Payload &msg);
+
+        Intents getIntents() { return requiredIntents_; }
 
         std::shared_ptr<GatewayEvents> events() const;
     protected:
         virtual void onMessage(const Payload &msg);
         virtual void onDispatch(const Dispatch &dispatch);
 
-        void send(const Payload &msg);
+        void sendInternal(const Payload &msg);
     private:
-        Gateway(const std::string &gatewayUrl);
+        Gateway(const std::string &gatewayUrl, Intents requiredIntents);
 
         void configureClient();
         void configureMessageHandler();
@@ -47,5 +51,7 @@ namespace adb::api
         const std::string gatewayUrl_;
         std::unique_ptr<GatewayData> data_;
         std::shared_ptr<GatewayEvents> events_;
+
+        Intents requiredIntents_;
     };
 }

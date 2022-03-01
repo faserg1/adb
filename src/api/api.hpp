@@ -3,10 +3,12 @@
 #include <string>
 #include <memory>
 
+#include <types/snowflake.hpp>
 namespace adb::api
 {
     class Auth;
     class Gateway;
+    class VoiceGateway;
     class ChannelApi;
     class GuildApi;
     class InteractionsApi;
@@ -18,11 +20,13 @@ namespace adb::api
         DiscordApi();
 
         std::unique_ptr<Auth> CreateAuth();
-        std::unique_ptr<Gateway> CreateGateway();
+        std::shared_ptr<Gateway> GetGateway();
+        std::unique_ptr<VoiceGateway> GetVoiceGateway(adb::types::SFID guildId);
         std::unique_ptr<ChannelApi> CreateChannelApi();
         std::unique_ptr<GuildApi> CreateGuildApi();
         std::unique_ptr<InteractionsApi> CreateInteractionsApi();
     private:
         const std::string baseUrl_;
+        std::shared_ptr<Gateway> gatewayInstance_;
     };
 }

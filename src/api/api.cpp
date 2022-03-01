@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <api/auth/auth.hpp>
 #include <api/gateway/gateway.hpp>
+#include <api/voice/gateway.hpp>
 #include <api/gateway/gateway-retrive.hpp>
 #include <api/channel/channel-api.hpp>
 #include <api/guild/guild-api.hpp>
@@ -21,14 +22,23 @@ std::unique_ptr<Auth> DiscordApi::CreateAuth()
     return std::unique_ptr<Auth>(new Auth(baseUrl_));
 }
 
-std::unique_ptr<Gateway> DiscordApi::CreateGateway()
+std::shared_ptr<Gateway> DiscordApi::GetGateway()
 {
+    if (gatewayInstance_)
+        return gatewayInstance_;
     GatewayRetrive gr(baseUrl_);
     auto retriveData = gr.retriveBotGateway(GatewayRetriveQuery {
         .version = 9,
         .encoding = GatewayEncoding::JSON
     });
-    return std::unique_ptr<Gateway>(new Gateway(retriveData.url));
+    auto intents = Intent::Guilds | Intent::GuildMessages | Intent::GuildVoiceStates;
+    gatewayInstance_ = std::shared_ptr<Gateway>(new Gateway(retriveData.url, intents));
+    return gatewayInstance_;
+}
+
+std::unique_ptr<VoiceGateway> DiscordApi::GetVoiceGateway(adb::types::SFID guildId)
+{
+    return std::unique_ptr<VoiceGateway>(new VoiceGateway(GetGateway(), guildId));
 }
 
 std::unique_ptr<ChannelApi> DiscordApi::CreateChannelApi()

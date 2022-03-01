@@ -35,8 +35,8 @@ struct Gateway::GatewayData
     
 };
 
-Gateway::Gateway(const std::string &gatewayUrl) :
-    gatewayUrl_(gatewayUrl), data_(std::make_unique<GatewayData>()), events_(GatewayEvents::create())
+Gateway::Gateway(const std::string &gatewayUrl, Intents requiredIntents) :
+    gatewayUrl_(gatewayUrl), data_(std::make_unique<GatewayData>()), events_(GatewayEvents::create()), requiredIntents_(requiredIntents)
 {
     configureClient();
     configureMessageHandler();
@@ -64,6 +64,11 @@ bool Gateway::connect()
 void Gateway::run()
 {
     data_->client.run();
+}
+
+void Gateway::send(const Payload &msg)
+{
+    sendInternal(msg);
 }
 
 std::shared_ptr<GatewayEvents> Gateway::events() const
@@ -125,7 +130,7 @@ void Gateway::onDispatch(const Dispatch &dispatch)
     events_->onDispatch(dispatch);
 }
 
-void Gateway::send(const Payload &msg)
+void Gateway::sendInternal(const Payload &msg)
 {
     nlohmann::json jsObj = msg;
     WebSocketError ec;
@@ -138,7 +143,7 @@ void Gateway::startHeartbeat(uint64_t intervalms)
     {
         while (!stop_token.stop_requested())
         {
-            send({
+            sendInternal({
                 .op = GatewayOpCode::Heartbeat,
                 .data = nlohmann::json::parse("null")
             });
@@ -165,9 +170,9 @@ void Gateway::identify()
             .browser = "adb",
             .device = "adb"
         },
-        .intents = Intent::Guilds | Intent::GuildMessages,
+        .intents = requiredIntents_,
     };
-    send({
+    sendInternal({
         .op = GatewayOpCode::Identify,
         .data = identity
     });

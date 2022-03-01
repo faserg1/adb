@@ -10,9 +10,9 @@ int main()
 	using namespace adb::api;
 
 	auto api = DiscordApi();
-	auto gateway = api.CreateGateway();
+	auto gateway = api.GetGateway();
 	
-	TestVoice tvoice(api, *gateway);
+	TestVoice tvoice(api, gateway);
 
 	gateway->connect();
 	gateway->run();

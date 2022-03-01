@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-
+#include <types/helpers/enums.hpp>
 namespace adb::api
 {
     enum class Intent : uint64_t
@@ -24,20 +24,5 @@ namespace adb::api
         GuildShelduleEvent = (1 << 16)
     };
 
-    using Intents = uint64_t;
-
-    constexpr Intents operator+(Intent i)
-    {
-        return static_cast<uint64_t>(i);
-    }
-
-    constexpr Intents operator|(Intent i1, Intent i2)
-    {
-        return static_cast<uint64_t>(i1) | static_cast<uint64_t>(i2);
-    }
-
-    constexpr Intents operator|(Intents i1, Intent i2)
-    {
-        return i1 | static_cast<uint64_t>(i2);
-    }
+    ADB_ENUM_FLAGS_OPERATORS(Intent, Intents, uint64_t)
 }

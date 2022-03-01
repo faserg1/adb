@@ -15,11 +15,11 @@
 using namespace adb::api;
 using namespace adb::types;
 
-void checkSmth(adb::api::DiscordApi &api, adb::api::Gateway &gateway)
+void checkSmth(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway)
 {
     auto channelApi = api.CreateChannelApi();
 	
-	auto sub = gateway.events()->subscribe<adb::api::Message>(adb::api::Event::MESSAGE_CREATE, [&channelApi](auto ev, auto &msg)
+	auto sub = gateway->events()->subscribe<adb::api::Message>(adb::api::Event::MESSAGE_CREATE, [&channelApi](auto ev, auto &msg)
 	{
 		if (msg.author.bot && msg.author.bot.value())
 			return;
@@ -84,7 +84,7 @@ void checkSmth(adb::api::DiscordApi &api, adb::api::Gateway &gateway)
 		if (createdMsg)
 			channelApi->createReaction(createdMsg.value().channelId, createdMsg.value().id, "👌");
 	});
-	auto sub2 = gateway.events()->subscribe(adb::api::Event::INTERACTION_CREATE, [&channelApi](auto ev, auto &msg)
+	auto sub2 = gateway->events()->subscribe(adb::api::Event::INTERACTION_CREATE, [&channelApi](auto ev, auto &msg)
 	{
 		int i = 0;
 	});
