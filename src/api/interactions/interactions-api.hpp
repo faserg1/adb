@@ -33,6 +33,14 @@ namespace adb::api
          * @return Was an interaction successefully responded
          */
         bool message(const adb::types::SFID &id, const std::string &token, const SendMessageParams &params);
+        /**
+         * @brief Promise to responding to an iteraction with a message later
+         * @details https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
+         * @param id Interaction ID, received via Gateway or webhook
+         * @param token Interaction token, received via Gateway or webhook
+         * @return Was an interaction response successefully promised
+         */
+        bool messageLater(const adb::types::SFID &id, const std::string &token);
     private:
         InteractionsApi(const std::string &baseUrl);
     private:

@@ -27,7 +27,7 @@ namespace adb::api
 
         bool connect();
         void run();
-        void send(const Payload &msg);
+        bool send(const Payload &msg);
 
         Intents getIntents() { return requiredIntents_; }
 
@@ -36,7 +36,7 @@ namespace adb::api
         virtual void onMessage(const Payload &msg);
         virtual void onDispatch(const Dispatch &dispatch);
 
-        void sendInternal(const Payload &msg);
+        bool sendInternal(const Payload &msg);
     private:
         Gateway(const std::string &gatewayUrl, Intents requiredIntents);
 

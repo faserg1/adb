@@ -47,6 +47,8 @@ void TestVoice::init()
         msg["id"].get_to(id);
         msg["token"].get_to(token);
         msg["data"]["values"].get_to(values);
+
+        // act->messageLater(id, token);
         
         if (values.empty())
         {
@@ -104,10 +106,19 @@ void TestVoice::onMessageChoose(adb::types::SFID channelId)
 
 void TestVoice::onMessageConnect(adb::types::SFID channelId)
 {
-    voiceGateway_->connect(channelId, false, false);
+    std::thread thread([this, channelId]()
+    {
+        auto future = voiceGateway_->connect(channelId, false, false);
+    });
+    thread.detach();
 }
 
 void TestVoice::onDisconnect()
 {
-    voiceGateway_->disconnect();
+    std::thread thread([this]()
+    {
+        auto future = voiceGateway_->disconnect();
+    });
+    thread.detach();
+    
 }

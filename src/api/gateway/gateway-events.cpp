@@ -1,6 +1,8 @@
 #include "gateway-events.hpp"
 #include <api/gateway/data/dispatch.hpp>
+
 #include <iostream>
+
 using namespace adb::api;
 using namespace adb::types;
 

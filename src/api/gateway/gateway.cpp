@@ -58,7 +58,7 @@ bool Gateway::connect()
         return false;
     }
     data_->connection = data_->client.connect(con);
-    return true;
+    return data_->connection && data_->connection->get_state() == websocketpp::session::state::open;
 }
 
 void Gateway::run()
@@ -66,9 +66,9 @@ void Gateway::run()
     data_->client.run();
 }
 
-void Gateway::send(const Payload &msg)
+bool Gateway::send(const Payload &msg)
 {
-    sendInternal(msg);
+    return sendInternal(msg);
 }
 
 std::shared_ptr<GatewayEvents> Gateway::events() const
@@ -130,11 +130,17 @@ void Gateway::onDispatch(const Dispatch &dispatch)
     events_->onDispatch(dispatch);
 }
 
-void Gateway::sendInternal(const Payload &msg)
+bool Gateway::sendInternal(const Payload &msg)
 {
     nlohmann::json jsObj = msg;
     WebSocketError ec;
     data_->client.send(data_->connection, jsObj.dump(), WebSocketOpcode::text, ec);
+    if (ec)
+    {
+        auto msg = ec.message();
+        return false;
+    }
+    return true;
 }
 
 void Gateway::startHeartbeat(uint64_t intervalms)

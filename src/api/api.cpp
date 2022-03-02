@@ -8,6 +8,7 @@
 #include <api/channel/channel-api.hpp>
 #include <api/guild/guild-api.hpp>
 #include <api/interactions/interactions-api.hpp>
+#include <api/user/user-api.hpp>
 
 using namespace adb::api;
 
@@ -38,7 +39,7 @@ std::shared_ptr<Gateway> DiscordApi::GetGateway()
 
 std::unique_ptr<VoiceGateway> DiscordApi::GetVoiceGateway(adb::types::SFID guildId)
 {
-    return std::unique_ptr<VoiceGateway>(new VoiceGateway(GetGateway(), guildId));
+    return std::unique_ptr<VoiceGateway>(new VoiceGateway(CreateUserApi(), GetGateway(), guildId));
 }
 
 std::unique_ptr<ChannelApi> DiscordApi::CreateChannelApi()
@@ -54,4 +55,9 @@ std::unique_ptr<GuildApi> DiscordApi::CreateGuildApi()
 std::unique_ptr<InteractionsApi> DiscordApi::CreateInteractionsApi()
 {
     return std::unique_ptr<InteractionsApi>(new InteractionsApi(baseUrl_));
+}
+
+std::unique_ptr<UserApi> DiscordApi::CreateUserApi()
+{
+    return std::unique_ptr<UserApi>(new UserApi(baseUrl_));
 }

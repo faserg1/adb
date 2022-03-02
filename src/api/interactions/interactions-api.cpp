@@ -45,3 +45,20 @@ bool InteractionsApi::message(const adb::types::SFID &id, const std::string &tok
     auto response = session.Post();
     return response.status_code == 200;
 }
+
+bool InteractionsApi::messageLater(const adb::types::SFID &id, const std::string &token)
+{
+    auto url = fmt::format("{}/{}/{}/callback",
+        baseUrl_, id.to_string(), token);
+    auto json = nlohmann::json
+    {
+        {"type", InteractionCallbackType::DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE}
+    };
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto contentType = std::pair{"content-type", "application/json"};
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetBody(json.dump());
+    auto response = session.Post();
+    return response.status_code == 200;
+}

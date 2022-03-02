@@ -12,6 +12,7 @@ namespace adb::api
     class ChannelApi;
     class GuildApi;
     class InteractionsApi;
+    class UserApi;
 
 
     class DiscordApi final
@@ -25,6 +26,7 @@ namespace adb::api
         std::unique_ptr<ChannelApi> CreateChannelApi();
         std::unique_ptr<GuildApi> CreateGuildApi();
         std::unique_ptr<InteractionsApi> CreateInteractionsApi();
+        std::unique_ptr<UserApi> CreateUserApi();
     private:
         const std::string baseUrl_;
         std::shared_ptr<Gateway> gatewayInstance_;
