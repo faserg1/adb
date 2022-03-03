@@ -9,6 +9,7 @@
 #include <api/message/data/allowed-mentions.hpp>
 #include <api/message/data/message-component.hpp>
 #include <api/message/data/attachment.hpp>
+#include <api/message/data/message-flags.hpp>
 
 #include <nlohmann/json_fwd.hpp>
 
@@ -32,6 +33,7 @@ namespace adb::api
         std::optional<std::vector<MessageComponent>> components;
         std::optional<std::vector<adb::types::SFID>> stickerIds;
         std::optional<std::vector<SendAttachment>> attachments;
+        MessageFlags flags;
     };
 
     void to_json(nlohmann::json& j, const MessageReference& mention);

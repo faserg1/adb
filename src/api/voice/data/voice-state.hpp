@@ -8,6 +8,10 @@
 
 namespace adb::api
 {
+    /**
+     * @brief Voice State
+     * @details https://discord.com/developers/docs/resources/voice#voice-state-object
+     */
     struct VoiceState
     {
         /// the guild id this voice state is for

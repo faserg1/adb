@@ -6,6 +6,8 @@
 #include <future>
 #include <stop_token>
 #include <optional>
+#include <vector>
+#include <array>
 #include <nlohmann/json_fwd.hpp>
 #include <api/voice/data/voice-state-update.hpp>
 
@@ -18,6 +20,7 @@ namespace adb::api
     struct VoiceState;
     struct VoiceServerUpdateEvent;
     struct VoicePayload;
+    struct VoiceReadyEvent;
 
     class VoiceGateway
     {
@@ -36,13 +39,32 @@ namespace adb::api
         [[nodiscard]] std::future<bool> connect(adb::types::SFID channelId, bool mute, bool deaf, bool force = false);
         [[nodiscard]] std::future<void> disconnect();
 
+        void setModeSelectorCallback(std::function<std::string(const std::vector<std::string> &)> modeSelector);
+        void setUserSpeakingCallback(std::function<void(adb::types::SFID userId, bool)> userSpeaking);
+
         bool send(const VoicePayload &msg);
         
         ConnectionState getState();
         adb::types::SFID getGuildId() const;
         std::optional<adb::types::SFID> getChannelId() const;
         const VoiceState &getCurrentState() const;
+        const std::string &getMode();
 
+        std::future<bool> sendData(const std::byte *ptr, size_t size);
+        std::future<size_t> receiveData(std::byte *ptr, size_t bufferSize);
+
+        std::future<bool> sendData(const std::vector<std::byte> &data)
+        {
+            return sendData(data.data(), data.size());
+        }
+
+        template <size_t Size>
+        std::future<bool> sendData(const std::array<std::byte, Size> &data)
+        {
+            return sendData(data.data(), Size);
+        }
+
+        std::future<std::vector<std::byte>> receiveData();
     protected:
         VoiceGateway(std::unique_ptr<UserApi> userApi, std::shared_ptr<Gateway> gateway, adb::types::SFID guildId);
 
@@ -65,6 +87,8 @@ namespace adb::api
 
         void connectInternal(std::stop_token stop);
         void identity();
+        std::future<bool> ipDiscovery();
+        void selectProtocol();
 
         std::future<bool> startWebSocket();
         std::future<void> stopWebSocket();
@@ -72,7 +96,7 @@ namespace adb::api
         std::future<bool> startHeartbeating(uint64_t intervalms);
         std::future<void> stopHeartbeating();
 
-        std::future<bool> startDataFlow();
+        std::future<bool> startDataFlow(const VoiceReadyEvent &voiceReady);
         std::future<void> stopDataFlow();
     private:
         std::shared_ptr<Gateway> gateway_;

@@ -22,6 +22,9 @@ target_link_libraries(adb PRIVATE cpr::cpr)
 target_link_libraries(adb PRIVATE toml11::toml11)
 target_link_libraries(adb PRIVATE websocketpp::websocketpp)
 
+target_link_libraries(adb PRIVATE unofficial-sodium::sodium)
+target_link_libraries(adb PRIVATE Opus::opus)
+
 target_link_libraries(adb PRIVATE ${USOCKETS_LIBRARY})
 
 target_secrets(adb)

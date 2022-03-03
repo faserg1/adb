@@ -43,26 +43,42 @@ void TestVoice::init()
         auto act = api_.CreateInteractionsApi();
         std::string token;
         adb::types::SFID id;
+        adb::types::SFID appId;
         std::vector<std::string> values;
         msg["id"].get_to(id);
+        msg["application_id"].get_to(appId);
         msg["token"].get_to(token);
         msg["data"]["values"].get_to(values);
 
-        // act->messageLater(id, token);
+        act->messageLater(id, token);
         
         if (values.empty())
         {
-            act->message(id, token, SendMessageParams
+            act->editReply(appId, token, SendMessageParams
             {
                 .content = std::string {"Channel not choosed!"},
             });
             return;
         }
-		onMessageConnect(adb::types::SFID{values.front()});
-        act->message(id, token, SendMessageParams
+        auto thread = std::thread([this, values, id, appId, token, act = std::move(act)]()
         {
-            .content = std::string {"Connecting..."},
+            auto result = onMessageConnect(adb::types::SFID{values.front()}).get();
+            if (result)
+            {
+                act->editReply(appId, token, SendMessageParams
+                {
+                    .content = std::string {"Connected"},
+                });
+            }
+            else
+            {
+                act->editReply(appId, token, SendMessageParams
+                {
+                    .content = std::string {"Connection failed!"},
+                });
+            }
         });
+		thread.detach();
 	}));
 }
 
@@ -104,13 +120,9 @@ void TestVoice::onMessageChoose(adb::types::SFID channelId)
     });
 }
 
-void TestVoice::onMessageConnect(adb::types::SFID channelId)
+std::future<bool> TestVoice::onMessageConnect(adb::types::SFID channelId)
 {
-    std::thread thread([this, channelId]()
-    {
-        auto future = voiceGateway_->connect(channelId, false, false);
-    });
-    thread.detach();
+    return voiceGateway_->connect(channelId, false, false);
 }
 
 void TestVoice::onDisconnect()

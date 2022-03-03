@@ -17,6 +17,7 @@ namespace adb::api
     public:
         bool createReaction(adb::types::SFID channelId, adb::types::SFID messageId, std::string emoji);
         std::optional<Message> sendMessage(adb::types::SFID channelId, const SendMessageParams &params);
+        std::optional<Message> editMessage(adb::types::SFID channelId, adb::types::SFID messageId, const SendMessageParams &params);
     private:
         ChannelApi(const std::string &baseUrl);
     private:

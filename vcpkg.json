@@ -11,7 +11,9 @@
     "websocketpp",
     "openssl",
     "boost-random",
-    "date"
+    "date",
+    "opus",
+    "libsodium"
   ]
 }
 

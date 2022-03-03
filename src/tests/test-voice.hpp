@@ -4,6 +4,7 @@
 #include <types/subscription.hpp>
 #include <types/snowflake.hpp>
 #include <optional>
+#include <future>
 
 namespace adb::api
 {
@@ -21,7 +22,7 @@ public:
 private:
     void init();
     void onMessageChoose(adb::types::SFID channelId);
-    void onMessageConnect(adb::types::SFID channelId);
+    std::future<bool> onMessageConnect(adb::types::SFID channelId);
     void onDisconnect();
 private:
     adb::api::DiscordApi &api_;

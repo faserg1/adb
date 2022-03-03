@@ -18,7 +18,7 @@ namespace adb::api
     class DiscordApi final
     {
     public:
-        DiscordApi();
+        DiscordApi(uint8_t version = 9);
 
         std::unique_ptr<Auth> CreateAuth();
         std::shared_ptr<Gateway> GetGateway();

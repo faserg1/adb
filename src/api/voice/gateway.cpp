@@ -8,11 +8,18 @@
 #include <api/voice/data/voice-identity.hpp>
 #include <api/voice/data/hello-event.hpp>
 #include <api/voice/data/ready-event.hpp>
+#include <api/voice/data/ip-discovery.hpp>
+#include <api/voice/data/speaking.hpp>
+#include <api/voice/data/select-protocol.hpp>
+#include <api/voice/data/session-description.hpp>
 #include <api/user/user-api.hpp>
 #include <nlohmann/json.hpp>
 #include <fmt/core.h>
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
+#include <boost/asio.hpp>
+#include <boost/array.hpp>
+#include <boost/bind.hpp>
 #include <stdexcept>
 #include <atomic>
 #include <mutex>
@@ -45,12 +52,30 @@ struct VoiceGateway::ConnectionData
     WebSocketClient client;
     WebSocketConnectionPtr connection;
 
+    boost::asio::io_service ioService;
+    std::unique_ptr<boost::asio::ip::udp::socket> socket;
+    boost::asio::ip::udp::endpoint endpoint;
+
+    VoiceReadyEvent readyData;
+    std::string myIp;
+    uint16_t myPort;
+    std::string mode;
+    std::vector<std::byte> secretKey;
+
+    struct {
+        std::function<std::string(const std::vector<std::string> &)> modeSelector;
+        std::function<void(adb::types::SFID userId, bool)> userSpeaking;
+    } callbacks;
+    
+
     struct EventAwaits {
         std::atomic_bool voiceState = true;
         std::atomic_bool voiceServerUpdate = true;
 
         std::mutex mutex;
         std::condition_variable cv;
+
+        std::promise<bool> totalConnection;
     } eventAwaits;
 };
 
@@ -132,9 +157,57 @@ std::future<void> VoiceGateway::disconnect()
     return stopWebSocket();
 }
 
+void VoiceGateway::setModeSelectorCallback(std::function<std::string(const std::vector<std::string> &)> modeSelector)
+{
+    connectionData_->callbacks.modeSelector = modeSelector;
+}
+
+void VoiceGateway::setUserSpeakingCallback(std::function<void(adb::types::SFID userId, bool)> userSpeaking)
+{
+    connectionData_->callbacks.userSpeaking = userSpeaking;
+}
+
 bool VoiceGateway::send(const VoicePayload &msg)
 {
     return sendInternal(msg);
+}
+
+std::future<bool> VoiceGateway::sendData(const std::byte *ptr, size_t size)
+{
+    using namespace boost::asio::ip;
+    auto promise = std::make_shared<std::promise<bool>>();
+    connectionData_->socket->async_send_to(boost::asio::buffer(ptr, size), connectionData_->endpoint,
+        [promise, size](auto error, auto writedBytes)
+        {
+            promise->set_value(!error && writedBytes == size);
+        });
+    return promise->get_future();
+}
+
+std::future<size_t> VoiceGateway::receiveData(std::byte *ptr, size_t bufferSize)
+{
+    using namespace boost::asio::ip;
+    auto promise = std::make_shared<std::promise<size_t>>();
+    connectionData_->socket->async_receive_from(boost::asio::buffer(ptr, bufferSize), connectionData_->endpoint,
+        [promise](auto error, auto readedBytes)
+        {
+            if (error)
+                promise->set_value(0);
+            else
+                promise->set_value((size_t) readedBytes);
+        });
+    return promise->get_future();
+}
+
+std::future<std::vector<std::byte>> VoiceGateway::receiveData()
+{
+    return std::async(std::launch::async, [this]() -> std::vector<std::byte>
+    {
+        std::vector<std::byte> buffer(4096);
+        auto receivedSize = receiveData(buffer.data(), buffer.size()).get();
+        buffer.resize(receivedSize);
+        return buffer;
+    });
 }
 
 void VoiceGateway::onPreConnect()
@@ -205,6 +278,26 @@ void VoiceGateway::onMessage(const VoicePayload &payload)
         {
             startHeartbeating(connectionData_->heartbeatIntervalms);
             auto ready = payload.data.get<VoiceReadyEvent>();
+            if (!startDataFlow(ready).get())
+                connectionData_->eventAwaits.totalConnection.set_value(false);
+            break;
+        }
+        case VoiceOpCode::SessionDescription:
+        {
+            auto desc = payload.data.get<SessionDescription>();
+            connectionData_->secretKey = desc.secretKey;
+            connectionData_->eventAwaits.totalConnection.set_value(true);
+            break;
+        }
+        case VoiceOpCode::Speaking:
+        {
+            auto speaking = payload.data.get<SpeakingReceivePayload>();
+            if (connectionData_->callbacks.userSpeaking)
+                connectionData_->callbacks.userSpeaking(speaking.userId, speaking.speaking);
+            break;
+        }
+        default:
+        {
             break;
         }
     }
@@ -268,6 +361,14 @@ void VoiceGateway::connectInternal(std::stop_token stop)
     }
     if (stop.stop_requested())
         return;
+    if (connectionData_->eventAwaits.totalConnection.get_future().get())
+    {
+        state_ = ConnectionState::Connected;
+    }
+    else
+    {
+        disconnect().wait();
+    }
 }
 
 void VoiceGateway::identity()
@@ -282,6 +383,52 @@ void VoiceGateway::identity()
         .opCode = VoiceOpCode::Identify,
         .data = identity
     });
+}
+
+std::future<bool> VoiceGateway::ipDiscovery()
+{
+    return std::async(std::launch::async, [this]() -> bool
+    {
+        IPDiscovery discovery = {};
+        discovery.type = IPDiscoveryType::Request;
+        discovery.ssrc = connectionData_->readyData.ssrc;
+
+        auto ipDiscoveryFutureSend = sendData(toBytes(discovery));
+        if (!ipDiscoveryFutureSend.get())
+            return false;
+
+        std::vector<std::byte> discoveryData = receiveData().get();
+        if (discoveryData.empty())
+            return false;
+        discovery = fromBytes(discoveryData);
+
+        connectionData_->myIp = std::string(discovery.address);
+        connectionData_->myPort = discovery.port;
+
+        return true;
+    });
+}
+
+void VoiceGateway::selectProtocol()
+{
+    if (connectionData_->callbacks.modeSelector)
+        connectionData_->mode = connectionData_->callbacks.modeSelector(connectionData_->readyData.modes);
+    else
+        connectionData_->mode = "xsalsa20_poly1305_lite";
+    SelectProtocol::SelectProtocolData protocolData = {
+        .address = connectionData_->myIp,
+        .port = connectionData_->myPort,
+        .mode = connectionData_->mode,
+    };
+    nlohmann::json data = SelectProtocol {
+        .protocol = "udp",
+        .data = protocolData
+    };
+    auto payload = VoicePayload {
+        .opCode = VoiceOpCode::SelectProtocol,
+        .data = data
+    };
+    send(payload);
 }
 
 std::future<bool> VoiceGateway::startWebSocket()
@@ -370,11 +517,34 @@ std::future<void> VoiceGateway::stopHeartbeating()
     });
 }
 
-std::future<bool> VoiceGateway::startDataFlow()
+std::future<bool> VoiceGateway::startDataFlow(const VoiceReadyEvent &voiceReady)
 {
-    return std::async(std::launch::async, [this]() -> bool
+    connectionData_->readyData = voiceReady;
+    return std::async(std::launch::async, [this, &voiceReady]() -> bool
     {
-        return false;
+        using namespace boost::asio::ip;
+        connectionData_->endpoint = udp::endpoint(address::from_string(voiceReady.ip), voiceReady.port);
+        connectionData_->socket = std::make_unique<udp::socket>(connectionData_->ioService);
+        connectionData_->socket->open(udp::v4());
+        connectionData_->socket->bind(udp::endpoint(address{}, 0));
+
+        connectionData_->voiceThread = std::jthread([this](std::stop_token stop)
+        {
+            while (!stop.stop_requested())
+            {
+                connectionData_->ioService.run();
+            }
+            int i = 0;
+        });
+
+        auto result = ipDiscovery().get();
+
+        if (!result)
+            return false;
+
+        selectProtocol();
+
+        return true;
     });
 }
 
@@ -404,6 +574,11 @@ std::optional<adb::types::SFID> VoiceGateway::getChannelId() const
 const VoiceState &VoiceGateway::getCurrentState() const
 {
     return connectionData_->currentState;
+}
+
+const std::string &VoiceGateway::getMode()
+{
+    return connectionData_->mode;
 }
 
 void VoiceGateway::subscribe()

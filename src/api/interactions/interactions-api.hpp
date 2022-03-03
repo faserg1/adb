@@ -3,6 +3,7 @@
 #include <types/snowflake.hpp>
 #include <string>
 #include <api/message/data/send-message.hpp>
+#include <api/message/data/message.hpp>
 
 namespace adb::api
 {
@@ -41,9 +42,18 @@ namespace adb::api
          * @return Was an interaction response successefully promised
          */
         bool messageLater(const adb::types::SFID &id, const std::string &token);
+
+        /**
+         * @brief Edit replayed message
+         * @details https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response
+         * @param token Interaction token, received via Gateway or webhook
+         * @return std::optional<Message> 
+         */
+        std::optional<Message> editReply(const adb::types::SFID &appId, const std::string &token, const SendMessageParams &params);
     private:
         InteractionsApi(const std::string &baseUrl);
     private:
-        std::string baseUrl_;
+        const std::string baseUrl_;
+        const std::string webhooksUrl_;
     };
 }

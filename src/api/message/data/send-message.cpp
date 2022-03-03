@@ -1,6 +1,7 @@
 #include "send-message.hpp"
 #include <nlohmann/json.hpp>
 #include <types/helpers/json-optional.hpp>
+#include <types/helpers/json-enum.hpp>
 using namespace adb::api;
 using namespace adb::types;
 
@@ -34,7 +35,7 @@ void adb::api::to_json(nlohmann::json& j, const SendMessageParams& params)
     map_to_json(j, "attachments", params.attachments);
     // files[n] do not serialized to json
     // payload_json do not serialized to json
-    //map_to_json(j, "attachments", params.);
+    j["flags"] = params.flags;
 }
 
 void adb::api::from_json(const nlohmann::json& j, SendMessageParams& params)

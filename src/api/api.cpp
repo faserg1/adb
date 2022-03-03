@@ -10,10 +10,18 @@
 #include <api/interactions/interactions-api.hpp>
 #include <api/user/user-api.hpp>
 
+#include <fmt/core.h>
+
 using namespace adb::api;
 
-DiscordApi::DiscordApi() :
-    baseUrl_("https://discord.com/api") // https://discord.com/developers/docs/reference#api-reference-base-url
+namespace
+{
+    /// @details https://discord.com/developers/docs/reference#api-reference-base-url
+    const std::string discordApiBaseUrl = "https://discord.com/api";
+}
+
+DiscordApi::DiscordApi(uint8_t version) :
+    baseUrl_(fmt::format("{}/v{}", discordApiBaseUrl, version)) 
 {
 
 }

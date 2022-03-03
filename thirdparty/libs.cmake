@@ -13,3 +13,6 @@ find_path(USOCKETS_INCLUDE_DIRS "libusockets.h")
 find_path(UWEBSOCKETS_INCLUDE_DIRS "uwebsockets/App.h")
 
 find_library(USOCKETS_LIBRARY NAMES uSockets REQUIRED)
+
+find_package(unofficial-sodium CONFIG REQUIRED)
+find_package(Opus CONFIG REQUIRED)

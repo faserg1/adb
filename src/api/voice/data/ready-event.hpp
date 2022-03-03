@@ -6,9 +6,13 @@
 
 namespace adb::api
 {
+    /**
+     * @brief Voice Ready Event
+     * @details https://discord.com/developers/docs/topics/voice-connections#establishing-a-voice-websocket-connection-example-voice-ready-payload
+     */
     struct VoiceReadyEvent
     {
-        uint64_t ssrc;
+        uint32_t ssrc;
         std::string ip;
         uint32_t port;
         std::vector<std::string> modes;
