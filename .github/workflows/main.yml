@@ -15,8 +15,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Install vcpkg
+        uses: actions/checkout@v2
         with:
-          submodules: 'recursive'
+          repository: microsoft/vcpkg
+          path: thirdparty/vcpkg
 
       - name: Cache VCPKG
         id: vcpkg-cache
@@ -30,7 +34,7 @@ jobs:
             /home/runner/.cache/vcpkg/archives
 
       - name: Configure CMake
-        run: cmake . -DVCPKG_TARGET_TRIPLET=x64-linux
+        run: cmake . -DCMAKE_TOOLCHAIN_FILE:STRING=$GITHUB_WORKSPACE/thirdparty/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-linux
         env:
           ADB_APP_ID: ${{ secrets.ADB_APP_ID }}
           ADB_BOT_TOKEN: ${{ secrets.ADB_BOT_TOKEN }}
