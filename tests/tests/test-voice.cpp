@@ -39,19 +39,17 @@ void TestVoice::init()
         if (msg.content == "!ts-bridge stop")
             onDisconnect();
     }));
-    subs_.emplace_back(gateway_->events()->subscribe(adb::api::Event::INTERACTION_CREATE, [this](auto ev, auto &msg)
+    subs_.emplace_back(gateway_->events()->subscribe<adb::api::Interaction>(adb::api::Event::INTERACTION_CREATE, [this](auto ev, auto &msg)
 	{
         auto act = api_.CreateInteractionsApi();
 
-        auto interaction = msg.get<Interaction>();
-
-        std::string token = interaction.token;
-        adb::types::SFID id = interaction.id;
-        adb::types::SFID appId = interaction.applicationId;
+        std::string token = msg.token;
+        adb::types::SFID id = msg.id;
+        adb::types::SFID appId = msg.applicationId;
         std::vector<std::string> values;
-        if (interaction.data.has_value())
+        if (msg.data.has_value())
         {
-            auto data = std::static_pointer_cast<InteractionDataComponent>(interaction.data.value());
+            auto data = std::static_pointer_cast<InteractionDataComponent>(msg.data.value());
             if (data->values.has_value())
                 values = data->values.value();
         }
