@@ -20,7 +20,7 @@ namespace adb::api
         Ready = 2,
         /// Keep the websocket connection alive.
         /// Send
-        Heartbeat = 3,
+        Heartbeat = 3, 
         /// Describe the session.
         /// Receive
         SessionDescription = 4,

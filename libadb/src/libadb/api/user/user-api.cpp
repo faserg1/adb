@@ -18,11 +18,6 @@ User UserApi::getCurrentUser()
     auto session = cpr::Session();
     session.SetUrl(cpr::Url{requestUrl});
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
-    session.SetVerbose({true});
-    session.SetDebugCallback(cpr::DebugCallback{[](cpr::DebugCallback::InfoType type, std::string data, auto userdata)
-    {
-        std::cout << data << std::endl;
-    }});
     auto response = session.Get();
     User user;
     if (response.status_code >= 200 && response.status_code < 300)

@@ -45,6 +45,7 @@ struct VoiceGateway::ConnectionData
     std::jthread heartbeatThread;
     uint64_t heartbeatIntervalms = 0;
     uint64_t heartbeatNonce = 0;
+    std::atomic<uint64_t> missedHeartBeats = 0;
     std::thread websocketThread;
     std::jthread voiceThread;
     std::unique_ptr<adb::types::Subscription> voiceStateSubscription;
@@ -277,7 +278,7 @@ void VoiceGateway::onServerUpdated(const VoiceServerUpdateEvent &voiceServerUpda
         return;
     token_ = voiceServerUpdate.token;
     if (voiceServerUpdate.endpoint)
-        gatewayUrl_ = fmt::format("{}{}?v={}", "wss://", *voiceServerUpdate.endpoint, 4);
+        gatewayUrl_ = fmt::format("{}{}/?v={}", "wss://", *voiceServerUpdate.endpoint, gatewayWebsocketVersion);
 
     if (connectionData_->eventAwaits.voiceServerUpdate.load())
     {
@@ -288,21 +289,23 @@ void VoiceGateway::onServerUpdated(const VoiceServerUpdateEvent &voiceServerUpda
 
 void VoiceGateway::onMessage(const VoicePayload &payload)
 {
-    std::cout << fmt::format("Received OpCode: {}", (uint64_t) payload.opCode) << std::endl;
-
     switch (payload.opCode)
     {
         case VoiceOpCode::Hello:
         {
             auto hello = payload.data.get<VoiceHelloEvent>();
             connectionData_->heartbeatIntervalms = hello.heartbeatInterval;
+            if (hello.version.has_value() && hello.version.value() != gatewayWebsocketVersion)
+            {
+                // Disconnect and assert?
+            }
             identity();
             break;
         }
         case VoiceOpCode::Ready:
         {
-            startHeartbeating(connectionData_->heartbeatIntervalms);
             auto ready = payload.data.get<VoiceReadyEvent>();
+            startHeartbeating(connectionData_->heartbeatIntervalms);
             if (!startDataFlow(ready).get())
                 connectionData_->eventAwaits.totalConnection.set_value(false);
             break;
@@ -321,6 +324,11 @@ void VoiceGateway::onMessage(const VoicePayload &payload)
                 connectionData_->callbacks.userSpeaking(speaking.userId, speaking.speaking);
             break;
         }
+        case VoiceOpCode::HeartbeatACK:
+        {
+            connectionData_->missedHeartBeats.store(0);
+            break;
+        }
         default:
         {
             break;
@@ -332,7 +340,8 @@ bool VoiceGateway::sendInternal(const VoicePayload &msg)
 {
     nlohmann::json jsObj = msg;
     WebSocketError ec;
-    connectionData_->client.send(connectionData_->connection, jsObj.dump(), WebSocketOpcode::text, ec);
+    const auto data = jsObj.dump();
+    connectionData_->client.send(connectionData_->connection, data, WebSocketOpcode::text, ec);
     if (ec)
     {
         auto msg = ec.message();
@@ -358,7 +367,10 @@ void VoiceGateway::configureMessageHandler()
 {
     connectionData_->client.set_message_handler([this](auto conHandle, auto msg)
     {
-        nlohmann::json obj = nlohmann::json::parse(msg->get_payload());
+        auto data = msg->get_payload();
+        // Research for not documented fields
+        // std::cout << "Received data: <<" << data << ">>" << std::endl;
+        nlohmann::json obj = nlohmann::json::parse(data);
         auto payload = obj.get<adb::api::VoicePayload>();
         onMessage(payload);
     });
@@ -524,13 +536,22 @@ std::future<bool> VoiceGateway::startHeartbeating(uint64_t intervalms)
         {
             while (!stop.stop_requested())
             {
-                auto data = nlohmann::json {connectionData_->heartbeatNonce};
+                std::this_thread::sleep_for(std::chrono::milliseconds(intervalms));
+                if (connectionData_->missedHeartBeats.load() > 3)
+                {
+                    int i = 0;
+                    // Reconnect
+                }
+
+                auto currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+                auto duration = currentTime.time_since_epoch();
+                connectionData_->heartbeatNonce = duration.count();
+                nlohmann::json data = connectionData_->heartbeatNonce;
                 sendInternal({
                     .opCode = VoiceOpCode::Heartbeat,
                     .data = data
                 });
-                std::this_thread::sleep_for(std::chrono::milliseconds(intervalms));
-                connectionData_->heartbeatNonce += intervalms;
+                connectionData_->missedHeartBeats++;
             }
         });
         return true;

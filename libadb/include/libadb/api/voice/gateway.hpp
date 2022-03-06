@@ -118,5 +118,6 @@ namespace adb::api
         std::optional<adb::types::SFID> channelId_;
 
         size_t bufferSize_ = 4096;
+        uint16_t gatewayWebsocketVersion = 6;
     };
 }
