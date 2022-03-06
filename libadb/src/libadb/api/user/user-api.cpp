@@ -3,6 +3,7 @@
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <fmt/core.h>
+#include <iostream>
 using namespace adb::api;
 
 UserApi::UserApi(const std::string &baseUrl) :
@@ -14,9 +15,20 @@ UserApi::UserApi(const std::string &baseUrl) :
 User UserApi::getCurrentUser()
 {
     auto requestUrl = fmt::format("{}/@me", baseUrl_);
-    auto response = cpr::Get(cpr::Url{requestUrl}, cpr::Header{TokenBot::getBotAuthTokenHeader()});
-    auto json = nlohmann::json::parse(response.text);
+    auto session = cpr::Session();
+    session.SetUrl(cpr::Url{requestUrl});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    session.SetVerbose({true});
+    session.SetDebugCallback(cpr::DebugCallback{[](cpr::DebugCallback::InfoType type, std::string data, auto userdata)
+    {
+        std::cout << data << std::endl;
+    }});
+    auto response = session.Get();
     User user;
-    json.get_to(user);
+    if (response.status_code >= 200 && response.status_code < 300)
+    {
+        auto json = nlohmann::json::parse(response.text);
+        json.get_to(user);
+    }
     return user;
 }

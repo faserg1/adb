@@ -7,6 +7,7 @@
 #include <libadb/types/color.hpp>
 #include <libadb/types/time.hpp>
 #include <nlohmann/json_fwd.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -149,27 +150,27 @@ namespace adb::api
         std::optional<std::vector<EmbedField>> fields;
     };
 
-    void to_json(nlohmann::json& j, const EmbedFooter& footer);
-    void from_json(const nlohmann::json& j, EmbedFooter& footer);
+    LIBADB_API void to_json(nlohmann::json& j, const EmbedFooter& footer);
+    LIBADB_API void from_json(const nlohmann::json& j, EmbedFooter& footer);
 
-    void to_json(nlohmann::json& j, const EmbedImage& image);
-    void from_json(const nlohmann::json& j, EmbedImage& image);
+    LIBADB_API void to_json(nlohmann::json& j, const EmbedImage& image);
+    LIBADB_API void from_json(const nlohmann::json& j, EmbedImage& image);
 
-    void to_json(nlohmann::json& j, const EmbedThumbnail& thumbnail);
-    void from_json(const nlohmann::json& j, EmbedThumbnail& thumbnail);
+    LIBADB_API void to_json(nlohmann::json& j, const EmbedThumbnail& thumbnail);
+    LIBADB_API void from_json(const nlohmann::json& j, EmbedThumbnail& thumbnail);
 
-    void to_json(nlohmann::json& j, const EmbedVideo& video);
-    void from_json(const nlohmann::json& j, EmbedVideo& video);
+    LIBADB_API void to_json(nlohmann::json& j, const EmbedVideo& video);
+    LIBADB_API void from_json(const nlohmann::json& j, EmbedVideo& video);
 
-    void to_json(nlohmann::json& j, const EmbedProvider& provider);
-    void from_json(const nlohmann::json& j, EmbedProvider& provider);
+    LIBADB_API void to_json(nlohmann::json& j, const EmbedProvider& provider);
+    LIBADB_API void from_json(const nlohmann::json& j, EmbedProvider& provider);
 
-    void to_json(nlohmann::json& j, const EmbedAuthor& author);
-    void from_json(const nlohmann::json& j, EmbedAuthor& author);
+    LIBADB_API void to_json(nlohmann::json& j, const EmbedAuthor& author);
+    LIBADB_API void from_json(const nlohmann::json& j, EmbedAuthor& author);
 
-    void to_json(nlohmann::json& j, const EmbedField& field);
-    void from_json(const nlohmann::json& j, EmbedField& field);
+    LIBADB_API void to_json(nlohmann::json& j, const EmbedField& field);
+    LIBADB_API void from_json(const nlohmann::json& j, EmbedField& field);
 
-    void to_json(nlohmann::json& j, const Embed& embed);
-    void from_json(const nlohmann::json& j, Embed& embed);
+    LIBADB_API void to_json(nlohmann::json& j, const Embed& embed);
+    LIBADB_API void from_json(const nlohmann::json& j, Embed& embed);
 }

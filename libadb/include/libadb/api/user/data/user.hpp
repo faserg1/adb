@@ -7,6 +7,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/api/user/data/user-flags.hpp>
 #include <libadb/api/user/data/user-premium-flag.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -48,6 +49,6 @@ namespace adb::api
         std::optional<UserFlags> publicFlags;
     };
 
-    void to_json(nlohmann::json& j, const User& user);
-    void from_json(const nlohmann::json& j, User& user);
+    LIBADB_API void to_json(nlohmann::json& j, const User& user);
+    LIBADB_API void from_json(const nlohmann::json& j, User& user);
 }

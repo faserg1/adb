@@ -3,6 +3,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/types/snowflake.hpp>
 #include <libadb/api/permissions/permissions.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -30,6 +31,6 @@ namespace adb::api
         Permissions deny;
     };
 
-    void to_json(nlohmann::json& j, const Overwrite& ow);
-    void from_json(const nlohmann::json& j, Overwrite& ow);
+    LIBADB_API void to_json(nlohmann::json& j, const Overwrite& ow);
+    LIBADB_API void from_json(const nlohmann::json& j, Overwrite& ow);
 }

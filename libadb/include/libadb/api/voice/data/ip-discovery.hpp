@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <vector>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -30,6 +31,6 @@ namespace adb::api
         uint16_t port = 0;
     };
 
-    std::vector<std::byte> toBytes(const IPDiscovery &ipDiscovery);
-    void fromBytes(const std::vector<std::byte> &bytes, IPDiscovery &ipDiscovery);
+    LIBADB_API std::vector<std::byte> toBytes(const IPDiscovery &ipDiscovery);
+    LIBADB_API void fromBytes(const std::vector<std::byte> &bytes, IPDiscovery &ipDiscovery);
 }

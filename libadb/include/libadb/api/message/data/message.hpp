@@ -9,6 +9,7 @@
 #include <libadb/api/guild/data/guild-member.hpp>
 #include <libadb/api/channel/data/channel-mention.hpp>
 #include <libadb/api/message/data/attachment.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -34,6 +35,6 @@ namespace adb::api
         std::vector<Attachment> attachments;
     };
 
-    void to_json(nlohmann::json& j, const Message& msg);
-    void from_json(const nlohmann::json& j, Message& msg);
+    LIBADB_API void to_json(nlohmann::json& j, const Message& msg);
+    LIBADB_API void from_json(const nlohmann::json& j, Message& msg);
 }

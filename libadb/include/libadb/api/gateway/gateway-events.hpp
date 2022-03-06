@@ -3,6 +3,7 @@
 #include <memory>
 #include <functional>
 #include <nlohmann/json.hpp>
+#include <libadb/libadb.hpp>
 #include <libadb/types/subscription.hpp>
 #include <libadb/api/gateway/data/event.hpp>
 
@@ -21,7 +22,7 @@ namespace adb::api
         template <class Type>
         using TypedSubscriber = std::function<void(Event, const Type&)>;
 
-        [[nodiscard]] std::unique_ptr<adb::types::Subscription> subscribe(Event ev, Subscriber sub);
+        LIBADB_API [[nodiscard]] std::unique_ptr<adb::types::Subscription> subscribe(Event ev, Subscriber sub);
         template <class Type>
         [[nodiscard]] std::unique_ptr<adb::types::Subscription> subscribe(Event ev, TypedSubscriber<Type> sub)
         {

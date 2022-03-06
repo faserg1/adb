@@ -4,6 +4,7 @@
 #include <libadb/types/nullable.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -21,6 +22,6 @@ namespace adb::api
         adb::types::Nullable<std::string> endpoint;
     };
 
-    void to_json(nlohmann::json& j, const VoiceServerUpdateEvent& serverUpdateEvent);
-    void from_json(const nlohmann::json& j, VoiceServerUpdateEvent& serverUpdateEvent);
+    LIBADB_API void to_json(nlohmann::json& j, const VoiceServerUpdateEvent& serverUpdateEvent);
+    LIBADB_API void from_json(const nlohmann::json& j, VoiceServerUpdateEvent& serverUpdateEvent);
 }

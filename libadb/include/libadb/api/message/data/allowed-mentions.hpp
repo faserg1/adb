@@ -5,6 +5,7 @@
 #include <optional>
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/types/helpers/enums.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -39,6 +40,6 @@ namespace adb::api
         std::optional<bool> repliedUser;
     };
 
-    void to_json(nlohmann::json& j, const AllowedMentions& allowedMention);
-    void from_json(const nlohmann::json& j, AllowedMentions& allowedMention);
+    LIBADB_API void to_json(nlohmann::json& j, const AllowedMentions& allowedMention);
+    LIBADB_API void from_json(const nlohmann::json& j, AllowedMentions& allowedMention);
 }

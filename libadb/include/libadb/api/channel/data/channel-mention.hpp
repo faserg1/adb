@@ -5,6 +5,7 @@
 #include <libadb/types/snowflake.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/api/channel/data/channel-type.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -24,6 +25,6 @@ namespace adb::api
         std::string name;
     };
 
-    void to_json(nlohmann::json& j, const ChannelMention& mention);
-    void from_json(const nlohmann::json& j, ChannelMention& mention);
+    LIBADB_API void to_json(nlohmann::json& j, const ChannelMention& mention);
+    LIBADB_API void from_json(const nlohmann::json& j, ChannelMention& mention);
 }

@@ -3,8 +3,8 @@
 #include <string>
 #include <optional>
 #include <nlohmann/json_fwd.hpp>
-
-#include "intents.hpp"
+#include <libadb/libadb.hpp>
+#include <libadb/api/gateway/data/intents.hpp>
 
 namespace adb::api
 {
@@ -36,9 +36,9 @@ namespace adb::api
         Intents intents;
     };
 
-    void to_json(nlohmann::json& j, const IdentityConnectionProperties& identity);
-    void from_json(const nlohmann::json& j, IdentityConnectionProperties& identity);
+    LIBADB_API void to_json(nlohmann::json& j, const IdentityConnectionProperties& identity);
+    LIBADB_API void from_json(const nlohmann::json& j, IdentityConnectionProperties& identity);
 
-    void to_json(nlohmann::json& j, const Identity& identity);
-    void from_json(const nlohmann::json& j, Identity& identity);
+    LIBADB_API void to_json(nlohmann::json& j, const Identity& identity);
+    LIBADB_API void from_json(const nlohmann::json& j, Identity& identity);
 }

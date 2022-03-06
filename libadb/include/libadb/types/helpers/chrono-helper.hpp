@@ -5,6 +5,8 @@
 #include <optional>
 #include <date/date.h>
 
+#include <libadb/libadb.hpp>
+
 namespace adb::types
 {
     struct ISO8601Time
@@ -28,5 +30,5 @@ namespace adb::types
         std::optional<LocalZone> localZone;
     };
 
-    std::optional<ISO8601Time> parseTime(std::string time);
+    LIBADB_API std::optional<ISO8601Time> parseTime(std::string time);
 }

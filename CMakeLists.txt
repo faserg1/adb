@@ -19,5 +19,8 @@ set(CMAKE_CXX_STANDARD 20)
 # Thirdparty librariies
 include(${ADB_THIRDPARTY_DIR}/libs.cmake)
 
+#add_compile_options(-fsanitize=address)
+#add_link_options(-fsanitize=address)
+
 add_subdirectory(libadb)
 add_subdirectory(tests)

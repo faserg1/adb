@@ -11,6 +11,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/api/voice/data/voice-state-update.hpp>
 #include <libadb/api/voice/data/voice-packet.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -35,25 +36,25 @@ namespace adb::api
             Connected
         };
     public:
-        ~VoiceGateway();
+        LIBADB_API ~VoiceGateway();
         
-        [[nodiscard]] std::future<bool> connect(adb::types::SFID channelId, bool mute, bool deaf, bool force = false);
-        [[nodiscard]] std::future<void> disconnect();
+        LIBADB_API [[nodiscard]] std::future<bool> connect(adb::types::SFID channelId, bool mute, bool deaf, bool force = false);
+        LIBADB_API [[nodiscard]] std::future<void> disconnect();
 
-        void setModeSelectorCallback(std::function<std::string(const std::vector<std::string> &)> modeSelector);
-        void setUserSpeakingCallback(std::function<void(adb::types::SFID userId, bool)> userSpeaking);
+        LIBADB_API void setModeSelectorCallback(std::function<std::string(const std::vector<std::string> &)> modeSelector);
+        LIBADB_API void setUserSpeakingCallback(std::function<void(adb::types::SFID userId, bool)> userSpeaking);
 
-        bool send(const VoicePayload &msg);
+        LIBADB_API bool send(const VoicePayload &msg);
         
-        ConnectionState getState();
-        adb::types::SFID getGuildId() const;
-        std::optional<adb::types::SFID> getChannelId() const;
-        const VoiceState &getCurrentState() const;
-        const std::string &getMode();
+        LIBADB_API ConnectionState getState();
+        LIBADB_API adb::types::SFID getGuildId() const;
+        LIBADB_API std::optional<adb::types::SFID> getChannelId() const;
+        LIBADB_API const VoiceState &getCurrentState() const;
+        LIBADB_API const std::string &getMode();
 
-        std::future<bool> sendData(const std::byte *ptr, size_t size);
-        std::future<size_t> receiveData(std::byte *ptr, size_t bufferSize);
-        void setBufferSize(size_t bufferSize);
+        LIBADB_API std::future<bool> sendData(const std::byte *ptr, size_t size);
+        LIBADB_API std::future<size_t> receiveData(std::byte *ptr, size_t bufferSize);
+        LIBADB_API void setBufferSize(size_t bufferSize);
 
         std::future<bool> sendData(const std::vector<std::byte> &data)
         {
@@ -66,10 +67,10 @@ namespace adb::api
             return sendData(data.data(), Size);
         }
 
-        std::future<std::vector<std::byte>> receiveData();
+        LIBADB_API std::future<std::vector<std::byte>> receiveData();
 
-        std::future<bool> sendPacket(const VoicePacket &packet);
-        std::future<VoicePacket> receivePacket();
+        LIBADB_API std::future<bool> sendPacket(const VoicePacket &packet);
+        LIBADB_API std::future<VoicePacket> receivePacket();
     protected:
         VoiceGateway(std::unique_ptr<UserApi> userApi, std::shared_ptr<Gateway> gateway, adb::types::SFID guildId);
 

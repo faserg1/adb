@@ -5,6 +5,7 @@
 #include <functional>
 #include <libadb/api/gateway/data/intents.hpp>
 #include <nlohmann/json_fwd.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -23,15 +24,15 @@ namespace adb::api
         friend DiscordApi;
         struct GatewayData;
     public:
-        ~Gateway();
+        LIBADB_API ~Gateway();
 
-        bool connect();
-        void run();
-        bool send(const Payload &msg);
+        LIBADB_API bool connect();
+        LIBADB_API void run();
+        LIBADB_API bool send(const Payload &msg);
 
         Intents getIntents() { return requiredIntents_; }
 
-        std::shared_ptr<GatewayEvents> events() const;
+        LIBADB_API std::shared_ptr<GatewayEvents> events() const;
     protected:
         virtual void onMessage(const Payload &msg);
         virtual void onDispatch(const Dispatch &dispatch);

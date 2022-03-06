@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <vector>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -39,6 +40,6 @@ namespace adb::api
         std::vector<std::byte> data;
     };
 
-    std::vector<std::byte> toBytes(const VoicePacket &packet);
-    void fromBytes(const std::vector<std::byte> &bytes, VoicePacket &packet);
+    LIBADB_API std::vector<std::byte> toBytes(const VoicePacket &packet);
+    LIBADB_API void fromBytes(const std::vector<std::byte> &bytes, VoicePacket &packet);
 }

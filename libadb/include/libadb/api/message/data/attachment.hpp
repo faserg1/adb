@@ -5,6 +5,7 @@
 #include <vector>
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/types/snowflake.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -66,9 +67,9 @@ namespace adb::api
         std::optional<bool> ephemeral;
     };
 
-    void to_json(nlohmann::json& j, const SendAttachment& attachment);
-    void from_json(const nlohmann::json& j, SendAttachment& attachment);
+    LIBADB_API void to_json(nlohmann::json& j, const SendAttachment& attachment);
+    LIBADB_API void from_json(const nlohmann::json& j, SendAttachment& attachment);
 
-    void to_json(nlohmann::json& j, const Attachment& attachment);
-    void from_json(const nlohmann::json& j, Attachment& attachment);
+    LIBADB_API void to_json(nlohmann::json& j, const Attachment& attachment);
+    LIBADB_API void from_json(const nlohmann::json& j, Attachment& attachment);
 }

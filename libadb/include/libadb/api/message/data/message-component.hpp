@@ -7,6 +7,7 @@
 #include <libadb/api/message/data/select-option.hpp>
 #include <libadb/api/message/data/message-component-type.hpp>
 #include <libadb/api/message/data/button-style.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -30,6 +31,6 @@ namespace adb::api
         std::optional<std::vector<MessageComponent>> components;
     };
 
-    void to_json(nlohmann::json& j, const MessageComponent& mc);
-    void from_json(const nlohmann::json& j, MessageComponent& mc);
+    LIBADB_API void to_json(nlohmann::json& j, const MessageComponent& mc);
+    LIBADB_API void from_json(const nlohmann::json& j, MessageComponent& mc);
 }

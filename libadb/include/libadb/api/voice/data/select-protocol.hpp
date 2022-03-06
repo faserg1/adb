@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdint>
 #include <nlohmann/json_fwd.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -21,6 +22,6 @@ namespace adb::api
         } data;
     };
 
-    void to_json(nlohmann::json& j, const SelectProtocol& selectProtocol);
-    void from_json(const nlohmann::json& j, SelectProtocol& selectProtocol);
+    LIBADB_API void to_json(nlohmann::json& j, const SelectProtocol& selectProtocol);
+    LIBADB_API void from_json(const nlohmann::json& j, SelectProtocol& selectProtocol);
 }

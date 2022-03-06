@@ -3,8 +3,10 @@ set(ROOT_SRC_DIR ${ROOT_LIB_DIR}/src)
 set(ROOT_INCLUDE_DIR ${ROOT_LIB_DIR}/include)
 file(GLOB_RECURSE LIBADB_SOURCES *.cpp *.hpp *.h)
 
-add_library(libadb ${LIBADB_SOURCES})
+add_library(libadb SHARED ${LIBADB_SOURCES})
 set_property(TARGET libadb PROPERTY CXX_STANDARD_REQUIRED 20)
+
+target_compile_definitions(libadb PRIVATE LIBADB_EXPORTS)
 
 target_include_directories(libadb PRIVATE
     ${USOCKETS_INCLUDE_DIRS}
@@ -25,6 +27,7 @@ target_link_libraries(libadb PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 target_link_libraries(libadb PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 target_link_libraries(libadb PRIVATE fmt::fmt)
 target_link_libraries(libadb PRIVATE cpr::cpr)
+
 target_link_libraries(libadb PRIVATE toml11::toml11)
 target_link_libraries(libadb PRIVATE websocketpp::websocketpp)
 

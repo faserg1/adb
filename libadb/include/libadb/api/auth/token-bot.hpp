@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <string>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -9,7 +10,7 @@ namespace adb::api
     {
     public:
         using HeaderRow = std::pair<std::string, std::string>;
-        static HeaderRow getBotAuthTokenHeader();
+        LIBADB_API static HeaderRow getBotAuthTokenHeader();
     };
     
 }

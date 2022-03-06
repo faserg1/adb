@@ -3,6 +3,7 @@
 #include <libadb/types/snowflake.hpp>
 #include <libadb/types/nullable.hpp>
 #include <nlohmann/json_fwd.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -22,6 +23,6 @@ namespace adb::api
         bool selfDeaf;
     };
 
-    void to_json(nlohmann::json& j, const VoiceStateUpdate& stateUpdate);
-    void from_json(const nlohmann::json& j, VoiceStateUpdate& stateUpdate);
+    LIBADB_API void to_json(nlohmann::json& j, const VoiceStateUpdate& stateUpdate);
+    LIBADB_API void from_json(const nlohmann::json& j, VoiceStateUpdate& stateUpdate);
 }

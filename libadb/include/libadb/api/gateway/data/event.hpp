@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -128,6 +129,6 @@ namespace adb::api
         WEBHOOKS_UPDATE,
     };
 
-    std::string to_string(Event e);
-    Event from_string(std::string_view str);
+    LIBADB_API std::string to_string(Event e);
+    LIBADB_API Event from_string(std::string_view str);
 }

@@ -5,6 +5,7 @@
 #include <libadb/api/user/data/user.hpp>
 #include <libadb/types/snowflake.hpp>
 #include <nlohmann/json_fwd.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -33,6 +34,6 @@ namespace adb::api
         std::optional<bool> available;
     };
 
-    void to_json(nlohmann::json& j, const Emoji& emoji);
-    void from_json(const nlohmann::json& j, Emoji& emoji);
+    LIBADB_API void to_json(nlohmann::json& j, const Emoji& emoji);
+    LIBADB_API void from_json(const nlohmann::json& j, Emoji& emoji);
 }

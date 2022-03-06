@@ -9,6 +9,7 @@
 #include <libadb/api/message/data/message.hpp>
 #include <libadb/api/interactions/data/interaction-type.hpp>
 #include <libadb/api/interactions/data/interaction-data.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -46,7 +47,7 @@ namespace adb::api
         std::optional<std::string> guildLocale;
     };
 
-    void to_json(nlohmann::json& j, const Interaction& interaction);
-    void from_json(const nlohmann::json& j, Interaction& interaction);
+    LIBADB_API void to_json(nlohmann::json& j, const Interaction& interaction);
+    LIBADB_API void from_json(const nlohmann::json& j, Interaction& interaction);
 
 }

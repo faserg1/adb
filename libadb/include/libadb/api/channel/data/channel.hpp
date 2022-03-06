@@ -8,6 +8,8 @@
 #include <libadb/api/user/data/user.hpp>
 #include <libadb/api/channel/data/channel-type.hpp>
 #include <libadb/api/channel/data/overwrite.hpp>
+#include <libadb/libadb.hpp>
+
 namespace adb::api
 {
     /**
@@ -48,6 +50,6 @@ namespace adb::api
 
     };
 
-    void to_json(nlohmann::json& j, const Channel& channel);
-    void from_json(const nlohmann::json& j, Channel& channel);
+    LIBADB_API void to_json(nlohmann::json& j, const Channel& channel);
+    LIBADB_API void from_json(const nlohmann::json& j, Channel& channel);
 }

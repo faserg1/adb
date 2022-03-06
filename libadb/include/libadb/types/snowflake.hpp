@@ -4,6 +4,8 @@
 #include <string>
 #include <nlohmann/json_fwd.hpp>
 
+#include <libadb/libadb.hpp>
+
 namespace adb::types
 {
     /**
@@ -13,16 +15,16 @@ namespace adb::types
     class SFID
     {
     public:
-        SFID() = default;
-        SFID(uint64_t id);
-        SFID(const std::string &strId);
+        LIBADB_API SFID() = default;
+        LIBADB_API SFID(uint64_t id);
+        LIBADB_API SFID(const std::string &strId);
 
-        SFID(const SFID &other) = default;
+        LIBADB_API SFID(const SFID &other) = default;
 
-        SFID create();
+        LIBADB_API SFID create();
 
-        inline operator uint64_t() const { return id_; }
-        std::string to_string() const;
+        LIBADB_API inline operator uint64_t() const { return id_; }
+        LIBADB_API std::string to_string() const;
     private:
         union
         {
@@ -37,6 +39,6 @@ namespace adb::types
         };
     };
 
-    void to_json(nlohmann::json& j, const SFID& id);
-    void from_json(const nlohmann::json& j, SFID& id);
+    LIBADB_API void to_json(nlohmann::json& j, const SFID& id);
+    LIBADB_API void from_json(const nlohmann::json& j, SFID& id);
 }

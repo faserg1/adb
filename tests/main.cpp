@@ -16,5 +16,6 @@ int main()
 
 	gateway->connect();
 	gateway->run();
+	
 	return 0;
 }

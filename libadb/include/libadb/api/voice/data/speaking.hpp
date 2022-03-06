@@ -4,6 +4,7 @@
 #include <libadb/types/helpers/enums.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/types/snowflake.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -37,8 +38,8 @@ namespace adb::api
         uint16_t ssrc;
     };
 
-    void to_json(nlohmann::json& j, const SpeakingSendPayload& speaking);
-    void from_json(const nlohmann::json& j, SpeakingSendPayload& speaking);
+    LIBADB_API void to_json(nlohmann::json& j, const SpeakingSendPayload& speaking);
+    LIBADB_API void from_json(const nlohmann::json& j, SpeakingSendPayload& speaking);
 
     /**
      * @brief Speaking Payload, that should be received from server
@@ -54,6 +55,6 @@ namespace adb::api
         uint16_t ssrc;
     };
 
-    void to_json(nlohmann::json& j, const SpeakingReceivePayload& speaking);
-    void from_json(const nlohmann::json& j, SpeakingReceivePayload& speaking);
+    LIBADB_API void to_json(nlohmann::json& j, const SpeakingReceivePayload& speaking);
+    LIBADB_API void from_json(const nlohmann::json& j, SpeakingReceivePayload& speaking);
 }

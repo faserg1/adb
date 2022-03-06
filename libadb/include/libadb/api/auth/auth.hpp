@@ -4,6 +4,7 @@
 #include <optional>
 #include <libadb/api/permissions/permissions.hpp>
 #include <libadb/types/snowflake.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -13,7 +14,7 @@ namespace adb::api
     {
         friend DiscordApi; 
     public:
-        std::string getBotAuthUrl(Permissions permissions = 0, std::optional<adb::types::SFID> guildId = std::nullopt, bool disableGuildSelect = false);
+        LIBADB_API std::string getBotAuthUrl(Permissions permissions = 0, std::optional<adb::types::SFID> guildId = std::nullopt, bool disableGuildSelect = false);
     private:
         Auth(std::string_view baseUrl);
     private:

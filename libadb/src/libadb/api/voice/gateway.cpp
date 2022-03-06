@@ -26,6 +26,8 @@
 #include <condition_variable>
 #include <chrono>
 
+#include <iostream>
+
 using namespace adb::api;
 
 using WebSocketOpcode = websocketpp::frame::opcode::value;
@@ -286,6 +288,8 @@ void VoiceGateway::onServerUpdated(const VoiceServerUpdateEvent &voiceServerUpda
 
 void VoiceGateway::onMessage(const VoicePayload &payload)
 {
+    std::cout << fmt::format("Received OpCode: {}", (uint64_t) payload.opCode) << std::endl;
+
     switch (payload.opCode)
     {
         case VoiceOpCode::Hello:
@@ -463,7 +467,14 @@ std::future<bool> VoiceGateway::startWebSocket()
             auto msg = ec.message();
             return false;
         }
-
+        connectionData_->client.set_close_handler([this](auto connection)
+        {
+            int i = 0;
+        });
+        connectionData_->client.set_fail_handler([this](auto connection)
+        {
+            int i = 0;
+        });
         connectionData_->connection = connectionData_->client.connect(con);
 
         connectionData_->websocketThread = std::thread([this]()

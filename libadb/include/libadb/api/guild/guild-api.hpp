@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <libadb/api/channel/data/channel.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -15,7 +16,7 @@ namespace adb::api
     {
         friend DiscordApi;
     public:
-        std::vector<Channel> getChannels(adb::types::SFID guildId) const;
+        LIBADB_API std::vector<Channel> getChannels(adb::types::SFID guildId) const;
     private:
         GuildApi(const std::string &baseUrl);
     private:

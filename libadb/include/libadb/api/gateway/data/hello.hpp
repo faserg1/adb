@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <nlohmann/json_fwd.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -15,6 +16,6 @@ namespace adb::api
         uint64_t heartbeatInterval;
     };
 
-    void to_json(nlohmann::json& j, const Hello& hello);
-    void from_json(const nlohmann::json& j, Hello& hello);
+    LIBADB_API void to_json(nlohmann::json& j, const Hello& hello);
+    LIBADB_API void from_json(const nlohmann::json& j, Hello& hello);
 }

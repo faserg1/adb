@@ -2,8 +2,9 @@
 
 #include <string>
 #include <optional>
-#include "data/gateway-retrive-data.hpp"
-#include "data/retrive-query.hpp"
+#include <libadb/libadb.hpp>
+#include <libadb/api/gateway/data/gateway-retrive-data.hpp>
+#include <libadb/api/gateway/data/retrive-query.hpp>
 
 namespace adb::api
 {
@@ -18,7 +19,7 @@ namespace adb::api
          * @details https://discord.com/developers/docs/topics/gateway#get-gateway-bot
          * @return GatewayBotRetriveData 
          */
-        GatewayBotRetriveData retriveBotGateway(std::optional<GatewayRetriveQuery> query);
+        LIBADB_API GatewayBotRetriveData retriveBotGateway(std::optional<GatewayRetriveQuery> query);
     private:
         GatewayRetrive(const std::string &baseUrl);
     private:

@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 
+#include <libadb/libadb.hpp>
 #include <libadb/types/snowflake.hpp>
 #include <libadb/api/message/data/embed.hpp>
 #include <libadb/api/message/data/allowed-mentions.hpp>
@@ -36,9 +37,9 @@ namespace adb::api
         MessageFlags flags;
     };
 
-    void to_json(nlohmann::json& j, const MessageReference& mention);
-    void from_json(const nlohmann::json& j, MessageReference& mention);
+    LIBADB_API void to_json(nlohmann::json& j, const MessageReference& mention);
+    LIBADB_API void from_json(const nlohmann::json& j, MessageReference& mention);
 
-    void to_json(nlohmann::json& j, const SendMessageParams& params);
-    void from_json(const nlohmann::json& j, SendMessageParams& params);
+    LIBADB_API void to_json(nlohmann::json& j, const SendMessageParams& params);
+    LIBADB_API void from_json(const nlohmann::json& j, SendMessageParams& params);
 }

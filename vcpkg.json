@@ -2,6 +2,10 @@
   "name": "adb",
   "version-string": "0.0.1",
   "dependencies": [
+    {
+      "name": "curl",
+      "features": ["openssl"]
+    },
     "cpr",
     "toml11",
     "fmt",

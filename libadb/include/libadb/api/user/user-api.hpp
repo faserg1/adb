@@ -2,6 +2,7 @@
 
 #include <string>
 #include <libadb/api/user/data/user.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -10,7 +11,7 @@ namespace adb::api
     {
         friend DiscordApi;
     public:
-        User getCurrentUser();
+        LIBADB_API User getCurrentUser();
 
     private:
         UserApi(const std::string &baseUrl);

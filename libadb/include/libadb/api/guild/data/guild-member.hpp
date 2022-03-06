@@ -3,6 +3,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <libadb/libadb.hpp>
 #include <libadb/types/chrono.hpp>
 #include <libadb/types/snowflake.hpp>
 #include <libadb/types/time.hpp>
@@ -31,6 +32,6 @@ namespace adb::api
         std::optional<adb::types::TimePoint> communicationDisabledUntil;
     };
 
-    void to_json(nlohmann::json& j, const GuildMember& guildMember);
-    void from_json(const nlohmann::json& j, GuildMember& guildMember);
+    LIBADB_API void to_json(nlohmann::json& j, const GuildMember& guildMember);
+    LIBADB_API void from_json(const nlohmann::json& j, GuildMember& guildMember);
 }

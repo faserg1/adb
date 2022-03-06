@@ -4,8 +4,8 @@
 #include <cstdint>
 #include <optional>
 #include <nlohmann/json.hpp>
-
-#include "opcode.hpp"
+#include <libadb/libadb.hpp>
+#include <libadb/api/gateway/data/opcode.hpp>
 
 namespace adb::api
 {
@@ -21,6 +21,6 @@ namespace adb::api
         std::optional<std::string> eventName;
     };
 
-    void to_json(nlohmann::json& j, const Payload& payload);
-    void from_json(const nlohmann::json& j, Payload& payload);
+    LIBADB_API void to_json(nlohmann::json& j, const Payload& payload);
+    LIBADB_API void from_json(const nlohmann::json& j, Payload& payload);
 }

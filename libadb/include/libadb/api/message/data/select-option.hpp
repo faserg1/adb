@@ -3,6 +3,7 @@
 #include <optional>
 #include <string>
 #include <libadb/api/emoji/data/emoji.hpp>
+#include <libadb/libadb.hpp>
 
 namespace adb::api
 {
@@ -24,6 +25,6 @@ namespace adb::api
         std::optional<bool> isDefault;
     };
 
-    void to_json(nlohmann::json& j, const SelectOption& op);
-    void from_json(const nlohmann::json& j, SelectOption& op);
+    LIBADB_API void to_json(nlohmann::json& j, const SelectOption& op);
+    LIBADB_API void from_json(const nlohmann::json& j, SelectOption& op);
 }

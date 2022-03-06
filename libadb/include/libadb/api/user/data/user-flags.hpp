@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libadb/types/helpers/enums.hpp>
+
 namespace adb::api
 {
     /**
@@ -42,20 +44,5 @@ namespace adb::api
         BOT_HTTP_INTERACTIONS	 = (1 << 19),
     };
 
-    using UserFlags = uint64_t;
-
-    constexpr UserFlags operator+(UserFlag p)
-    {
-        return static_cast<uint64_t>(p);
-    }
-
-    constexpr UserFlags operator|(UserFlag p1, UserFlag p2)
-    {
-        return static_cast<uint64_t>(p1) | static_cast<uint64_t>(p2);
-    }
-
-    constexpr UserFlags operator|(UserFlags p1, UserFlag p2)
-    {
-        return p1 | static_cast<uint64_t>(p2);
-    }
+    ADB_ENUM_FLAGS_OPERATORS(UserFlag, UserFlags, uint64_t)
 }

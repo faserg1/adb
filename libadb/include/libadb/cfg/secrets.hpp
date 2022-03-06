@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <libadb/libadb.hpp>
 #include <libadb/types/snowflake.hpp>
 
 namespace adb::cfg
@@ -20,13 +21,13 @@ namespace adb::cfg
     public:
         Secrets() = delete;
 
-        static adb::types::SFID GetAppId();
-        static std::string_view GetPublicKey();
-        static adb::types::SFID GetClientId();
-        static std::string_view GetClientSecret();
-        static std::string_view GetBotToken();
+        LIBADB_API static adb::types::SFID GetAppId();
+        LIBADB_API static std::string_view GetPublicKey();
+        LIBADB_API static adb::types::SFID GetClientId();
+        LIBADB_API static std::string_view GetClientSecret();
+        LIBADB_API static std::string_view GetBotToken();
 
-        static void OverrideSecrets(const SecretsData& data);
+        LIBADB_API static void OverrideSecrets(const SecretsData& data);
     private:
         static SecretsData data_;
     };

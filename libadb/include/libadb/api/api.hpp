@@ -3,7 +3,9 @@
 #include <string>
 #include <memory>
 
+#include <libadb/libadb.hpp>
 #include <libadb/types/snowflake.hpp>
+
 
 namespace adb::api
 {
@@ -19,15 +21,15 @@ namespace adb::api
     class DiscordApi final
     {
     public:
-        DiscordApi(uint8_t version = 9);
+        LIBADB_API DiscordApi(uint8_t version = 9);
 
-        std::unique_ptr<Auth> CreateAuth();
-        std::shared_ptr<Gateway> GetGateway();
-        std::unique_ptr<VoiceGateway> GetVoiceGateway(adb::types::SFID guildId);
-        std::unique_ptr<ChannelApi> CreateChannelApi();
-        std::unique_ptr<GuildApi> CreateGuildApi();
-        std::unique_ptr<InteractionsApi> CreateInteractionsApi();
-        std::unique_ptr<UserApi> CreateUserApi();
+        LIBADB_API std::unique_ptr<Auth> CreateAuth();
+        LIBADB_API std::shared_ptr<Gateway> GetGateway();
+        LIBADB_API std::unique_ptr<VoiceGateway> GetVoiceGateway(adb::types::SFID guildId);
+        LIBADB_API std::unique_ptr<ChannelApi> CreateChannelApi();
+        LIBADB_API std::unique_ptr<GuildApi> CreateGuildApi();
+        LIBADB_API std::unique_ptr<InteractionsApi> CreateInteractionsApi();
+        LIBADB_API std::unique_ptr<UserApi> CreateUserApi();
     private:
         const std::string baseUrl_;
         std::shared_ptr<Gateway> gatewayInstance_;
