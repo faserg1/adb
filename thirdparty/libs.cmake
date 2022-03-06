@@ -1,3 +1,5 @@
+find_package(Threads REQUIRED)
+
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(cpr CONFIG REQUIRED)

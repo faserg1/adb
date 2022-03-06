@@ -6,6 +6,6 @@
 #    else
 #        define LIBADB_API __declspec(dllimport)
 #    endif
-#elif
+#else
 #    define LIBADB_API
 #endif
