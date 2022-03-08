@@ -16,31 +16,31 @@ Image ImageResolver::getGroupDMIcon(const std::string &hash)
 Image ImageResolver::getGuildIcon(const adb::types::SFID &guildId, const std::string &hash)
 {
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP, ImageFormat::GIF},
-        std::format("icons/{}/", guildId.to_string()), hash, true);
+        fmt::format("icons/{}/", guildId.to_string()), hash, true);
 }
 
 Image ImageResolver::getGuildSplash(const adb::types::SFID &guildId, const std::string &hash)
 {
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},
-        std::format("splashes/{}/", guildId.to_string()), hash);
+        fmt::format("splashes/{}/", guildId.to_string()), hash);
 }
 
 Image ImageResolver::getGuildDiscoverySplash(const adb::types::SFID &guildId, const std::string &hash)
 {
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},
-        std::format("discovery-splashes/{}/", guildId.to_string()), hash);
+        fmt::format("discovery-splashes/{}/", guildId.to_string()), hash);
 }
 
 Image ImageResolver::getGuildBanner(const adb::types::SFID &guildId, const std::string &hash)
 {
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},
-        std::format("banners/{}/", guildId.to_string()), hash);
+        fmt::format("banners/{}/", guildId.to_string()), hash);
 }
 
 Image ImageResolver::getUserBanner(const adb::types::SFID &userId, const std::string &hash)
 {
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP, ImageFormat::GIF},
-        std::format("banners/{}/", userId.to_string()), hash, true);
+        fmt::format("banners/{}/", userId.to_string()), hash, true);
 }
 
 Image ImageResolver::getDefaultUserAvatar(const std::string &discriminator)
@@ -52,11 +52,11 @@ Image ImageResolver::getDefaultUserAvatar(const std::string &discriminator)
 Image ImageResolver::getUserAvarar(const adb::types::SFID &userId, const std::string &hash)
 {
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP, ImageFormat::GIF},
-        std::format("avatars/{}/", userId.to_string()), hash, true);
+        fmt::format("avatars/{}/", userId.to_string()), hash, true);
 }
 
 Image ImageResolver::getGuildMemberAvatar(const adb::types::SFID &guildId, const adb::types::SFID &userId, const std::string &hash)
 {
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP, ImageFormat::GIF},
-        std::format("guilds/{}/users/{}/avatars/", guildId.to_string(), userId.to_string()), hash, true);
+        fmt::format("guilds/{}/users/{}/avatars/", guildId.to_string(), userId.to_string()), hash, true);
 }
