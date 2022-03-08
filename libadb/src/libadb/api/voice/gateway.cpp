@@ -313,6 +313,10 @@ void VoiceGateway::onMessage(const VoicePayload &payload)
         case VoiceOpCode::SessionDescription:
         {
             auto desc = payload.data.get<SessionDescription>();
+            if (connectionData_->mode != desc.mode)
+            {
+                // Assert that or smth
+            }
             connectionData_->secretKey = desc.secretKey;
             connectionData_->eventAwaits.totalConnection.set_value(true);
             break;

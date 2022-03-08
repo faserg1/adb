@@ -7,7 +7,7 @@ using namespace adb::types;
 
 void adb::api::to_json(nlohmann::json& j, const Interaction& interaction)
 {
-
+    // todo: 
 }
 
 void adb::api::from_json(const nlohmann::json& j, Interaction& interaction)
@@ -29,15 +29,40 @@ void adb::api::from_json(const nlohmann::json& j, Interaction& interaction)
     }
     else if (interaction.type == InteractionType::MODAL_SUBMIT)
     {
-
+        // todo: 
     }
     map_from_json(j, "guild_id", interaction.guildId);
     map_from_json(j, "channel_id", interaction.guildId);
     map_from_json(j, "member", interaction.guildMember);
     map_from_json(j, "user", interaction.user);
+
+    if (interaction.guildId.has_value() && interaction.guildMember.has_value())
+    {
+        std::optional<adb::types::SFID> userId;
+        if (interaction.user.has_value())
+        {
+            userId = interaction.user.value().id;
+        }
+        gm_parse_avatar(interaction.guildId.value(), userId, j["member"], interaction.guildMember.value());
+    }
+
     j.at("token").get_to(interaction.token);
     j.at("version").get_to(interaction.version);
     map_from_json(j, "message", interaction.message);
-    map_from_json(j, "locale", interaction.locale);
-    map_from_json(j, "guild_locale", interaction.guildLocale);
+    if (j.contains("locale"))
+    {
+        std::string str;
+        j.at("locale").get_to(str);
+        adb::resource::Locale locale;
+        adb::resource::from_string(str, locale);
+        interaction.locale = locale;
+    }
+    if (j.contains("guild_locale"))
+    {
+        std::string str;
+        j.at("guild_locale").get_to(str);
+        adb::resource::Locale locale;
+        adb::resource::from_string(str, locale);
+        interaction.guildLocale = locale;
+    }
 }

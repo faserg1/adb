@@ -7,10 +7,10 @@ And yes, currently in development.
 
 Hm...
 
-[] Messages - receiving and sending... but not editing and removing =( SAD
-[] Inegrations - some of them.
-[] Reactions - well, you can create them!
-[] Voice - in dev. Soon will be added Opus & libsodium decoding/encoding.
+- [x] Messages - receiving and sending... but not editing and removing =( SAD
+- [x] Inegrations - some of them.
+- [x] Reactions - well, you can create them!
+- [ ] Voice - in dev. Soon will be added Opus & libsodium decoding/encoding.
 
 And much more things in plans, with logging and error handling (yup, there is no error handling yet)
 

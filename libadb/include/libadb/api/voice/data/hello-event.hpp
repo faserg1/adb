@@ -14,6 +14,7 @@ namespace adb::api
      */
     struct VoiceHelloEvent
     {
+        /// Heartbeat interval in milliseconds
         uint64_t heartbeatInterval;
         /// Not documented. Supposed: version of API Gateway.
         std::optional<uint16_t> version;

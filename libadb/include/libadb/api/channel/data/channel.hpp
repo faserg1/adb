@@ -5,6 +5,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/types/snowflake.hpp>
 #include <libadb/types/nullable.hpp>
+#include <libadb/resource/image.hpp>
 #include <libadb/api/user/data/user.hpp>
 #include <libadb/api/channel/data/channel-type.hpp>
 #include <libadb/api/channel/data/overwrite.hpp>
@@ -30,22 +31,23 @@ namespace adb::api
         std::optional<std::vector<Overwrite>> permissionOverwrites;
         /// the name of the channel (1-100 characters)
         std::optional<std::string> name;
-        /// 
+        /// the channel topic (0-1024 characters)
         std::optional<adb::types::Nullable<std::string>> topic;
-        /// 
+        /// whether the channel is nsfw
         std::optional<bool> nsfw;
-        /// 
-        std::optional<adb::types::SFID> lastMessageId;
-        /// 
+        /// the id of the last message sent in this channel (may not point to an existing or valid message)
+        std::optional<adb::types::Nullable<adb::types::SFID>> lastMessageId;
+        /// the bitrate (in bits) of the voice channel
         std::optional<int> bitrate;
-        /// 
+        /// the user limit of the voice channel
         std::optional<int> userLimit;
-        /// 
+        /// amount of seconds a user has to wait before sending another message (0-21600);
+        /// bots, as well as users with the permission manage_messages or manage_channel, are unaffected
         std::optional<int> rateLimitPerUser;
-        /// 
+        /// the recipients of the DM
         std::optional<std::vector<User>> recipients;
-        ///
-        std::optional<adb::types::Nullable<std::string>> iconHash;
+        /// icon hash of the group DM
+        std::optional<adb::types::Nullable<adb::resource::Image>> icon;
         
 
     };

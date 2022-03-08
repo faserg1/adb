@@ -4,10 +4,13 @@
 #include <string>
 #include <libadb/types/snowflake.hpp>
 #include <libadb/types/color.hpp>
+#include <libadb/types/nullable.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/api/user/data/user-flags.hpp>
 #include <libadb/api/user/data/user-premium-flag.hpp>
 #include <libadb/libadb.hpp>
+#include <libadb/resource/image.hpp>
+#include <libadb/resource/locale.hpp>
 
 namespace adb::api
 {
@@ -24,7 +27,7 @@ namespace adb::api
         /// the user's 4-digit discord-tag
         std::string discriminator;
         /// the user's avatar hash
-        std::string avatarHash;
+        adb::types::Nullable<adb::resource::Image> avatar;
         /// whether the user belongs to an OAuth2 application
         std::optional<bool> bot;
         /// whether the user is an Official Discord System user (part of the urgent message system)
@@ -32,11 +35,11 @@ namespace adb::api
         /// whether the user has two factor enabled on their account
         std::optional<bool> mfaEnabled;
         /// the user's banner hash
-        std::optional<std::string> bannerHash;
+        std::optional<adb::types::Nullable<adb::resource::Image>> banner;
         /// the user's banner color encoded as an integer representation of hexadecimal color code
         std::optional<adb::types::Color> accentColor;
         /// the user's chosen language option
-        std::optional<std::string> locale;
+        std::optional<adb::resource::Locale> locale;
         /// whether the email on this account has been verified
         std::optional<bool> verified;
         /// the user's email

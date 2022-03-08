@@ -3,6 +3,7 @@
 #include <libadb/types/helpers/json-optional.hpp>
 #include <libadb/types/helpers/json-nullable.hpp>
 #include <libadb/types/helpers/json-enum.hpp>
+#include <libadb/resource/image-resolver.hpp>
 
 using namespace adb::api;
 using namespace adb::types;
@@ -30,5 +31,14 @@ void adb::api::from_json(const nlohmann::json& j, Channel& channel)
     map_from_json(j, "user_limit", channel.userLimit);
     map_from_json(j, "rate_limit_per_user", channel.rateLimitPerUser);
     map_from_json(j, "recipients", channel.recipients);
-    map_from_json(j, "icon", channel.iconHash);
+
+    std::optional<adb::types::Nullable<std::string>> iconHash;
+    map_from_json(j, "icon", iconHash);
+
+    if (iconHash.has_value() && iconHash.value())
+    {
+        channel.icon = std::make_shared<adb::resource::Image>(
+            adb::resource::ImageResolver::getGroupDMIcon(*iconHash.value())
+        );
+    }
 }

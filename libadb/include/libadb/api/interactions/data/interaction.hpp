@@ -1,15 +1,17 @@
 #pragma once
 
-#include <libadb/types/snowflake.hpp>
 #include <optional>
 #include <memory>
 #include <nlohmann/json_fwd.hpp>
+#include <libadb/libadb.hpp>
+#include <libadb/types/snowflake.hpp>
+#include <libadb/resource/locale.hpp>
 #include <libadb/api/guild/data/guild-member.hpp>
 #include <libadb/api/user/data/user.hpp>
 #include <libadb/api/message/data/message.hpp>
 #include <libadb/api/interactions/data/interaction-type.hpp>
 #include <libadb/api/interactions/data/interaction-data.hpp>
-#include <libadb/libadb.hpp>
+
 
 namespace adb::api
 {
@@ -42,9 +44,9 @@ namespace adb::api
         /// for components, the message they were attached to
         std::optional<Message> message;
         /// the selected language of the invoking user
-        std::optional<std::string> locale;
+        std::optional<adb::resource::Locale> locale;
         /// the guild's preferred locale, if invoked in a guild
-        std::optional<std::string> guildLocale;
+        std::optional<adb::resource::Locale> guildLocale;
     };
 
     LIBADB_API void to_json(nlohmann::json& j, const Interaction& interaction);
