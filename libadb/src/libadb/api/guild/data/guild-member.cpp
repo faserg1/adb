@@ -36,13 +36,7 @@ void adb::api::from_json(const nlohmann::json& j, GuildMember& guildMember)
     j.at("deaf").get_to(guildMember.deaf);
     j.at("mute").get_to(guildMember.mute);
     map_from_json(j, "pending", guildMember.pending);
-    /// yes, it's a string
-    std::optional<std::string> permissions;
-    map_from_json(j, "permissions", permissions);
-    if (permissions.has_value())
-    {
-        guildMember.permissions = std::atoll(permissions.value().data());
-    }
+    map_from_json(j, "permissions", guildMember.permissions);
     map_from_json(j, "communication_disabled_until", guildMember.communicationDisabledUntil);
 }
 

@@ -6,6 +6,7 @@
 
 #include <libadb/libadb.hpp>
 #include <libadb/types/snowflake.hpp>
+#include <libadb/api/message/data/message-reference.hpp>
 #include <libadb/api/message/data/embed.hpp>
 #include <libadb/api/message/data/allowed-mentions.hpp>
 #include <libadb/api/message/data/message-component.hpp>
@@ -16,14 +17,6 @@
 
 namespace adb::api
 {
-    struct MessageReference
-    {
-        std::optional<adb::types::SFID> messageId;
-        std::optional<adb::types::SFID> channelId;
-        std::optional<adb::types::SFID> guildId;
-        std::optional<bool> failIfNotExists;
-    };
-
     struct SendMessageParams
     {
         std::optional<std::string> content;
@@ -36,9 +29,6 @@ namespace adb::api
         std::optional<std::vector<SendAttachment>> attachments;
         MessageFlags flags;
     };
-
-    LIBADB_API void to_json(nlohmann::json& j, const MessageReference& mention);
-    LIBADB_API void from_json(const nlohmann::json& j, MessageReference& mention);
 
     LIBADB_API void to_json(nlohmann::json& j, const SendMessageParams& params);
     LIBADB_API void from_json(const nlohmann::json& j, SendMessageParams& params);

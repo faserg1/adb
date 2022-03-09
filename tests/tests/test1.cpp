@@ -23,6 +23,8 @@ void checkSmth(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gat
 	{
 		if (msg.author.bot && msg.author.bot.value())
 			return;
+		if (msg.content != "!test")
+			return;
 		auto msgMention = MessageReference {
 			.messageId = msg.id
 		};

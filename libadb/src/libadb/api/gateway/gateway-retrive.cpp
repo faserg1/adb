@@ -1,5 +1,6 @@
 #include <libadb/api/gateway/gateway-retrive.hpp>
 #include <libadb/api/auth/token-bot.hpp>
+#include <stdexcept>
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <fmt/core.h>
@@ -15,8 +16,11 @@ GatewayBotRetriveData GatewayRetrive::retriveBotGateway(std::optional<GatewayRet
 {
     auto requestUrl = fmt::format("{}/bot", baseGatewayUrl_);
     auto response = cpr::Get(cpr::Url{requestUrl}, cpr::Header{TokenBot::getBotAuthTokenHeader()});
-    if (response.status_code != 200)
+    if (response.status_code < 200 || response.status_code >= 300)
+    {
+        throw std::runtime_error(response.status_line);
         return {};
+    }
     
     auto json = nlohmann::json::parse(response.text);
     auto sessionStartLimit = json["session_start_limit"];

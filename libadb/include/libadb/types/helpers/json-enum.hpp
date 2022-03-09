@@ -26,7 +26,13 @@ namespace nlohmann
 
         static void from_json(const json& j, Enum &value)
         {
-            value = static_cast<Enum>(j.get<std::underlying_type_t<Enum>>());
+            if (j.is_string())
+            {
+                auto tempStr = j.get<std::string>();
+                value = static_cast<Enum>(std::atoll(tempStr.data()));
+            }
+            else
+                value = static_cast<Enum>(j.get<std::underlying_type_t<Enum>>());
         }
     };
 }

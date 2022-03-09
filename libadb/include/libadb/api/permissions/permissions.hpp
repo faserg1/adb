@@ -1,7 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+#include <libadb/libadb.hpp>
 #include <libadb/types/helpers/enums.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace adb::api
 {
@@ -53,4 +56,7 @@ namespace adb::api
     };
 
     ADB_ENUM_FLAGS_OPERATORS(Permission, Permissions, uint64_t)
+
+    LIBADB_API void from_string(const std::string &str, Permissions &permissions);
+    LIBADB_API std::string to_string(Permissions permissions);
 }
