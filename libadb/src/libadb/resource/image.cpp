@@ -45,7 +45,7 @@ std::future<std::vector<std::byte>> Image::getImage(ImageFormat format, size_t s
         name = name_;
     // The returned size can be changed by appending a querystring of ?size=desired_size to the URL.
     auto querySize = size ? std::format("?size={}", size) : "";
-    auto url = std::format("{}{}{}{}{}", cdnBase_, path_, name, extension, querySize);
+    auto url = fmt::format("{}{}{}{}{}", cdnBase_, path_, name, extension, querySize);
     return std::async(std::launch::async, [url]() -> std::vector<std::byte>
     {
         auto session = cpr::Session();
