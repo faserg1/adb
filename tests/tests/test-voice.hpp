@@ -12,7 +12,7 @@ namespace adb::api
     class DiscordApi;
     class ChannelApi;
     class Gateway;
-    class VoiceGateway;
+    class MediaGateway;
 }
 
 class TestVoice
@@ -30,7 +30,7 @@ private:
 private:
     adb::api::DiscordApi &api_;
     std::shared_ptr<adb::api::Gateway> gateway_;
-    std::shared_ptr<adb::api::VoiceGateway> voiceGateway_;
+    std::shared_ptr<adb::api::MediaGateway> mediaGateway_;
     std::unique_ptr<adb::api::ChannelApi> channelApi_;
     std::vector<std::unique_ptr<adb::types::Subscription>> subs_;
     std::jthread voiceDataThreadReceiver;

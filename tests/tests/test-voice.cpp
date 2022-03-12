@@ -5,7 +5,7 @@
 #include <ranges>
 #include <libadb/api/api.hpp>
 #include <libadb/api/gateway/gateway.hpp>
-#include <libadb/api/voice/gateway.hpp>
+#include <libadb/api/media/media-gateway.hpp>
 #include <libadb/api/interactions/data/interaction.hpp>
 #include <libadb/api/gateway/gateway-events.hpp>
 #include <libadb/api/message/data/message.hpp>
@@ -22,7 +22,7 @@ using namespace adb::types;
 TestVoice::TestVoice(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway) :
     api_(api), gateway_(gateway), channelApi_(api_.CreateChannelApi())
 {
-    voiceGateway_ = api.GetVoiceGateway(adb::types::SFID{"918981635918159943"});
+    mediaGateway_ = api.GetMediaGateway(adb::types::SFID{"918981635918159943"});
     init();
 }
 
@@ -132,21 +132,21 @@ void TestVoice::receiveWorker(std::stop_token stop)
 {
     while (!stop.stop_requested())
     {
-        auto packet = voiceGateway_->receivePacket().get();
+        auto packet = mediaGateway_->receivePacket().get();
         std::cout << fmt::format("Packet {:#x} {:#x}", packet.vpxcc, packet.mpt) << std::endl;
     }
 }
 
 std::future<bool> TestVoice::onMessageConnect(adb::types::SFID channelId)
 {
-    return voiceGateway_->connect(channelId, false, false);
+    return mediaGateway_->connect(channelId, false, false);
 }
 
 void TestVoice::onDisconnect()
 {
     std::thread thread([this]()
     {
-        auto future = voiceGateway_->disconnect();
+        auto future = mediaGateway_->disconnect();
     });
     thread.detach();
     

@@ -9,8 +9,8 @@
 #include <vector>
 #include <array>
 #include <nlohmann/json_fwd.hpp>
-#include <libadb/api/voice/data/voice-state-update.hpp>
-#include <libadb/api/voice/data/voice-packet.hpp>
+#include <libadb/api/media/data/voice-state-update.hpp>
+#include <libadb/api/media/data/voice-packet.hpp>
 #include <libadb/libadb.hpp>
 
 namespace adb::api
@@ -21,10 +21,10 @@ namespace adb::api
 
     struct VoiceState;
     struct VoiceServerUpdateEvent;
-    struct VoicePayload;
+    struct MediaPayload;
     struct VoiceReadyEvent;
 
-    class VoiceGateway
+    class MediaGateway
     {
         friend DiscordApi;
         struct ConnectionData;
@@ -36,7 +36,7 @@ namespace adb::api
             Connected
         };
     public:
-        LIBADB_API ~VoiceGateway();
+        LIBADB_API ~MediaGateway();
         
         LIBADB_API [[nodiscard]] std::future<bool> connect(adb::types::SFID channelId, bool mute, bool deaf, bool force = false);
         LIBADB_API [[nodiscard]] std::future<void> disconnect();
@@ -44,7 +44,7 @@ namespace adb::api
         LIBADB_API void setModeSelectorCallback(std::function<std::string(const std::vector<std::string> &)> modeSelector);
         LIBADB_API void setUserSpeakingCallback(std::function<void(adb::types::SFID userId, bool)> userSpeaking);
 
-        LIBADB_API bool send(const VoicePayload &msg);
+        LIBADB_API bool send(const MediaPayload &msg);
         
         LIBADB_API ConnectionState getState();
         LIBADB_API adb::types::SFID getGuildId() const;
@@ -72,7 +72,7 @@ namespace adb::api
         LIBADB_API std::future<bool> sendPacket(const VoicePacket &packet);
         LIBADB_API std::future<VoicePacket> receivePacket();
     protected:
-        VoiceGateway(std::unique_ptr<UserApi> userApi, std::shared_ptr<Gateway> gateway, adb::types::SFID guildId);
+        MediaGateway(std::unique_ptr<UserApi> userApi, std::shared_ptr<Gateway> gateway, adb::types::SFID guildId);
 
         virtual void onPreConnect();
         virtual void onPostConnect();
@@ -83,8 +83,8 @@ namespace adb::api
         virtual void onVoiceStateUpdated(const VoiceState &voiceState);
         virtual void onServerUpdated(const VoiceServerUpdateEvent &voiceServerUpdate);
 
-        virtual void onMessage(const VoicePayload &payload);
-        bool sendInternal(const VoicePayload &msg);
+        virtual void onMessage(const MediaPayload &payload);
+        bool sendInternal(const MediaPayload &msg);
     private:
         void subscribe();
 

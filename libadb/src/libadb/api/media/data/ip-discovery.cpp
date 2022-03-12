@@ -1,4 +1,4 @@
-#include <libadb/api/voice/data/ip-discovery.hpp>
+#include <libadb/api/media/data/ip-discovery.hpp>
 #include <libadb/encoding/endian.hpp>
 using namespace adb::api;
 

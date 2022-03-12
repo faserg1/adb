@@ -1,17 +1,17 @@
-#include <libadb/api/voice/gateway.hpp>
+#include <libadb/api/media/media-gateway.hpp>
 #include <libadb/api/gateway/gateway.hpp>
 #include <libadb/api/gateway/gateway-events.hpp>
 #include <libadb/api/gateway/data/payload.hpp>
-#include <libadb/api/voice/data/voice-server-update-event.hpp>
-#include <libadb/api/voice/data/voice-state.hpp>
-#include <libadb/api/voice/data/payload.hpp>
-#include <libadb/api/voice/data/voice-identity.hpp>
-#include <libadb/api/voice/data/hello-event.hpp>
-#include <libadb/api/voice/data/ready-event.hpp>
-#include <libadb/api/voice/data/ip-discovery.hpp>
-#include <libadb/api/voice/data/speaking.hpp>
-#include <libadb/api/voice/data/select-protocol.hpp>
-#include <libadb/api/voice/data/session-description.hpp>
+#include <libadb/api/media/data/voice-server-update-event.hpp>
+#include <libadb/api/media/data/voice-state.hpp>
+#include <libadb/api/media/data/payload.hpp>
+#include <libadb/api/media/data/voice-identity.hpp>
+#include <libadb/api/media/data/hello-event.hpp>
+#include <libadb/api/media/data/ready-event.hpp>
+#include <libadb/api/media/data/ip-discovery.hpp>
+#include <libadb/api/media/data/speaking.hpp>
+#include <libadb/api/media/data/select-protocol.hpp>
+#include <libadb/api/media/data/session-description.hpp>
 #include <libadb/api/user/user-api.hpp>
 #include <nlohmann/json.hpp>
 #include <fmt/core.h>
@@ -39,7 +39,7 @@ using WebSocketConnection = websocketpp::connection<WebSocketClientType>;
 using WebSocketConnectionPtr = std::shared_ptr<WebSocketConnection>;
 using SSLContextPtr = std::shared_ptr<boost::asio::ssl::context>;
 
-struct VoiceGateway::ConnectionData
+struct MediaGateway::ConnectionData
 {
     std::jthread connectionThread;
     std::jthread heartbeatThread;
@@ -83,7 +83,7 @@ struct VoiceGateway::ConnectionData
 };
 
 
-VoiceGateway::VoiceGateway(std::unique_ptr<UserApi> userApi, std::shared_ptr<Gateway> gateway, adb::types::SFID guildId) :
+MediaGateway::MediaGateway(std::unique_ptr<UserApi> userApi, std::shared_ptr<Gateway> gateway, adb::types::SFID guildId) :
     gateway_(gateway), connectionData_(std::make_unique<ConnectionData>()), guildId_(guildId)
 {
     if (!(gateway_->getIntents() & Intent::GuildVoiceStates))
@@ -96,9 +96,9 @@ VoiceGateway::VoiceGateway(std::unique_ptr<UserApi> userApi, std::shared_ptr<Gat
     configureMessageHandler();
 }
 
-VoiceGateway::~VoiceGateway() = default;
+MediaGateway::~MediaGateway() = default;
 
-std::future<bool> VoiceGateway::connect(adb::types::SFID channelId, bool mute, bool deaf, bool force)
+std::future<bool> MediaGateway::connect(adb::types::SFID channelId, bool mute, bool deaf, bool force)
 {
     // если мы уже подключились или подклчаемся к какому-то каналу, мы не можем без флага force его сменить
     if ((state_ == ConnectionState::Connected || state_ == ConnectionState::Connecting) && channelId != channelId_ && !force)
@@ -141,7 +141,7 @@ std::future<bool> VoiceGateway::connect(adb::types::SFID channelId, bool mute, b
     });
 }
 
-std::future<void> VoiceGateway::disconnect()
+std::future<void> MediaGateway::disconnect()
 {
     nlohmann::json data = VoiceStateUpdate {
         .guildId = guildId_,
@@ -160,22 +160,22 @@ std::future<void> VoiceGateway::disconnect()
     return stopWebSocket();
 }
 
-void VoiceGateway::setModeSelectorCallback(std::function<std::string(const std::vector<std::string> &)> modeSelector)
+void MediaGateway::setModeSelectorCallback(std::function<std::string(const std::vector<std::string> &)> modeSelector)
 {
     connectionData_->callbacks.modeSelector = modeSelector;
 }
 
-void VoiceGateway::setUserSpeakingCallback(std::function<void(adb::types::SFID userId, bool)> userSpeaking)
+void MediaGateway::setUserSpeakingCallback(std::function<void(adb::types::SFID userId, bool)> userSpeaking)
 {
     connectionData_->callbacks.userSpeaking = userSpeaking;
 }
 
-bool VoiceGateway::send(const VoicePayload &msg)
+bool MediaGateway::send(const MediaPayload &msg)
 {
     return sendInternal(msg);
 }
 
-std::future<bool> VoiceGateway::sendData(const std::byte *ptr, size_t size)
+std::future<bool> MediaGateway::sendData(const std::byte *ptr, size_t size)
 {
     using namespace boost::asio::ip;
     auto promise = std::make_shared<std::promise<bool>>();
@@ -187,7 +187,7 @@ std::future<bool> VoiceGateway::sendData(const std::byte *ptr, size_t size)
     return promise->get_future();
 }
 
-std::future<size_t> VoiceGateway::receiveData(std::byte *ptr, size_t bufferSize)
+std::future<size_t> MediaGateway::receiveData(std::byte *ptr, size_t bufferSize)
 {
     using namespace boost::asio::ip;
     auto promise = std::make_shared<std::promise<size_t>>();
@@ -202,12 +202,12 @@ std::future<size_t> VoiceGateway::receiveData(std::byte *ptr, size_t bufferSize)
     return promise->get_future();
 }
 
-void VoiceGateway::setBufferSize(size_t size)
+void MediaGateway::setBufferSize(size_t size)
 {
     bufferSize_ = size;
 }
 
-std::future<std::vector<std::byte>> VoiceGateway::receiveData()
+std::future<std::vector<std::byte>> MediaGateway::receiveData()
 {
     return std::async(std::launch::async, [this]() -> std::vector<std::byte>
     {
@@ -218,13 +218,13 @@ std::future<std::vector<std::byte>> VoiceGateway::receiveData()
     });
 }
 
-std::future<bool> VoiceGateway::sendPacket(const VoicePacket &packet)
+std::future<bool> MediaGateway::sendPacket(const VoicePacket &packet)
 {
     auto data = toBytes(packet);
     return sendData(data);
 }
 
-std::future<VoicePacket> VoiceGateway::receivePacket()
+std::future<VoicePacket> MediaGateway::receivePacket()
 {
     return std::async(std::launch::async, [this]() -> VoicePacket {
         auto data = receiveData().get();
@@ -234,28 +234,28 @@ std::future<VoicePacket> VoiceGateway::receivePacket()
     });
 }
 
-void VoiceGateway::onPreConnect()
+void MediaGateway::onPreConnect()
 {
     connectionData_->eventAwaits.voiceServerUpdate.store(true);
     connectionData_->eventAwaits.voiceState.store(true);
 }
 
-void VoiceGateway::onPostConnect()
+void MediaGateway::onPostConnect()
 {
 
 }
 
-void VoiceGateway::onPreDisconnect()
+void MediaGateway::onPreDisconnect()
 {
 
 }
 
-void VoiceGateway::onPostDisconnect()
+void MediaGateway::onPostDisconnect()
 {
 
 }
 
-void VoiceGateway::onVoiceStateUpdated(const VoiceState &voiceState)
+void MediaGateway::onVoiceStateUpdated(const VoiceState &voiceState)
 {
     if (voiceState.guildId != guildId_ && voiceState.channelId != channelId_)
         return;
@@ -272,7 +272,7 @@ void VoiceGateway::onVoiceStateUpdated(const VoiceState &voiceState)
     }
 }
 
-void VoiceGateway::onServerUpdated(const VoiceServerUpdateEvent &voiceServerUpdate)
+void MediaGateway::onServerUpdated(const VoiceServerUpdateEvent &voiceServerUpdate)
 {
     if (voiceServerUpdate.guildId != guildId_)
         return;
@@ -287,11 +287,11 @@ void VoiceGateway::onServerUpdated(const VoiceServerUpdateEvent &voiceServerUpda
     }
 }
 
-void VoiceGateway::onMessage(const VoicePayload &payload)
+void MediaGateway::onMessage(const MediaPayload &payload)
 {
     switch (payload.opCode)
     {
-        case VoiceOpCode::Hello:
+        case MediaOpCode::Hello:
         {
             auto hello = payload.data.get<VoiceHelloEvent>();
             connectionData_->heartbeatIntervalms = hello.heartbeatInterval;
@@ -302,7 +302,7 @@ void VoiceGateway::onMessage(const VoicePayload &payload)
             identity();
             break;
         }
-        case VoiceOpCode::Ready:
+        case MediaOpCode::Ready:
         {
             auto ready = payload.data.get<VoiceReadyEvent>();
             startHeartbeating(connectionData_->heartbeatIntervalms);
@@ -310,7 +310,7 @@ void VoiceGateway::onMessage(const VoicePayload &payload)
                 connectionData_->eventAwaits.totalConnection.set_value(false);
             break;
         }
-        case VoiceOpCode::SessionDescription:
+        case MediaOpCode::SessionDescription:
         {
             auto desc = payload.data.get<SessionDescription>();
             if (connectionData_->mode != desc.mode)
@@ -321,14 +321,14 @@ void VoiceGateway::onMessage(const VoicePayload &payload)
             connectionData_->eventAwaits.totalConnection.set_value(true);
             break;
         }
-        case VoiceOpCode::Speaking:
+        case MediaOpCode::Speaking:
         {
             auto speaking = payload.data.get<SpeakingReceivePayload>();
             if (connectionData_->callbacks.userSpeaking)
                 connectionData_->callbacks.userSpeaking(speaking.userId, speaking.speaking);
             break;
         }
-        case VoiceOpCode::HeartbeatACK:
+        case MediaOpCode::HeartbeatACK:
         {
             connectionData_->missedHeartBeats.store(0);
             break;
@@ -340,7 +340,7 @@ void VoiceGateway::onMessage(const VoicePayload &payload)
     }
 }
 
-bool VoiceGateway::sendInternal(const VoicePayload &msg)
+bool MediaGateway::sendInternal(const MediaPayload &msg)
 {
     nlohmann::json jsObj = msg;
     WebSocketError ec;
@@ -354,7 +354,7 @@ bool VoiceGateway::sendInternal(const VoicePayload &msg)
     return true;
 }
 
-void VoiceGateway::configureClient()
+void MediaGateway::configureClient()
 {
     connectionData_->client.init_asio();
     connectionData_->client.set_tls_init_handler([](auto conHandler) -> SSLContextPtr {
@@ -367,7 +367,7 @@ void VoiceGateway::configureClient()
     });
 }
 
-void VoiceGateway::configureMessageHandler()
+void MediaGateway::configureMessageHandler()
 {
     connectionData_->client.set_message_handler([this](auto conHandle, auto msg)
     {
@@ -375,12 +375,12 @@ void VoiceGateway::configureMessageHandler()
         // Research for not documented fields
         // std::cout << "Received data: <<" << data << ">>" << std::endl;
         nlohmann::json obj = nlohmann::json::parse(data);
-        auto payload = obj.get<adb::api::VoicePayload>();
+        auto payload = obj.get<adb::api::MediaPayload>();
         onMessage(payload);
     });
 }
 
-void VoiceGateway::connectInternal(std::stop_token stop)
+void MediaGateway::connectInternal(std::stop_token stop)
 {
     using namespace std::chrono_literals;
     std::unique_lock<std::mutex> lk(connectionData_->eventAwaits.mutex);
@@ -412,7 +412,7 @@ void VoiceGateway::connectInternal(std::stop_token stop)
     }
 }
 
-void VoiceGateway::identity()
+void MediaGateway::identity()
 {
     auto identity = VoiceIdentity {
         .serverId = guildId_,
@@ -420,13 +420,13 @@ void VoiceGateway::identity()
         .sessionId = sessionId_,
         .token = token_
     };
-    send(VoicePayload {
-        .opCode = VoiceOpCode::Identify,
+    send(MediaPayload {
+        .opCode = MediaOpCode::Identify,
         .data = identity
     });
 }
 
-std::future<bool> VoiceGateway::ipDiscovery()
+std::future<bool> MediaGateway::ipDiscovery()
 {
     return std::async(std::launch::async, [this]() -> bool
     {
@@ -450,7 +450,7 @@ std::future<bool> VoiceGateway::ipDiscovery()
     });
 }
 
-void VoiceGateway::selectProtocol()
+void MediaGateway::selectProtocol()
 {
     if (connectionData_->callbacks.modeSelector)
         connectionData_->mode = connectionData_->callbacks.modeSelector(connectionData_->readyData.modes);
@@ -465,14 +465,14 @@ void VoiceGateway::selectProtocol()
         .protocol = "udp",
         .data = protocolData
     };
-    auto payload = VoicePayload {
-        .opCode = VoiceOpCode::SelectProtocol,
+    auto payload = MediaPayload {
+        .opCode = MediaOpCode::SelectProtocol,
         .data = data
     };
     send(payload);
 }
 
-std::future<bool> VoiceGateway::startWebSocket()
+std::future<bool> MediaGateway::startWebSocket()
 {
     return std::async(std::launch::async, [this]() -> bool
     {
@@ -506,7 +506,7 @@ std::future<bool> VoiceGateway::startWebSocket()
     });
 }
 
-std::future<void> VoiceGateway::stopWebSocket()
+std::future<void> MediaGateway::stopWebSocket()
 {
     return std::async(std::launch::async, [this]() -> void
     {
@@ -532,7 +532,7 @@ std::future<void> VoiceGateway::stopWebSocket()
     });
 }
 
-std::future<bool> VoiceGateway::startHeartbeating(uint64_t intervalms)
+std::future<bool> MediaGateway::startHeartbeating(uint64_t intervalms)
 {
     return std::async(std::launch::async, [this, intervalms]() -> bool
     {
@@ -552,7 +552,7 @@ std::future<bool> VoiceGateway::startHeartbeating(uint64_t intervalms)
                 connectionData_->heartbeatNonce = duration.count();
                 nlohmann::json data = connectionData_->heartbeatNonce;
                 sendInternal({
-                    .opCode = VoiceOpCode::Heartbeat,
+                    .opCode = MediaOpCode::Heartbeat,
                     .data = data
                 });
                 connectionData_->missedHeartBeats++;
@@ -562,7 +562,7 @@ std::future<bool> VoiceGateway::startHeartbeating(uint64_t intervalms)
     });
 }
 
-std::future<void> VoiceGateway::stopHeartbeating()
+std::future<void> MediaGateway::stopHeartbeating()
 {
     return std::async(std::launch::async, [this]() -> void
     {
@@ -574,7 +574,7 @@ std::future<void> VoiceGateway::stopHeartbeating()
     });
 }
 
-std::future<bool> VoiceGateway::startDataFlow(const VoiceReadyEvent &voiceReady)
+std::future<bool> MediaGateway::startDataFlow(const VoiceReadyEvent &voiceReady)
 {
     connectionData_->readyData = voiceReady;
     return std::async(std::launch::async, [this, &voiceReady]() -> bool
@@ -605,7 +605,7 @@ std::future<bool> VoiceGateway::startDataFlow(const VoiceReadyEvent &voiceReady)
     });
 }
 
-std::future<void> VoiceGateway::stopDataFlow()
+std::future<void> MediaGateway::stopDataFlow()
 {
     return std::async(std::launch::async, [this]() -> void
     {
@@ -613,32 +613,32 @@ std::future<void> VoiceGateway::stopDataFlow()
     });
 }
 
-VoiceGateway::ConnectionState VoiceGateway::getState()
+MediaGateway::ConnectionState MediaGateway::getState()
 {
     return state_;
 }
 
-adb::types::SFID VoiceGateway::getGuildId() const
+adb::types::SFID MediaGateway::getGuildId() const
 {
     return guildId_;
 }
 
-std::optional<adb::types::SFID> VoiceGateway::getChannelId() const
+std::optional<adb::types::SFID> MediaGateway::getChannelId() const
 {
     return channelId_;
 }
 
-const VoiceState &VoiceGateway::getCurrentState() const
+const VoiceState &MediaGateway::getCurrentState() const
 {
     return connectionData_->currentState;
 }
 
-const std::string &VoiceGateway::getMode()
+const std::string &MediaGateway::getMode()
 {
     return connectionData_->mode;
 }
 
-void VoiceGateway::subscribe()
+void MediaGateway::subscribe()
 {
     connectionData_->voiceStateSubscription = gateway_->events()->subscribe<VoiceState>(Event::VOICE_STATE_UPDATE,
         [this](auto ev, auto &msg)

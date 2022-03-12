@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <functional>
+#include <future>
 #include <nlohmann/json.hpp>
 #include <libadb/libadb.hpp>
 #include <libadb/types/subscription.hpp>
@@ -23,6 +24,8 @@ namespace adb::api
         using TypedSubscriber = std::function<void(Event, const Type&)>;
 
         LIBADB_API [[nodiscard]] std::unique_ptr<adb::types::Subscription> subscribe(Event ev, Subscriber sub);
+        LIBADB_API [[nodiscard]] std::future<nlohmann::json> waitOne(Event ev);
+
         template <class Type>
         [[nodiscard]] std::unique_ptr<adb::types::Subscription> subscribe(Event ev, TypedSubscriber<Type> sub)
         {
@@ -33,6 +36,14 @@ namespace adb::api
                 }
             );
             return std::move(subscribe(ev, innerSub));
+        }
+        template <class Type>
+        [[nodiscard]] std::future<Type> waitOne(Event ev)
+        {
+            return std::async(std::launch::async, [this, ev]() -> Type
+            {
+                return waitOne(ev).get().get<Type>();
+            });
         }
     protected:
         GatewayEvents();

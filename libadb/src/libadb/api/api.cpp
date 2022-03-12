@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <libadb/api/auth/auth.hpp>
 #include <libadb/api/gateway/gateway.hpp>
-#include <libadb/api/voice/gateway.hpp>
+#include <libadb/api/media/media-gateway.hpp>
 #include <libadb/api/gateway/gateway-retrive.hpp>
 #include <libadb/api/channel/channel-api.hpp>
 #include <libadb/api/guild/guild-api.hpp>
@@ -45,9 +45,9 @@ std::shared_ptr<Gateway> DiscordApi::GetGateway()
     return gatewayInstance_;
 }
 
-std::unique_ptr<VoiceGateway> DiscordApi::GetVoiceGateway(adb::types::SFID guildId)
+std::unique_ptr<MediaGateway> DiscordApi::GetMediaGateway(adb::types::SFID guildId)
 {
-    return std::unique_ptr<VoiceGateway>(new VoiceGateway(CreateUserApi(), GetGateway(), guildId));
+    return std::unique_ptr<MediaGateway>(new MediaGateway(CreateUserApi(), GetGateway(), guildId));
 }
 
 std::unique_ptr<ChannelApi> DiscordApi::CreateChannelApi()

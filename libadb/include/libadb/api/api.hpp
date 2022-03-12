@@ -11,7 +11,7 @@ namespace adb::api
 {
     class Auth;
     class Gateway;
-    class VoiceGateway;
+    class MediaGateway;
     class ChannelApi;
     class GuildApi;
     class InteractionsApi;
@@ -25,7 +25,7 @@ namespace adb::api
 
         LIBADB_API std::unique_ptr<Auth> CreateAuth();
         LIBADB_API std::shared_ptr<Gateway> GetGateway();
-        LIBADB_API std::unique_ptr<VoiceGateway> GetVoiceGateway(adb::types::SFID guildId);
+        LIBADB_API std::unique_ptr<MediaGateway> GetMediaGateway(adb::types::SFID guildId);
         LIBADB_API std::unique_ptr<ChannelApi> CreateChannelApi();
         LIBADB_API std::unique_ptr<GuildApi> CreateGuildApi();
         LIBADB_API std::unique_ptr<InteractionsApi> CreateInteractionsApi();

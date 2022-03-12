@@ -4,12 +4,12 @@
 
 namespace adb::api
 {
-    /** @brief Voice Opcodes
+    /** @brief Media Opcodes
      * @details https://discord.com/developers/docs/topics/opcodes-and-status-codes#voice
      */
-    enum class VoiceOpCode : uint8_t
+    enum class MediaOpCode : uint8_t
     {
-        /// Begin a voice websocket connection.
+        /// Begin a media websocket connection.
         /// Send
         Identify = 0,
         /// Select the voice protocol.

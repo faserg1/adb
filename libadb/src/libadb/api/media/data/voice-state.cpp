@@ -1,4 +1,4 @@
-#include <libadb/api/voice/data/voice-state.hpp>
+#include <libadb/api/media/data/voice-state.hpp>
 #include <nlohmann/json.hpp>
 #include <libadb/types/helpers/json-chrono.hpp>
 #include <libadb/types/helpers/json-enum.hpp>

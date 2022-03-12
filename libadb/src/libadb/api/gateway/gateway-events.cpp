@@ -65,6 +65,20 @@ std::unique_ptr<Subscription> GatewayEvents::subscribe(Event ev, Subscriber sub)
     return std::make_unique<GatewaySubscription>(*subs_, ev, id);
 }
 
+std::future<nlohmann::json> GatewayEvents::waitOne(Event ev)
+{
+    return std::async(std::launch::async, [this, ev]() -> nlohmann::json
+    {
+        auto promise = std::make_shared<std::promise<nlohmann::json>>();
+        auto future = promise->get_future();
+        auto sub = subscribe(ev, [promise = std::move(promise)](auto ev, auto data)
+        {
+            promise->set_value(data);
+        });
+        return future.get();
+    });
+}
+
 void GatewayEvents::onDispatch(const Dispatch &dispatch)
 {
     auto eventSub = subs_->eventSubscribers.find(dispatch.event);

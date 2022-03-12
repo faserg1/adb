@@ -1,4 +1,4 @@
-#include <libadb/api/voice/data/speaking.hpp>
+#include <libadb/api/media/data/speaking.hpp>
 #include <nlohmann/json.hpp>
 #include <libadb/types/helpers/json-enum.hpp>
 

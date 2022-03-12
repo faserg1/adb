@@ -3,7 +3,10 @@
 #include <libadb/types/snowflake.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
+#include <vector>
+#include <optional>
 #include <libadb/libadb.hpp>
+#include <libadb/api/media/data/media-stream-description.hpp>
 
 namespace adb::api
 {
@@ -21,6 +24,10 @@ namespace adb::api
         std::string sessionId;
         /// token, received from VoiceServerUpdateEvent
         std::string token;
+        /// should video be enabled [NOT DOCUMENTED!!!]
+        std::optional<bool> video;
+        /// ???
+        std::optional<std::vector<MediaStreamDescription>> streams;
     };
 
     LIBADB_API void to_json(nlohmann::json& j, const VoiceIdentity& identity);
