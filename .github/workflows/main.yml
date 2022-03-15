@@ -15,6 +15,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      - name: Install GCC 11
+        run: |
+          sudo apt install gcc-11 g++-11
 
       - name: Install vcpkg
         uses: actions/checkout@v2
@@ -41,8 +45,8 @@ jobs:
           ADB_CLIENT_ID: ${{ secrets.ADB_CLIENT_ID }}
           ADB_CLIENT_SECRET: ${{ secrets.ADB_CLIENT_SECRET }}
           ADB_PUBLIC_KEY: ${{ secrets.ADB_PUBLIC_KEY }}
-          CC: gcc-10
-          CXX: g++-10
+          CC: gcc-11
+          CXX: g++-11
 
       - name: Build
         run: cmake --build .
