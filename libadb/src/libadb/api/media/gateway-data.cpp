@@ -4,14 +4,7 @@ using namespace adb::api;
 GatewayMediaData::GatewayMediaData() :
     socket_(ioService_)
 {
-
-}
-
-void GatewayMediaData::init()
-{
-    using namespace boost::asio::ip;
-    socket_.open(udp::v4());
-    socket_.bind(udp::endpoint(address{}, 0));
+    init();
 }
 
 void GatewayMediaData::relocate(std::string ip, uint16_t port, uint32_t ssrc)
@@ -21,6 +14,21 @@ void GatewayMediaData::relocate(std::string ip, uint16_t port, uint32_t ssrc)
     port_ = port;
     ssrc_ = ssrc;
     endpoint_ = udp::endpoint(address::from_string(ip), port);
+}
+
+bool GatewayMediaData::start()
+{
+    if (workerThread_.joinable())
+        return true;
+    workerThread_ = std::jthread([this](std::stop_token token){socketWorker(token);});
+}
+
+std::future<void> GatewayMediaData::stop()
+{
+    workerThread_.request_stop();
+    return std::async(std::launch::async, [this]{
+        workerThread_.join();
+    });
 }
 
 std::future<IPDiscovery> GatewayMediaData::ipDiscovery()
@@ -91,6 +99,13 @@ void GatewayMediaData::onDataFlowStarted()
 void GatewayMediaData::onDataFlowStopped()
 {
 
+}
+
+void GatewayMediaData::init()
+{
+    using namespace boost::asio::ip;
+    socket_.open(udp::v4());
+    socket_.bind(udp::endpoint(address{}, 0));
 }
 
 void GatewayMediaData::socketWorker(std::stop_token stop)

@@ -32,8 +32,13 @@ namespace adb::api
         void setMessageHandler(MessageHandler handler);
         bool sendMessage(const MediaPayload &payload);
 
-        std::future<bool> connect(adb::types::SFID channelId, std::string endpoint, std::string session, std::string token);
-        std::future<void> disconnect();
+        [[nodiscard]] std::future<bool> connect(adb::types::SFID channelId, std::string endpoint, std::string session, std::string token);
+        [[nodiscard]] std::future<void> disconnect();
+
+        bool isConnected() const;
+        adb::types::SFID getChannelId() const;
+
+        std::vector<std::string> getAwailableModes() const;
 
     protected:
         virtual void initClient();
@@ -42,6 +47,8 @@ namespace adb::api
         virtual void onHearbeatStart();
         virtual void onHeartbeatStop();
         virtual void onHearbeatDead();
+
+        void log(std::string msg);
 
     private:
         void internalOnMessage(const MediaPayload &payload);
@@ -65,9 +72,12 @@ namespace adb::api
         const adb::types::SFID userId_;
 
         adb::types::SFID channelId_;
+        std::string endpoint_;
         std::string gatewayUrl_;
         std::string sessionId_;
         std::string token_;
+
+        std::vector<std::string> modes_;
 
         MessageHandler handler_;
         WebSocketClient client_;
@@ -79,6 +89,9 @@ namespace adb::api
         uint64_t heartbeatNonce_ = 0;
         std::atomic<uint64_t> missedHeartBeats_ = 0;
         std::thread websocketThread_;
+
+        std::atomic_bool connected_;
+        std::atomic_flag connectionUpdated_;
 
         const size_t gatewayWebsocketVersion_ = 6;
     };

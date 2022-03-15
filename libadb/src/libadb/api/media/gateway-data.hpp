@@ -17,8 +17,9 @@ namespace adb::api
     public:
         GatewayMediaData();
 
-        void init();
         void relocate(std::string ip, uint16_t port, uint32_t ssrc);
+        bool start();
+        std::future<void> stop();
 
         std::future<IPDiscovery> ipDiscovery();
 
@@ -42,6 +43,7 @@ namespace adb::api
         virtual void onDataFlowStopped();
 
     private:
+        void init();
         void socketWorker(std::stop_token stop);
 
     private:

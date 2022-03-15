@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, media-dev ]
   pull_request:
     branches: [ master ]
 
