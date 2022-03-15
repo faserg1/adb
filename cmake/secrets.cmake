@@ -10,8 +10,10 @@ macro(readIfExists VAR_NAME FILE TYPE DEFAULT_VALUE)
     if(NOT DEFINED ${VAR_NAME} AND DEFINED DEFAULT_VALUE)
         set(${VAR_NAME} ${DEFAULT_VALUE})
     endif()
-    set(${VAR_NAME}_TYPE "${TYPE}")
-    list(APPEND SECRETS_LIST ${VAR_NAME})
+    if(DEFINED ${VAR_NAME})
+        set(${VAR_NAME}_TYPE "${TYPE}")
+        list(APPEND SECRETS_LIST ${VAR_NAME})
+    endif()
 endmacro()
 
 
