@@ -48,6 +48,11 @@ jobs:
           CC: gcc-11
           CXX: g++-11
 
+      - name: Patch packages
+        run: |
+          patch $GITHUB_WORKSPACE/vcpkg_installed/x64-linux/include/websocketpp/endpoint.hpp $GITHUB_WORKSPACE/thirdparty/patches/websocketpp/endpoint.patch 
+          patch $GITHUB_WORKSPACE/vcpkg_installed/x64-linux/include/websocketpp/logger/basic.hpp $GITHUB_WORKSPACE/thirdparty/patches/websocketpp/logger.basic.patch 
+
       - name: Build
         run: cmake --build .
         env:
