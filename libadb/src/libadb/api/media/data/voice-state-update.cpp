@@ -1,4 +1,4 @@
-#include <libadb/api/voice/data/voice-state-update.hpp>
+#include <libadb/api/media/data/voice-state-update.hpp>
 #include <nlohmann/json.hpp>
 #include <libadb/types/helpers/json-nullable.hpp>
 using namespace adb::api;
