@@ -21,14 +21,21 @@ void adb::api::from_json(const nlohmann::json& j, GuildMember& guildMember)
     map_from_json(j, "nick", guildMember.nick);
     if (j.contains("avatar"))
     {
-        std::string hash;
+        adb::types::Nullable<std::string> hash;
         j.at("avatar").get_to(hash);
-        adb::types::SFID userId;
-        if (guildMember.user.has_value())
-            userId = guildMember.user.value().id;
-        // avatar will be parsed in another function
-        guildMember.avatar = std::make_shared<adb::resource::Image>(
-            adb::resource::ImageResolver::getGuildMemberAvatar({}, userId, hash));
+        if (hash)
+        {
+            adb::types::SFID userId;
+            if (guildMember.user.has_value())
+                userId = guildMember.user.value().id;
+            // avatar will be parsed in another function
+            guildMember.avatar = std::make_shared<adb::resource::Image>(
+                adb::resource::ImageResolver::getGuildMemberAvatar({}, userId, *hash));
+        }
+        else
+        {
+            guildMember.avatar = nullptr;
+        }
     }
     j.at("roles").get_to(guildMember.roleIds);
     j.at("joined_at").get_to(guildMember.joinedAt);
@@ -36,7 +43,14 @@ void adb::api::from_json(const nlohmann::json& j, GuildMember& guildMember)
     j.at("deaf").get_to(guildMember.deaf);
     j.at("mute").get_to(guildMember.mute);
     map_from_json(j, "pending", guildMember.pending);
-    map_from_json(j, "permissions", guildMember.permissions);
+    std::optional<std::string> strPermissions;
+    map_from_json(j, "permissions", strPermissions);
+    if (strPermissions.has_value())
+    {
+        Permissions permissions;
+        adb::api::from_string(strPermissions.value(), permissions);
+        guildMember.permissions = permissions;
+    }
     map_from_json(j, "communication_disabled_until", guildMember.communicationDisabledUntil);
 }
 
@@ -45,14 +59,22 @@ void adb::api::gm_parse_avatar(adb::types::SFID guildId, std::optional<adb::type
 {
     if (jGuildMember.contains("avatar"))
     {
-        std::string hash;
+        adb::types::Nullable<std::string> hash;
         jGuildMember.at("avatar").get_to(hash);
-        adb::types::SFID userId;
-        if (guildMember.user.has_value())
-            userId = guildMember.user.value().id;
-        else if (optUserId.has_value())
-            userId = optUserId.value();
-        guildMember.avatar = std::make_shared<adb::resource::Image>(
-            adb::resource::ImageResolver::getGuildMemberAvatar(guildId, userId, hash));
+        if (hash)
+        {
+            adb::types::SFID userId;
+            if (guildMember.user.has_value())
+                userId = guildMember.user.value().id;
+            else if (optUserId.has_value())
+                userId = optUserId.value();
+            guildMember.avatar = std::make_shared<adb::resource::Image>(
+                adb::resource::ImageResolver::getGuildMemberAvatar(guildId, userId, *hash));
+        }
+        else
+        {
+            guildMember.avatar = nullptr;
+        }
+        
     }
 }

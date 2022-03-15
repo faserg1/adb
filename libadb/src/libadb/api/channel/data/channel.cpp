@@ -54,5 +54,12 @@ void adb::api::from_json(const nlohmann::json& j, Channel& channel)
     map_from_json(j, "thread_metadata", channel.threadMetadata);
     map_from_json(j, "member", channel.threadMember);
     map_from_json(j, "defailt_auto_archive_duration", channel.defailtAutoArchiveDuration);
-    map_from_json(j, "permissions", channel.permissions);
+    std::optional<std::string> strPermissions;
+    map_from_json(j, "permissions", strPermissions);
+    if (strPermissions.has_value())
+    {
+        Permissions permissions;
+        adb::api::from_string(strPermissions.value(), permissions);
+        channel.permissions = permissions;
+    }
 }
