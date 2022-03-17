@@ -4,6 +4,7 @@
 #include <libadb/api/gateway/gateway.hpp>
 
 #include "tests/test-voice.hpp"
+#include "tests/app-commands.hpp"
 
 int main()
 {
@@ -12,7 +13,9 @@ int main()
 	auto api = DiscordApi();
 	auto gateway = api.GetGateway();
 	
-	TestVoice tvoice(api, gateway);
+	/*TestVoice tvoice(api, gateway);*/
+
+	checkAppCommands(api, gateway);
 
 	gateway->connect();
 	gateway->run();

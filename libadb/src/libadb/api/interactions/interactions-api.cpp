@@ -7,7 +7,7 @@
 using namespace adb::api;
 
 InteractionsApi::InteractionsApi(const std::string &baseUrl) :
-    baseUrl_(baseUrl  + "/interactions"), webhooksUrl_(baseUrl  + "/webhooks")
+    baseUrl_(baseUrl  + "/interactions"), webhooksUrl_(baseUrl  + "/webhooks"), appUrl_(baseUrl  + "/applications")
 {
 
 }
@@ -109,4 +109,32 @@ std::optional<Message> InteractionsApi::editReply(const adb::types::SFID &appId,
     // todo: handle error
     nlohmann::json jresponse = nlohmann::json::parse(response.text);
     return jresponse.get<Message>();
+}
+
+std::optional<ApplicationCommand> InteractionsApi::createGuildCommand(const adb::types::SFID &appId, const adb::types::SFID &guildId, const CreateApplicationCommandParams& params)
+{
+    auto url = fmt::format("{}/{}/guilds/{}/commands", appUrl_, appId.to_string(), guildId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    nlohmann::json j = params;
+    auto contentType = std::pair{"content-type", "application/json"};
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetBody(j.dump());
+    auto response = session.Post();
+    if (response.status_code >= 200 && response.status_code < 300)
+    {
+        nlohmann::json jresponse = nlohmann::json::parse(response.text);
+        return jresponse.get<ApplicationCommand>();
+    }
+    return {};
+}
+
+bool InteractionsApi::deleteGuldCommand(const adb::types::SFID &appId, const adb::types::SFID &guildId, const adb::types::SFID & commandId)
+{
+    auto url = fmt::format("{}/{}/guilds/{}/commands/{}", appUrl_, appId.to_string(), guildId.to_string(), commandId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    auto response = session.Delete();
+    return response.status_code >= 200 && response.status_code < 300;
 }

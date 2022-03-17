@@ -1,4 +1,4 @@
-#include <libadb/api/message/data/message-component.hpp>
+#include <libadb/api/interactions/data/message-component.hpp>
 #include <nlohmann/json.hpp>
 #include <libadb/types/helpers/json-enum.hpp>
 #include <libadb/types/helpers/json-optional.hpp>

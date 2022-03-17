@@ -12,6 +12,7 @@ namespace adb::api
     {
         ActionRow = 1,
         Button = 2,
-        SelectMenu = 3
+        SelectMenu = 3,
+        TextInput = 4
     };
 }

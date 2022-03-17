@@ -19,10 +19,10 @@
 #include <libadb/api/message/data/reaction.hpp>
 #include <libadb/api/message/data/message-activity.hpp>
 #include <libadb/api/message/data/message-reference.hpp>
-#include <libadb/api/message/data/message-component.hpp>
 #include <libadb/api/application/data/application.hpp>
 #include <libadb/api/interactions/data/message-interaction.hpp>
 #include <libadb/api/sticker/data/sticker-item.hpp>
+#include <libadb/api/interactions/data/message-component.hpp>
 
 namespace adb::api
 {

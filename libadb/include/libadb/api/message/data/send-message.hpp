@@ -9,9 +9,9 @@
 #include <libadb/api/message/data/message-reference.hpp>
 #include <libadb/api/message/data/embed.hpp>
 #include <libadb/api/message/data/allowed-mentions.hpp>
-#include <libadb/api/message/data/message-component.hpp>
 #include <libadb/api/message/data/attachment.hpp>
 #include <libadb/api/message/data/message-flags.hpp>
+#include <libadb/api/interactions/data/message-component.hpp>
 
 #include <nlohmann/json_fwd.hpp>
 

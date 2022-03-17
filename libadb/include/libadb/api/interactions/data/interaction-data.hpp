@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 #include <nlohmann/json_fwd.hpp>
-#include <libadb/api/message/data/message-component-type.hpp>
+#include <libadb/api/interactions/data/message-component-type.hpp>
 #include <libadb/api/interactions/data/application-command-type.hpp>
 #include <libadb/libadb.hpp>
 

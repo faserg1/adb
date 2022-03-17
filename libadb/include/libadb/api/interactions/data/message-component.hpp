@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 #include <libadb/api/emoji/data/emoji.hpp>
-#include <libadb/api/message/data/select-option.hpp>
-#include <libadb/api/message/data/message-component-type.hpp>
-#include <libadb/api/message/data/button-style.hpp>
+#include <libadb/api/interactions/data/select-option.hpp>
+#include <libadb/api/interactions/data/message-component-type.hpp>
+#include <libadb/api/interactions/data/button-style.hpp>
 #include <libadb/libadb.hpp>
 
 namespace adb::api
