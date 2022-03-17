@@ -14,7 +14,8 @@ target_include_directories(libadb PRIVATE
 )
 
 target_include_directories(libadb PUBLIC
-    ${ROOT_INCLUDE_DIR}
+    "$<BUILD_INTERFACE:${ROOT_INCLUDE_DIR}>"
+    "$<INSTALL_INTERFACE:libadb/include>"
 )
 
 target_include_directories(libadb PRIVATE
