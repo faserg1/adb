@@ -18,6 +18,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 # Thirdparty librariies
 include(${ADB_THIRDPARTY_DIR}/libs.cmake)
+include(GNUInstallDirs)
 
 #add_compile_options(-fsanitize=address)
 #add_link_options(-fsanitize=address)

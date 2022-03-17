@@ -38,10 +38,9 @@ target_link_libraries(libadb PRIVATE ${USOCKETS_LIBRARY})
 
 target_secrets(libadb)
 
-if (DEFINED CMAKE_INSTALL_INCLUDEDIR AND DEFINED CMAKE_INSTALL_DATADIR)
-    install(TARGETS libadb EXPORT libadb-targets)
-    install(DIRECTORY ${ROOT_INCLUDE_DIR} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-    install(EXPORT libadb-targets
-        NAMESPACE libadb::
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/libadb)
-endif()
+
+install(TARGETS libadb EXPORT libadb-targets)
+install(DIRECTORY ${ROOT_INCLUDE_DIR} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT libadb-targets
+    NAMESPACE libadb::
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/libadb)
