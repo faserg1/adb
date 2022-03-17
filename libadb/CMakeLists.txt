@@ -15,7 +15,7 @@ target_include_directories(libadb PRIVATE
 
 target_include_directories(libadb PUBLIC
     "$<BUILD_INTERFACE:${ROOT_INCLUDE_DIR}>"
-    "$<INSTALL_INTERFACE:libadb/include>"
+    "$<INSTALL_INTERFACE:libadb/include/libadb>"
 )
 
 target_include_directories(libadb PRIVATE
@@ -41,7 +41,7 @@ target_secrets(libadb)
 
 
 install(TARGETS libadb EXPORT libadb-targets)
-install(DIRECTORY ${ROOT_INCLUDE_DIR} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY "include/libadb" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT libadb-targets
     NAMESPACE libadb::
     DESTINATION ${CMAKE_INSTALL_DATADIR}/libadb)
