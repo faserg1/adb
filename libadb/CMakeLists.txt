@@ -39,8 +39,18 @@ target_link_libraries(libadb PRIVATE ${USOCKETS_LIBRARY})
 
 target_secrets(libadb)
 
+set(ADB_PROJECT_CONFIG ${PROJECT_BINARY_DIR}/adb-config.cmake)
 
-install(TARGETS libadb EXPORT libadb-targets)
+set(targets_export_name libadb-targets)
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    ${PROJECT_SOURCE_DIR}/cmake/adb-config.cmake.in
+    ${ADB_PROJECT_CONFIG}
+    INSTALL_DESTINATION ${ADB_CMAKE_OUT})
+
+install(TARGETS libadb EXPORT ${targets_export_name})
 install(DIRECTORY "include/libadb" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT libadb-targets
     NAMESPACE libadb::
