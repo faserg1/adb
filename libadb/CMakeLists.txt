@@ -15,7 +15,7 @@ target_include_directories(libadb PRIVATE
 
 target_include_directories(libadb PUBLIC
     "$<BUILD_INTERFACE:${ROOT_INCLUDE_DIR}>"
-    "$<INSTALL_INTERFACE:libadb/include/libadb>"
+    "$<INSTALL_INTERFACE:include>"
 )
 
 target_include_directories(libadb PRIVATE
@@ -50,6 +50,9 @@ configure_package_config_file(
     ${ADB_PROJECT_CONFIG}
     INSTALL_DESTINATION ${ADB_CMAKE_OUT})
 
+install(
+    FILES ${ADB_PROJECT_CONFIG}
+    DESTINATION ${ADB_CMAKE_OUT})
 install(TARGETS libadb EXPORT ${targets_export_name})
 install(DIRECTORY "include/libadb" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT libadb-targets
