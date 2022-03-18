@@ -6,6 +6,7 @@
 #include <libadb/api/message/data/message.hpp>
 #include <libadb/api/interactions/data/create-application-command-params.hpp>
 #include <libadb/api/interactions/data/application-command.hpp>
+#include <libadb/api/interactions/data/guild-application-command-permissions.hpp>
 #include <libadb/libadb.hpp>
 
 namespace adb::api
@@ -72,6 +73,46 @@ namespace adb::api
          * @return true if command deleted successefully  
          */
         LIBADB_API bool deleteGuldCommand(const adb::types::SFID &appId, const adb::types::SFID &guildId, const adb::types::SFID & commandId);
+        /**
+         * @brief Fetches command permissions for all commands for your application in a guild.
+         * @param appId Application ID
+         * @param guildId Guild ID, where to fetch commands permissions
+         * @return Commands permissions for all commands in the guild
+         */
+        LIBADB_API std::optional<std::vector<GuildApplicationCommandPermissions>> getGuildCommandPermissions(const adb::types::SFID &appId, const adb::types::SFID &guildId);
+        /**
+         * @brief Get the Command Permissions object
+         * @param appId Application ID
+         * @param guildId Guild ID, where to fetch command permissions
+         * @param commandId Command ID
+         * @return Command permissions 
+         */
+        LIBADB_API std::optional<GuildApplicationCommandPermissions> getCommandPermissions(const adb::types::SFID &appId, const adb::types::SFID &guildId, const adb::types::SFID & commandId);
+        /**
+         * @brief Edits command permissions for a specific command for your application in a guild. You can only add up to 10 permission overwrites for a command.
+         * @param appId Application ID
+         * @param guildId Guild ID, where to change command permissions
+         * @param commandId Command ID, which permissions should be changed
+         * @param permissions List of permissions
+         * 
+         * @note This endpoint will overwrite existing permissions for the command in that guild
+         * @note Deleting or renaming a command will permanently delete all permissions for that command
+         * 
+         * @return Command permissions
+         */
+        LIBADB_API std::optional<GuildApplicationCommandPermissions> editCommandPermissions(const adb::types::SFID &appId, const adb::types::SFID &guildId, const adb::types::SFID & commandId,
+            const std::vector<ApplicationCommandPermission> &permissions);
+        /**
+         * @brief Batch edits permissions for all commands in a guild.
+         * Takes an array of partial guild application command permissions objects including id and permissions.
+         * You can only add up to 10 permission overwrites for a command.
+         * @param appId Application ID
+         * @param guildId Guild ID, where to change commands permissions
+         * @param permissions List of permissions
+         * @return List of all commands permissions
+         */
+        LIBADB_API std::optional<std::vector<GuildApplicationCommandPermissions>> batchEditCommandPermissions(const adb::types::SFID &appId, const adb::types::SFID &guildId,
+            const std::vector<GuildApplicationCommandPermissions> &permissions);
     private:
         InteractionsApi(const std::string &baseUrl);
     private:
