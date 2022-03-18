@@ -13,10 +13,10 @@ include(GNUInstallDirs)
 
 include(${ADB_ROOT_DIR}/cmake/arch.cmake)
 include(${ADB_ROOT_DIR}/cmake/secrets.cmake)
+include(${ADB_ROOT_DIR}/cmake/parameters.cmake)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(ADB_CMAKE_OUT ${CMAKE_INSTALL_LIBDIR}/cmake/adb)
 set(CMAKE_CXX_STANDARD 20)
 
 # Thirdparty librariies

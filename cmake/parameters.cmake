@@ -1,0 +1,1 @@
+set(ADB_CMAKE_OUT "${CMAKE_INSTALL_LIBDIR}/cmake/adb" CACHE STRING "Installation directory for cmake files")
