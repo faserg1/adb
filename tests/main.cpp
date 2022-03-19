@@ -4,6 +4,7 @@
 #include <libadb/api/gateway/gateway.hpp>
 
 #include "tests/test-voice.hpp"
+#include "tests/test-guild.hpp"
 #include "tests/app-commands.hpp"
 
 int main()
@@ -15,7 +16,8 @@ int main()
 	
 	/*TestVoice tvoice(api, gateway);*/
 
-	checkAppCommands(api, gateway);
+	// checkAppCommands(api, gateway);
+	// checkGuildChannels(api, gateway);
 
 	gateway->connect();
 	gateway->run();

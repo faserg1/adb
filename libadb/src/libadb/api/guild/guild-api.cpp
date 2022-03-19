@@ -1,5 +1,7 @@
 #include <libadb/api/guild/guild-api.hpp>
 #include <libadb/api/auth/token-bot.hpp>
+#include <libadb/api/utils/fill-reason.hpp>
+#include <libadb/api/auth/token-bot.hpp>
 #include <nlohmann/json.hpp>
 #include <fmt/core.h>
 #include <cpr/cpr.h>
@@ -23,4 +25,27 @@ std::vector<Channel> GuildApi::getChannels(adb::types::SFID guildId) const
     std::vector<Channel> channels;
     jresponse.get_to(channels);
     return channels;
+}
+
+std::optional<Channel> GuildApi::createChannel(adb::types::SFID guildId,
+    const CreateGuildChannelParams &params, std::optional<std::string> reason)
+{
+    auto url = fmt::format("{}/{}/channels",
+        baseUrl_, guildId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto contentType = std::pair{"content-type", "application/json"};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType};
+    fillReason(header, reason);
+    session.SetHeader(header);
+    nlohmann::json j = params;
+    auto data = j.dump();
+    session.SetBody(data);
+    auto response = session.Post();
+    if (response.status_code >= 200 && response.status_code < 300)
+    {
+        nlohmann::json jresponse = nlohmann::json::parse(response.text);
+        return jresponse.get<Channel>();
+    }
+    return {};
 }
