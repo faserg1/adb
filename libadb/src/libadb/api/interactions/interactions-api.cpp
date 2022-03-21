@@ -12,10 +12,10 @@ InteractionsApi::InteractionsApi(const std::string &baseUrl) :
 
 }
 
-bool InteractionsApi::ack(const adb::types::SFID &id, const std::string &token)
+bool InteractionsApi::ack(const adb::types::SFID &interactionId, const std::string &token)
 {
     auto url = fmt::format("{}/{}/{}/callback",
-        baseUrl_, id.to_string(), token);
+        baseUrl_, interactionId.to_string(), token);
     auto json = nlohmann::json
     {
         {"type", InteractionCallbackType::PONG}
@@ -29,10 +29,10 @@ bool InteractionsApi::ack(const adb::types::SFID &id, const std::string &token)
     return response.status_code >= 200 && response.status_code < 300;
 }
 
-bool InteractionsApi::message(const adb::types::SFID &id, const std::string &token, const SendMessageParams &params)
+bool InteractionsApi::message(const adb::types::SFID &interactionId, const std::string &token, const SendMessageParams &params)
 {
     auto url = fmt::format("{}/{}/{}/callback",
-        baseUrl_, id.to_string(), token);
+        baseUrl_, interactionId.to_string(), token);
     auto json = nlohmann::json
     {
         {"type", InteractionCallbackType::CHANNEL_MESSAGE_WITH_SOURCE},
@@ -62,13 +62,31 @@ bool InteractionsApi::message(const adb::types::SFID &id, const std::string &tok
     return response.status_code >= 200 && response.status_code < 300;
 }
 
-bool InteractionsApi::messageLater(const adb::types::SFID &id, const std::string &token)
+bool InteractionsApi::messageLater(const adb::types::SFID &interactionId, const std::string &token)
 {
     auto url = fmt::format("{}/{}/{}/callback",
-        baseUrl_, id.to_string(), token);
+        baseUrl_, interactionId.to_string(), token);
     auto json = nlohmann::json
     {
         {"type", InteractionCallbackType::DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE}
+    };
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto contentType = std::pair{"content-type", "application/json"};
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetBody(json.dump());
+    auto response = session.Post();
+    return response.status_code >= 200 && response.status_code < 300;
+}
+
+bool InteractionsApi::modal(const adb::types::SFID &interactionId, const std::string &token, const adb::api::Modal &modal)
+{
+    auto url = fmt::format("{}/{}/{}/callback",
+        baseUrl_, interactionId.to_string(), token);
+    auto json = nlohmann::json
+    {
+        {"type", InteractionCallbackType::MODAL},
+        {"data", modal}
     };
     auto session = cpr::Session();
     session.SetUrl(url);

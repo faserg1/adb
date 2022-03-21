@@ -8,17 +8,19 @@ using namespace adb::types;
 
 void adb::api::to_json(nlohmann::json& j, const InteractionDataApplicationCommand& appCommand)
 {
-
+    // todo:
 }
 
 void adb::api::from_json(const nlohmann::json& j, InteractionDataApplicationCommand& appCommand)
 {
-
+    j.at("id").get_to(appCommand.id);
+    j.at("name").get_to(appCommand.name);
+    j.at("type").get_to(appCommand.type);
 }
 
 void adb::api::to_json(nlohmann::json& j, const InteractionDataComponent& dataComponent)
 {
-
+    // todo:
 }
 
 void adb::api::from_json(const nlohmann::json& j, InteractionDataComponent& dataComponent)

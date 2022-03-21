@@ -4,6 +4,7 @@
 #include <string>
 #include <libadb/api/message/data/send-message.hpp>
 #include <libadb/api/message/data/message.hpp>
+#include <libadb/api/interactions/data/modal.hpp>
 #include <libadb/api/interactions/data/create-application-command-params.hpp>
 #include <libadb/api/interactions/data/application-command.hpp>
 #include <libadb/api/interactions/data/guild-application-command-permissions.hpp>
@@ -24,15 +25,15 @@ namespace adb::api
         /**
          * @brief Responding to an iteraction with a PONG
          * @details https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
-         * @param id Interaction ID, received via Gateway or webhook
+         * @param interactionId Interaction ID, received via Gateway or webhook
          * @param token Interaction token, received via Gateway or webhook
          * @return Was an interaction successefully acknowledged
          */
-        LIBADB_API bool ack(const adb::types::SFID &id, const std::string &token);
+        LIBADB_API bool ack(const adb::types::SFID &interactionId, const std::string &token);
         /**
          * @brief Responding to an iteraction with a message
          * @details https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
-         * @param id Interaction ID, received via Gateway or webhook
+         * @param interactionId Interaction ID, received via Gateway or webhook
          * @param token Interaction token, received via Gateway or webhook
          * @param params Responding message
          * @return Was an interaction successefully responded
@@ -41,11 +42,13 @@ namespace adb::api
         /**
          * @brief Promise to responding to an iteraction with a message later
          * @details https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
-         * @param id Interaction ID, received via Gateway or webhook
+         * @param interactionId Interaction ID, received via Gateway or webhook
          * @param token Interaction token, received via Gateway or webhook
          * @return Was an interaction response successefully promised
          */
-        LIBADB_API bool messageLater(const adb::types::SFID &id, const std::string &token);
+        LIBADB_API bool messageLater(const adb::types::SFID &interactionId, const std::string &token);
+
+        LIBADB_API bool modal(const adb::types::SFID &interactionId, const std::string &token, const adb::api::Modal &modal);
 
         /**
          * @brief Edit replayed message

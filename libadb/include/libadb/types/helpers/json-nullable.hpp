@@ -3,10 +3,20 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <libadb/types/nullable.hpp>
+#include <type_traits>
 
 namespace nlohmann
 {
-    template <typename OptType>
+    template <class OptType>
+    concept Abstract = requires
+    {
+        typename OptType::Origin;
+    };
+
+    template <class OptType>
+    concept NonAbstract = !Abstract<OptType>;
+
+    template <NonAbstract OptType>
     struct adl_serializer<adb::types::Nullable<OptType>>
     {
         static void to_json(json& obj, const adb::types::Nullable<OptType> &value)

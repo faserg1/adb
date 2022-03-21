@@ -12,6 +12,8 @@
 #include <libadb/api/channel/channel-api.hpp>
 #include <libadb/api/guild/guild-api.hpp>
 #include <libadb/api/interactions/interactions-api.hpp>
+#include <libadb/api/interactions/data/action-row-component.hpp>
+#include <libadb/api/interactions/data/select-menu-component.hpp>
 #include <nlohmann/json.hpp>
 #include <libadb/api/utils/msg-format.hpp>
 #include <fmt/format.h>
@@ -108,20 +110,18 @@ void TestVoice::onMessageChoose(adb::types::SFID channelId)
         };
     });
     
-    auto components = std::vector {
-        MessageComponent {
-            .type = MessageComponentType::SelectMenu,
-            .customId = "ts-bridge-choose-channel",
-            .options = opts,
-            .placeholder = "Choose a channel",
-        },
+    std::vector<MessageComponent> components;
+    SelectMenuComponent selectMenu {
+        .customId = "ts-bridge-choose-channel",
+        .options = opts,
+        .placeholder = "Choose a channel",
     };
-    auto actionRows = std::vector{
-        MessageComponent {
-            .type = MessageComponentType::ActionRow,
-            .components = components
-        }
+    components.push_back(createSelectMenu(selectMenu));
+    std::vector<MessageComponent> actionRows;
+    ActionRowComponent actionRow {
+        .components = components
     };
+    actionRows.push_back(createActionRow(actionRow));
     auto channelApi = api_.CreateChannelApi();
     auto createdMsg = channelApi->sendMessage(channelId, {
         .components = actionRows,

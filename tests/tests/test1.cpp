@@ -6,6 +6,11 @@
 #include <libadb/api/gateway/gateway.hpp>
 #include <libadb/api/gateway/gateway-events.hpp>
 #include <libadb/api/message/data/message.hpp>
+#include <libadb/api/interactions/data/select-option.hpp>
+#include <libadb/api/interactions/data/select-menu-component.hpp>
+#include <libadb/api/interactions/data/action-row-component.hpp>
+#include <libadb/api/interactions/data/button-component.hpp>
+#include <libadb/api/interactions/data/text-input-component.hpp>
 #include <libadb/api/channel/channel-api.hpp>
 #include <libadb/api/guild/guild-api.hpp>
 #include <nlohmann/json.hpp>
@@ -53,19 +58,16 @@ void checkSmth(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gat
 				.value = "Y"
 			},
 		};
-		auto components = std::vector {
-			MessageComponent {
-				.type = MessageComponentType::SelectMenu,
-				.customId = "chooser-looser",
-				.options = opts,
-				.placeholder = "Choose a coordinate",
-			},
-		};
-		auto actionRows = std::vector{
-			MessageComponent {
-				.type = MessageComponentType::ActionRow,
+		std::vector<MessageComponent> components;
+		components.push_back(createSelectMenu(SelectMenuComponent {
+			.customId = "chooser-looser",
+			.options = opts,
+			.placeholder = "Choose a coordinate",
+		}));
+		auto actionRows = std::vector<MessageComponent>{
+			createActionRow(ActionRowComponent{
 				.components = components
-			}
+			})
 		};
 		auto attachments = std::vector
 		{

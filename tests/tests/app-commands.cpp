@@ -3,8 +3,14 @@
 #include <libadb/api/gateway/gateway.hpp>
 #include <libadb/api/gateway/gateway-events.hpp>
 #include <libadb/api/interactions/interactions-api.hpp>
+#include <libadb/api/interactions/data/interaction.hpp>
+#include <libadb/api/interactions/data/text-input-component.hpp>
+#include <libadb/api/interactions/data/button-component.hpp>
+#include <libadb/api/interactions/data/action-row-component.hpp>
 #include <libadb/cfg/secrets.hpp>
 using namespace adb::api;
+
+static std::unique_ptr<adb::types::Subscription> cmdSub;
 
 void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 {
@@ -69,4 +75,30 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
     };
 
     auto cmd4 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), {"918981635918159943"}, commandParams4);
+
+    cmdSub = gateway->events()->subscribe<adb::api::Interaction>(adb::api::Event::INTERACTION_CREATE, [&api](auto ev, auto &msg)
+	{
+        auto ixApi = api.CreateInteractionsApi();
+        if (msg.type != InteractionType::APPLICATION_COMMAND)
+            return;
+        auto data = std::static_pointer_cast<InteractionDataApplicationCommand>(msg.data.value());
+        if (data->name != "duck1")
+            return;
+
+        auto textInput = createTextInput(TextInputComponent {
+            .customId = "lol",
+            .style = TextInputStyle::Short,
+            .label = "You know what"
+        });
+        auto actionRow = createActionRow(ActionRowComponent {
+            .components = {textInput}
+        });
+        ixApi->modal(msg.id, msg.token, Modal {
+            .customId = "test-modal",
+            .title = "Get on",
+            .components = {
+                actionRow
+            }
+        });
+    });
 }

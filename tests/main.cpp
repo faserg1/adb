@@ -16,7 +16,7 @@ int main()
 	
 	/*TestVoice tvoice(api, gateway);*/
 
-	// checkAppCommands(api, gateway);
+	checkAppCommands(api, gateway);
 	// checkGuildChannels(api, gateway);
 
 	gateway->connect();

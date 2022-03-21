@@ -2,37 +2,116 @@
 #include <nlohmann/json.hpp>
 #include <libadb/types/helpers/json-enum.hpp>
 #include <libadb/types/helpers/json-optional.hpp>
+#include <libadb/api/interactions/data/action-row-component.hpp>
+#include <libadb/api/interactions/data/select-menu-component.hpp>
+#include <libadb/api/interactions/data/text-input-component.hpp>
+#include <libadb/api/interactions/data/button-component.hpp>
 using namespace adb::api;
 using namespace adb::types;
 
-void adb::api::to_json(nlohmann::json& j, const MessageComponent& mc)
+namespace
 {
-    j["type"] = mc.type;
-    map_to_json(j, "custom_id", mc.customId);
-    map_to_json(j, "disabled", mc.disabled);
-    map_to_json(j, "style", mc.style);
-    map_to_json(j, "label", mc.label);
-    map_to_json(j, "emoji", mc.emoji);
-    map_to_json(j, "url", mc.url);
-    map_to_json(j, "options", mc.options);
-    map_to_json(j, "placeholder", mc.placeholder);
-    map_to_json(j, "min_values", mc.minValues);
-    map_to_json(j, "max_values", mc.maxValues);
-    map_to_json(j, "components", mc.components);
+    template <MessageComponentType type>
+    struct component_by_type
+    {
+    };
+    
+    template <>
+    struct component_by_type<MessageComponentType::ActionRow>
+    {
+        using Type = ActionRowComponent;
+    };
+
+    template <>
+    struct component_by_type<MessageComponentType::Button>
+    {
+        using Type = ButtonComponent;
+    };
+
+    template <>
+    struct component_by_type<MessageComponentType::SelectMenu>
+    {
+        using Type = SelectMenuComponent;
+    };
+
+    template <>
+    struct component_by_type<MessageComponentType::TextInput>
+    {
+        using Type = TextInputComponent;
+    };
+
+    template<MessageComponentType type>
+    std::shared_ptr<typename component_by_type<type>::Type> create()
+    {
+        auto *ptr = new component_by_type<type>::Type;
+        return std::shared_ptr<typename component_by_type<type>::Type>(ptr);
+    }
 }
 
-void adb::api::from_json(const nlohmann::json& j, MessageComponent& mc)
+void adb::api::to_json(nlohmann::json& j, const std::shared_ptr<MessageComponentBase>& mc)
 {
-    j.at("type").get_to(mc.type);
-    map_from_json(j, "custom_id", mc.customId);
-    map_from_json(j, "disabled", mc.disabled);
-    map_from_json(j, "style", mc.style);
-    map_from_json(j, "label", mc.label);
-    map_from_json(j, "emoji", mc.emoji);
-    map_from_json(j, "url", mc.url);
-    map_from_json(j, "options", mc.options);
-    map_from_json(j, "placeholder", mc.placeholder);
-    map_from_json(j, "min_values", mc.minValues);
-    map_from_json(j, "max_values", mc.maxValues);
-    map_from_json(j, "components", mc.components);
+    switch (mc->type)
+    {
+        case MessageComponentType::ActionRow:
+        {
+            auto ptr = std::static_pointer_cast<component_by_type<MessageComponentType::ActionRow>::Type>(mc);
+            j = *ptr;
+            break;
+        }
+        case MessageComponentType::TextInput:
+        {
+            auto ptr = std::static_pointer_cast<component_by_type<MessageComponentType::TextInput>::Type>(mc);
+            j = *ptr;
+            break;
+        }
+        case MessageComponentType::Button:
+        {
+            auto ptr = std::static_pointer_cast<component_by_type<MessageComponentType::Button>::Type>(mc);
+            j = *ptr;
+            break;
+        }
+        case MessageComponentType::SelectMenu:
+        {
+            auto ptr = std::static_pointer_cast<component_by_type<MessageComponentType::SelectMenu>::Type>(mc);
+            j = *ptr;
+            break;
+        }
+    }
+}
+
+void adb::api::from_json(const nlohmann::json& j, std::shared_ptr<MessageComponentBase>& mc)
+{
+    MessageComponentType type;
+    j.at("type").get_to(type);
+    switch (type)
+    {
+        case MessageComponentType::ActionRow:
+        {
+            auto ptr = create<MessageComponentType::ActionRow>();
+            j.get_to(*ptr);
+            mc = ptr;
+            break;
+        }
+        case MessageComponentType::TextInput:
+        {
+            auto ptr = std::make_shared<component_by_type<MessageComponentType::TextInput>::Type>();
+            j.get_to(*ptr);
+            mc = ptr;
+            break;
+        }
+        case MessageComponentType::Button:
+        {
+            auto ptr = std::make_shared<component_by_type<MessageComponentType::Button>::Type>();
+            j.get_to(*ptr);
+            mc = ptr;
+            break;
+        }
+        case MessageComponentType::SelectMenu:
+        {
+            auto ptr = std::make_shared<component_by_type<MessageComponentType::SelectMenu>::Type>();
+            j.get_to(*ptr);
+            mc = ptr;
+            break;
+        }
+    }
 }
