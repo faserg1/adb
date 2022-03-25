@@ -60,3 +60,9 @@ Image ImageResolver::getGuildMemberAvatar(const adb::types::SFID &guildId, const
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP, ImageFormat::GIF},
         fmt::format("guilds/{}/users/{}/avatars/", guildId.to_string(), userId.to_string()), hash, true);
 }
+
+Image ImageResolver::getRoleIcon(const adb::types::SFID &roleId, const std::string &hash)
+{
+    return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},
+        fmt::format("role-icons/{}/", roleId.to_string()), hash, true);
+}

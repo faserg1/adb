@@ -25,5 +25,6 @@ namespace adb::resource
         LIBADB_API static Image getDefaultUserAvatar(const std::string &discriminator);
         LIBADB_API static Image getUserAvarar(const adb::types::SFID &userId, const std::string &hash);
         LIBADB_API static Image getGuildMemberAvatar(const adb::types::SFID &guildId, const adb::types::SFID &userId, const std::string &hash);
+        LIBADB_API static Image getRoleIcon(const adb::types::SFID &roleId, const std::string &hash);
     };
 }

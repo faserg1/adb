@@ -12,6 +12,7 @@ namespace adb::api
         friend DiscordApi;
     public:
         LIBADB_API User getCurrentUser();
+        LIBADB_API User getUser(const adb::types::SFID id);
 
     private:
         UserApi(const std::string &baseUrl);

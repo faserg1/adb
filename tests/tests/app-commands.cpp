@@ -1,5 +1,7 @@
 #include "app-commands.hpp"
 #include <libadb/api/api.hpp>
+#include <libadb/api/user/user-api.hpp>
+#include <libadb/api/guild/guild-api.hpp>
 #include <libadb/api/gateway/gateway.hpp>
 #include <libadb/api/gateway/gateway-events.hpp>
 #include <libadb/api/interactions/interactions-api.hpp>
@@ -11,6 +13,7 @@
 using namespace adb::api;
 
 static std::unique_ptr<adb::types::Subscription> cmdSub;
+const adb::types::SFID guildId{"918981635918159943"};
 
 void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 {
@@ -28,12 +31,12 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         .name = "Duck 3",
         .type = ApplicationCommandType::MESSAGE
     };
-    auto cmd1 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), {"918981635918159943"}, commandParams1);
-    auto cmd2 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), {"918981635918159943"}, commandParams2);
-    auto cmd3 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), {"918981635918159943"}, commandParams3);
+    auto cmd1 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), guildId, commandParams1);
+    auto cmd2 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), guildId, commandParams2);
+    auto cmd3 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), guildId, commandParams3);
 
-    auto allPerms = ixApi->getGuildCommandPermissions(adb::cfg::Secrets::GetAppId(), {"918981635918159943"});
-    auto perms1 = ixApi->getCommandPermissions(adb::cfg::Secrets::GetAppId(), {"918981635918159943"}, cmd2.value().id);
+    auto allPerms = ixApi->getGuildCommandPermissions(adb::cfg::Secrets::GetAppId(), guildId);
+    auto perms1 = ixApi->getCommandPermissions(adb::cfg::Secrets::GetAppId(), guildId, cmd2.value().id);
 
     std::vector<ApplicationCommandOption> opts = {
         ApplicationCommandOption {
@@ -74,17 +77,27 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         .options = subGroup
     };
 
-    auto cmd4 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), {"918981635918159943"}, commandParams4);
+    auto cmd4 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), guildId, commandParams4);
 
     cmdSub = gateway->events()->subscribe<adb::api::Interaction>(adb::api::Event::INTERACTION_CREATE, [&api](auto ev, auto &msg)
 	{
         auto ixApi = api.CreateInteractionsApi();
+        auto userApi = api.CreateUserApi();
+        auto guildApi = api.CreateGuildApi();
         if (msg.type != InteractionType::APPLICATION_COMMAND)
             return;
         auto data = std::static_pointer_cast<InteractionDataApplicationCommand>(msg.data.value());
+
         if (data->name != "duck1")
             return;
-
+        auto sameUser = userApi->getUser(msg.guildMember.value().user.value().id);
+        auto roleParams = CreateGuildRoleParams
+        {
+            .name = "wow",
+        };
+        auto role = guildApi->createRole(guildId, roleParams, "We did it!");
+        guildApi->addMemberRole(guildId, sameUser.id, role.value().id, "We adding role!");
+        guildApi->removeMemberRole(guildId, sameUser.id, role.value().id, "We removing role!");
         auto textInput = createTextInput(TextInputComponent {
             .customId = "lol",
             .style = TextInputStyle::Short,

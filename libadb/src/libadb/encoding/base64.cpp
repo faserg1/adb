@@ -25,7 +25,7 @@ namespace
     }
 }
 
-std::string adb::encoding::encode(std::span<std::byte> data)
+std::string adb::encoding::encode(std::vector<std::byte> data)
 {
     const auto totalBits = data.size() * 8;
     const auto needSize = (totalBits / 6);

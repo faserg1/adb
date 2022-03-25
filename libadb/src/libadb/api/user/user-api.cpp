@@ -27,3 +27,19 @@ User UserApi::getCurrentUser()
     }
     return user;
 }
+
+User UserApi::getUser(const adb::types::SFID id)
+{
+    auto requestUrl = fmt::format("{}/{}", baseUrl_, id.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(cpr::Url{requestUrl});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    auto response = session.Get();
+    User user;
+    if (response.status_code >= 200 && response.status_code < 300)
+    {
+        auto json = nlohmann::json::parse(response.text);
+        json.get_to(user);
+    }
+    return user;
+}
