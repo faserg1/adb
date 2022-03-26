@@ -19,7 +19,7 @@ namespace adb::api
     {
         friend DiscordApi;
     public:
-        LIBADB_API std::vector<Channel> getChannels(adb::types::SFID guildId) const;
+        LIBADB_API std::vector<Channel> getChannels(const adb::types::SFID &guildId) const;
         /**
          * @brief Create a Channel in the Guild
          * @details https://discord.com/developers/docs/resources/guild#create-guild-channel
@@ -28,18 +28,35 @@ namespace adb::api
          * @param reason Reason, that will be displayed in audit log
          * @return Channel, if succeed 
          */
-        LIBADB_API std::optional<Channel> createChannel(adb::types::SFID guildId,
+        LIBADB_API std::optional<Channel> createChannel(const adb::types::SFID &guildId,
             const CreateGuildChannelParams &params, std::optional<std::string> reason = {});
+        /**
+         * @brief Get the Roles of the Guild
+         * @details https://discord.com/developers/docs/resources/guild#get-guild-roles
+         * @param guildId Guild ID
+         * @return Guild roles, of succeed 
+         */
+        LIBADB_API std::vector<Role> getRoles(const adb::types::SFID &guildId);
         /**
          * @brief Create a Role in the Guild
          * @details https://discord.com/developers/docs/resources/guild#create-guild-role
          * @param guildId Guild ID
          * @param params Parameters of the role
-         * @param reason  Reason, that will be displayed in audit log
+         * @param reason Reason, that will be displayed in audit log
          * @return Role, if succeed 
          */
         LIBADB_API std::optional<Role> createRole(const adb::types::SFID &guildId,
             const CreateGuildRoleParams &params, std::optional<std::string> reason = {});
+        /**
+         * @brief 
+         * @details https://discord.com/developers/docs/resources/guild#delete-guild-role
+         * @param guildId Guild ID
+         * @param roleId Role ID to delete
+         * @param reason Reason, that will be displayed in audit log
+         * @return LIBADB_API 
+         */
+        LIBADB_API bool deleteRole(const adb::types::SFID &guildId,
+            const adb::types::SFID &roleId, std::optional<std::string> reason = {});
 
         LIBADB_API bool addMemberRole(const adb::types::SFID &guildId, const adb::types::SFID &userId, const adb::types::SFID &roleId,
             std::optional<std::string> reason = {});

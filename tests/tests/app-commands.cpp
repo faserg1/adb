@@ -98,6 +98,7 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         auto role = guildApi->createRole(guildId, roleParams, "We did it!");
         guildApi->addMemberRole(guildId, sameUser.id, role.value().id, "We adding role!");
         guildApi->removeMemberRole(guildId, sameUser.id, role.value().id, "We removing role!");
+        guildApi->deleteRole(guildId, role.value().id, "Fuck that role!");
         auto textInput = createTextInput(TextInputComponent {
             .customId = "lol",
             .style = TextInputStyle::Short,
