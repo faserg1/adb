@@ -2,6 +2,7 @@
 #include <libadb/api/api.hpp>
 #include <libadb/api/user/user-api.hpp>
 #include <libadb/api/guild/guild-api.hpp>
+#include <libadb/api/channel/channel-api.hpp>
 #include <libadb/api/gateway/gateway.hpp>
 #include <libadb/api/gateway/gateway-events.hpp>
 #include <libadb/api/interactions/interactions-api.hpp>
@@ -83,6 +84,7 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 	{
         auto ixApi = api.CreateInteractionsApi();
         auto userApi = api.CreateUserApi();
+        auto channelApi = api.CreateChannelApi();
         auto guildApi = api.CreateGuildApi();
         if (msg.type != InteractionType::APPLICATION_COMMAND)
             return;
@@ -90,15 +92,11 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 
         if (data->name != "duck1")
             return;
-        auto sameUser = userApi->getUser(msg.guildMember.value().user.value().id);
-        auto roleParams = CreateGuildRoleParams
-        {
-            .name = "wow",
+        auto channel = userApi->createDM(msg.guildMember.value().user.value().id);
+        SendMessageParams params {
+            .content = "Hi! You sended a command!"
         };
-        auto role = guildApi->createRole(guildId, roleParams, "We did it!");
-        guildApi->addMemberRole(guildId, sameUser.id, role.value().id, "We adding role!");
-        guildApi->removeMemberRole(guildId, sameUser.id, role.value().id, "We removing role!");
-        guildApi->deleteRole(guildId, role.value().id, "Fuck that role!");
+        channelApi->sendMessage(channel.value().id, params);
         auto textInput = createTextInput(TextInputComponent {
             .customId = "lol",
             .style = TextInputStyle::Short,

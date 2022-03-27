@@ -33,6 +33,7 @@ User UserApi::getUser(const adb::types::SFID id)
     auto requestUrl = fmt::format("{}/{}", baseUrl_, id.to_string());
     auto session = cpr::Session();
     session.SetUrl(cpr::Url{requestUrl});
+    
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
     auto response = session.Get();
     User user;
@@ -42,4 +43,26 @@ User UserApi::getUser(const adb::types::SFID id)
         json.get_to(user);
     }
     return user;
+}
+
+std::optional<Channel> UserApi::createDM(const adb::types::SFID recipientId)
+{
+    auto requestUrl = fmt::format("{}/@me/channels", baseUrl_);
+    auto session = cpr::Session();
+    session.SetUrl(cpr::Url{requestUrl});
+    auto contentType = std::pair{"content-type", "application/json"};
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    nlohmann::json j
+    {
+        {"recipient_id", recipientId}
+    };
+    auto data = j.dump();
+    session.SetBody(data);
+    auto response = session.Post();
+    if (response.status_code >= 200 && response.status_code < 300)
+    {
+        auto json = nlohmann::json::parse(response.text);
+        return json.get<Channel>();
+    }
+    return {};
 }

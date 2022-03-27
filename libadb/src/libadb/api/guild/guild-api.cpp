@@ -50,7 +50,7 @@ std::optional<Channel> GuildApi::createChannel(const adb::types::SFID &guildId,
     return {};
 }
 
-LIBADB_API std::vector<Role> GuildApi::getRoles(const adb::types::SFID &guildId)
+std::vector<Role> GuildApi::getRoles(const adb::types::SFID &guildId)
 {
     auto url = fmt::format("{}/{}/roles",
         baseUrl_, guildId.to_string());
