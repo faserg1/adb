@@ -16,6 +16,21 @@ std::string SFID::to_string() const
     return std::to_string(id_);
 }
 
+SFID SFID::create()
+{
+    return {};
+}
+
+SFID::operator uint64_t() const
+{
+    return id_;
+}
+
+bool SFID::operator==(const SFID &other) const
+{
+    return id_ == other.id_;
+}
+
 void adb::types::to_json(nlohmann::json& j, const SFID& id)
 {
     j = id.to_string();

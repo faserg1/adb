@@ -21,9 +21,10 @@ namespace adb::types
 
         LIBADB_API SFID(const SFID &other) = default;
 
-        LIBADB_API SFID create();
+        LIBADB_API static SFID create();
 
-        LIBADB_API inline operator uint64_t() const { return id_; }
+        LIBADB_API operator uint64_t() const;
+        LIBADB_API bool operator==(const SFID &other) const;
         LIBADB_API std::string to_string() const;
     private:
         union

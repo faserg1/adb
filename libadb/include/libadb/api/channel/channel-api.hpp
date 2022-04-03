@@ -29,6 +29,17 @@ namespace adb::api
          * @return 
          */
         LIBADB_API std::vector<Message> getMessages(adb::types::SFID channelId, std::optional<GetMessagesOpt> opt, std::optional<uint8_t> limit);
+        /**
+         * @brief Create a reaction for the message.
+         * This endpoint requires the 'READ_MESSAGE_HISTORY' permission to be present on the current user.
+         * Additionally, if nobody else has reacted to the message using this emoji,
+         * this endpoint requires the 'ADD_REACTIONS' permission to be present on the current user.
+         * 
+         * @details https://discord.com/developers/docs/resources/channel#create-reaction
+         * @param channelId The ID of the channel, where the message exists.
+         * @param messageId The ID of the message, to add reaction.
+         * @param emoji Unicode emoji. To use custom emoji, you must encode it in the format name:id with the emoji name and emoji id. 
+         */
         LIBADB_API bool createReaction(adb::types::SFID channelId, adb::types::SFID messageId, std::string emoji);
         LIBADB_API std::optional<Message> sendMessage(adb::types::SFID channelId, const SendMessageParams &params);
         LIBADB_API std::optional<Message> editMessage(adb::types::SFID channelId, adb::types::SFID messageId, const SendMessageParams &params);
