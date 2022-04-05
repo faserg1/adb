@@ -1,6 +1,7 @@
 #include <libadb/api/interactions/interactions-api.hpp>
 #include <libadb/api/interactions/data/interaction-type.hpp>
 #include <libadb/api/auth/token-bot.hpp>
+#include <libadb/api/utils/message-session.hpp>
 #include <nlohmann/json.hpp>
 #include <fmt/core.h>
 #include <cpr/cpr.h>
@@ -41,24 +42,7 @@ bool InteractionsApi::message(const adb::types::SFID &interactionId, const std::
     };
     auto data = json.dump();
     auto session = cpr::Session();
-    auto multiform = params.attachments.has_value() && params.attachments.value().size() > 0;
-    auto contentType = std::pair{"content-type", multiform ? "multipart/form-data" : "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
-    if (multiform)
-    {
-        cpr::Multipart mp {};
-        mp.parts.emplace_back("payload_json", data, "application/json");
-        for (auto &attachment : params.attachments.value())
-        {
-            auto &content = attachment.fileContent.value();
-            cpr::Buffer b {content.begin(), content.end(), attachment.filename.value_or("")};
-            auto name = fmt::format("files[{}]", (size_t) attachment.id);
-            mp.parts.emplace_back(cpr::Part{name, b, attachment.contentType.value_or(std::string{})});
-        }
-        session.SetMultipart(std::move(mp));
-    }
-    else
-        session.SetBody(data);
+    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
     auto response = session.Post();
     return response.status_code >= 200 && response.status_code < 300;
 }
@@ -106,31 +90,7 @@ std::optional<Message> InteractionsApi::editReply(const adb::types::SFID &appId,
     auto data = j.dump();
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto multiform = params.attachments.has_value() &&
-        params.attachments.value() &&
-        std::any_of(params.attachments.value()->begin(), params.attachments.value()->end(), [](const SendAttachment &attachment) -> bool
-        {
-            return attachment.fileContent.has_value();
-        });
-    auto contentType = std::pair{"content-type", multiform ? "multipart/form-data" : "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
-    if (multiform)
-    {
-        cpr::Multipart mp {};
-        mp.parts.emplace_back("payload_json", data, "application/json");
-        for (auto &attachment : *params.attachments.value())
-        {
-            if (!attachment.fileContent.has_value())
-                continue;
-            auto &content = attachment.fileContent.value();
-            cpr::Buffer b {content.begin(), content.end(), attachment.filename.value_or("")};
-            auto name = fmt::format("files[{}]", (size_t) attachment.id);
-            mp.parts.emplace_back(cpr::Part{name, b, attachment.contentType.value_or(std::string{})});
-        }
-        session.SetMultipart(std::move(mp));
-    }
-    else
-        session.SetBody(data);
+    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
     auto response = session.Patch();
     // todo: handle error
     nlohmann::json jresponse = nlohmann::json::parse(response.text);
