@@ -93,10 +93,10 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         if (data->name != "duck1")
             return;
         auto channel = userApi->createDM(msg.guildMember.value().user.value().id);
-        SendMessageParams params {
+        CreateMessageParams params {
             .content = "Hi! You sended a command!"
         };
-        channelApi->sendMessage(channel.value().id, params);
+        channelApi->createMessage(channel.value().id, params);
         auto textInput = createTextInput(TextInputComponent {
             .customId = "lol",
             .style = TextInputStyle::Short,

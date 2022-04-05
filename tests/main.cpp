@@ -14,9 +14,9 @@ int main()
 	auto api = DiscordApi();
 	auto gateway = api.GetGateway();
 	
-	/*TestVoice tvoice(api, gateway);*/
+	TestVoice tvoice(api, gateway);
 
-	checkAppCommands(api, gateway);
+	// checkAppCommands(api, gateway);
 	// checkGuildChannels(api, gateway);
 
 	gateway->connect();

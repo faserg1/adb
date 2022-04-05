@@ -78,7 +78,7 @@ void checkSmth(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gat
 				.fileContent = std::vector<std::byte>{std::byte{0x55}, std::byte{0x55}, std::byte{0x55}, std::byte{0x0}}
 			}
 		};
-		auto createdMsg = channelApi->sendMessage(msg.channelId, {
+		auto createdMsg = channelApi->createMessage(msg.channelId, {
 			.content = "Fuck you!",
 			.embeds = embeds,
 			.messageReference = msgMention,

@@ -36,8 +36,7 @@ void adb::api::from_json(const nlohmann::json& j, GuildMemberUpdate& guildMember
         auto guildId = guildMemberUpdate.guildId;
         auto userId = guildMemberUpdate.user.id;
         auto hash = j.at("avatar").get<std::string>();
-        guildMemberUpdate.avatar = std::make_shared<adb::resource::Image>(
-            adb::resource::ImageResolver::getGuildMemberAvatar(guildId, userId, hash));
+        guildMemberUpdate.avatar = adb::resource::ImageResolver::getGuildMemberAvatar(guildId, userId, hash);
     }
     map_from_json(j, "joined_at", guildMemberUpdate.joinedAt);
     map_from_json(j, "premium_since", guildMemberUpdate.premiumSince);

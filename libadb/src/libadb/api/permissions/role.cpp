@@ -41,9 +41,7 @@ void adb::api::from_json(const nlohmann::json& j, Role& role)
     std::optional<adb::types::Nullable<std::string>> iconHash;
     if (iconHash.has_value() && iconHash.value())
     {
-        role.icon = std::make_shared<adb::resource::Image>(
-            adb::resource::ImageResolver::getRoleIcon(role.id, *iconHash.value())
-        );
+        role.icon = adb::resource::ImageResolver::getRoleIcon(role.id, *iconHash.value());
     }
 
     map_from_json(j, "unicode_emoji", role.unicodeEmoji);

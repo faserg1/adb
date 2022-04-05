@@ -51,7 +51,7 @@ void adb::api::from_json(const nlohmann::json& j, User& user)
     {
         std::string hash;
         j.at("avatar").get_to(hash);
-        user.avatar = std::make_shared<adb::resource::Image>(adb::resource::ImageResolver::getUserAvarar(user.id, hash));
+        user.avatar = adb::resource::ImageResolver::getUserAvarar(user.id, hash);
     }
     if (j.contains("bot"))
         j.at("bot").get_to(user.bot);
@@ -63,7 +63,7 @@ void adb::api::from_json(const nlohmann::json& j, User& user)
     {
         std::string hash;
         j.at("banner").get_to(hash);
-        user.banner = std::make_shared<adb::resource::Image>(adb::resource::ImageResolver::getUserBanner(user.id, hash));
+        user.banner = adb::resource::ImageResolver::getUserBanner(user.id, hash);
     }
     if (j.contains("accent_color") && !j.at("accent_color").is_null())
         j.at("accent_color").get_to(user.accentColor);

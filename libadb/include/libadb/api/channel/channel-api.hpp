@@ -6,7 +6,8 @@
 #include <vector>
 
 #include <libadb/api/channel/data/get-messages.hpp>
-#include <libadb/api/message/data/send-message.hpp>
+#include <libadb/api/message/data/create-message.hpp>
+#include <libadb/api/message/data/edit-message.hpp>
 #include <libadb/api/message/data/message.hpp>
 #include <libadb/libadb.hpp>
 
@@ -41,8 +42,33 @@ namespace adb::api
          * @param emoji Unicode emoji. To use custom emoji, you must encode it in the format name:id with the emoji name and emoji id. 
          */
         LIBADB_API bool createReaction(adb::types::SFID channelId, adb::types::SFID messageId, std::string emoji);
-        LIBADB_API std::optional<Message> sendMessage(adb::types::SFID channelId, const SendMessageParams &params);
-        LIBADB_API std::optional<Message> editMessage(adb::types::SFID channelId, adb::types::SFID messageId, const SendMessageParams &params);
+        /**
+         * @brief Post a message to a guild text or DM channel.
+         * @details https://discord.com/developers/docs/resources/channel#create-message
+         * @param channelId Channel, where to create messages
+         * @param params Message Create Params
+         * @return If success, returns a message object.
+         */
+        LIBADB_API std::optional<Message> createMessage(adb::types::SFID channelId, const CreateMessageParams &params);
+        /**
+         * @brief Edit a previously sent message.
+         * @details https://discord.com/developers/docs/resources/channel#edit-message
+         * @param channelId Channel, where to edit messages
+         * @param messageId Message ID to edit
+         * @param params Message Edit Params
+         * @return If success, returns a message object. 
+         */
+        LIBADB_API std::optional<Message> editMessage(adb::types::SFID channelId, adb::types::SFID messageId, const EditMessageParams &params);
+        /**
+         * @brief Delete a message.
+         * If operating on a guild channel and trying to delete a message that was not sent by the current user,
+         * this endpoint requires the MANAGE_MESSAGES permission.
+         * @details https://discord.com/developers/docs/resources/channel#delete-message
+         * @param channelId Channel, where to delete messages
+         * @param messageId Messages ID to delete
+         * @param reason Reason of deleteting message (for audit log)
+         */
+        LIBADB_API bool deleteMessage(const adb::types::SFID &channelId, const adb::types::SFID &messageId, std::optional<std::string> reason = {});
         /**
          * @brief Bulk Delete messages from channel, not elder than 14 days
          * @details https://discord.com/developers/docs/resources/channel#bulk-delete-messages
@@ -51,6 +77,7 @@ namespace adb::api
          * @param reason Reason of deleteting messages (for audit log)
          */
         LIBADB_API bool bulkDeleteMessages(adb::types::SFID channelId, std::vector<adb::types::SFID> messageIds, std::optional<std::string> reason = {});
+        
     private:
         ChannelApi(const std::string &baseUrl);
     private:

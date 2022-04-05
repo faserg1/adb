@@ -2,7 +2,8 @@
 
 #include <libadb/types/snowflake.hpp>
 #include <string>
-#include <libadb/api/message/data/send-message.hpp>
+#include <libadb/api/message/data/create-message.hpp>
+#include <libadb/api/message/data/edit-message.hpp>
 #include <libadb/api/message/data/message.hpp>
 #include <libadb/api/interactions/data/modal.hpp>
 #include <libadb/api/interactions/data/create-application-command-params.hpp>
@@ -38,7 +39,7 @@ namespace adb::api
          * @param params Responding message
          * @return Was an interaction successefully responded
          */
-        LIBADB_API bool message(const adb::types::SFID &id, const std::string &token, const SendMessageParams &params);
+        LIBADB_API bool message(const adb::types::SFID &id, const std::string &token, const CreateMessageParams &params);
         /**
          * @brief Promise to responding to an iteraction with a message later
          * @details https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
@@ -57,7 +58,7 @@ namespace adb::api
          * @param token Interaction token, received via Gateway or webhook
          * @return std::optional<Message> 
          */
-        LIBADB_API std::optional<Message> editReply(const adb::types::SFID &appId, const std::string &token, const SendMessageParams &params);
+        LIBADB_API std::optional<Message> editReply(const adb::types::SFID &appId, const std::string &token, const EditMessageParams &params);
         /**
          * @brief Create an Application Guild Command
          * @details https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command

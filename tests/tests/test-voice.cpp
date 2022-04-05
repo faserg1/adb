@@ -60,7 +60,7 @@ void TestVoice::init()
         
         if (values.empty())
         {
-            act->editReply(appId, token, SendMessageParams
+            act->editReply(appId, token, EditMessageParams
             {
                 .content = std::string {"Channel not choosed!"},
             });
@@ -71,7 +71,7 @@ void TestVoice::init()
             auto result = onMessageConnect(adb::types::SFID{values.front()}).get();
             if (result)
             {
-                act->editReply(appId, token, SendMessageParams
+                act->editReply(appId, token, EditMessageParams
                 {
                     .content = std::string {"Connected"},
                 });
@@ -82,7 +82,7 @@ void TestVoice::init()
             }
             else
             {
-                act->editReply(appId, token, SendMessageParams
+                act->editReply(appId, token, EditMessageParams
                 {
                     .content = std::string {"Connection failed!"},
                 });
@@ -123,7 +123,7 @@ void TestVoice::onMessageChoose(adb::types::SFID channelId)
     };
     actionRows.push_back(createActionRow(actionRow));
     auto channelApi = api_.CreateChannelApi();
-    auto createdMsg = channelApi->sendMessage(channelId, {
+    auto createdMsg = channelApi->createMessage(channelId, {
         .components = actionRows,
     });
 }

@@ -29,8 +29,7 @@ void adb::api::from_json(const nlohmann::json& j, GuildMember& guildMember)
             if (guildMember.user.has_value())
                 userId = guildMember.user.value().id;
             // avatar will be parsed in another function
-            guildMember.avatar = std::make_shared<adb::resource::Image>(
-                adb::resource::ImageResolver::getGuildMemberAvatar({}, userId, *hash));
+            guildMember.avatar = adb::resource::ImageResolver::getGuildMemberAvatar({}, userId, *hash);
         }
         else
         {
@@ -68,8 +67,7 @@ void adb::api::gm_parse_avatar(adb::types::SFID guildId, std::optional<adb::type
                 userId = guildMember.user.value().id;
             else if (optUserId.has_value())
                 userId = optUserId.value();
-            guildMember.avatar = std::make_shared<adb::resource::Image>(
-                adb::resource::ImageResolver::getGuildMemberAvatar(guildId, userId, *hash));
+            guildMember.avatar = adb::resource::ImageResolver::getGuildMemberAvatar(guildId, userId, *hash);
         }
         else
         {

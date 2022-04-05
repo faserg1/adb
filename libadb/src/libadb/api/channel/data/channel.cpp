@@ -38,9 +38,7 @@ void adb::api::from_json(const nlohmann::json& j, Channel& channel)
 
     if (iconHash.has_value() && iconHash.value())
     {
-        channel.icon = std::make_shared<adb::resource::Image>(
-            adb::resource::ImageResolver::getGroupDMIcon(*iconHash.value())
-        );
+        channel.icon = adb::resource::ImageResolver::getGroupDMIcon(*iconHash.value());
     }
 
     map_from_json(j, "owner_id", channel.ownerId);

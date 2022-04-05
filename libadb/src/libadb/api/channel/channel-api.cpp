@@ -4,6 +4,7 @@
 #include <libadb/api/utils/fill-reason.hpp>
 #include <fmt/core.h>
 #include <cpr/cpr.h>
+#include <algorithm>
 using namespace adb::api;
 using namespace adb::types;
 
@@ -64,7 +65,7 @@ bool ChannelApi::createReaction(adb::types::SFID channelId, adb::types::SFID mes
     return response.status_code == 204;
 }
 
-std::optional<Message> ChannelApi::sendMessage(adb::types::SFID channelId, const SendMessageParams &params)
+std::optional<Message> ChannelApi::createMessage(adb::types::SFID channelId, const CreateMessageParams &params)
 {
     auto url = fmt::format("{}/{}/messages",
         baseUrl_, channelId.to_string());
@@ -96,7 +97,7 @@ std::optional<Message> ChannelApi::sendMessage(adb::types::SFID channelId, const
     return jresponse.get<Message>();
 }
 
-std::optional<Message> ChannelApi::editMessage(adb::types::SFID channelId, adb::types::SFID messageId, const SendMessageParams &params)
+std::optional<Message> ChannelApi::editMessage(adb::types::SFID channelId, adb::types::SFID messageId, const EditMessageParams &params)
 {
     auto url = fmt::format("{}/{}/messages/{}",
         baseUrl_, channelId.to_string(), messageId.to_string());
@@ -104,15 +105,22 @@ std::optional<Message> ChannelApi::editMessage(adb::types::SFID channelId, adb::
     auto data = j.dump();
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto multiform = params.attachments.has_value() && params.attachments.value().size() > 0;
+    auto multiform = params.attachments.has_value() &&
+        params.attachments.value() &&
+        std::any_of(params.attachments.value()->begin(), params.attachments.value()->end(), [](const SendAttachment &attachment) -> bool
+        {
+            return attachment.fileContent.has_value();
+        });
     auto contentType = std::pair{"content-type", multiform ? "multipart/form-data" : "application/json"};
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
     if (multiform)
     {
         cpr::Multipart mp {};
         mp.parts.emplace_back("payload_json", data, "application/json");
-        for (auto &attachment : params.attachments.value())
+        for (auto &attachment : *params.attachments.value())
         {
+            if (!attachment.fileContent.has_value())
+                continue;
             auto &content = attachment.fileContent.value();
             cpr::Buffer b {content.begin(), content.end(), attachment.filename.value_or("")};
             auto name = fmt::format("files[{}]", (size_t) attachment.id);
@@ -126,6 +134,19 @@ std::optional<Message> ChannelApi::editMessage(adb::types::SFID channelId, adb::
     // todo: handle error
     nlohmann::json jresponse = nlohmann::json::parse(response.text);
     return jresponse.get<Message>();
+}
+
+bool ChannelApi::deleteMessage(const adb::types::SFID &channelId, const adb::types::SFID &messageId, std::optional<std::string> reason)
+{
+    auto url = fmt::format("{}/{}/messages/{}",
+        baseUrl_, channelId.to_string(), messageId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    cpr::Header header{TokenBot::getBotAuthTokenHeader()};
+    fillReason(header, reason);
+    session.SetHeader(header);
+    auto response = session.Delete();
+    return response.status_code >= 200 && response.status_code < 300;
 }
 
 bool ChannelApi::bulkDeleteMessages(SFID channelId, std::vector<SFID> messageIds, std::optional<std::string> reason)

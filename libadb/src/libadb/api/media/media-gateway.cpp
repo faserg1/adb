@@ -125,7 +125,7 @@ std::future<bool> MediaGateway::connect(adb::types::SFID channelId, bool mute, b
 
         nlohmann::json data = VoiceStateUpdate {
             .guildId = guildId_,
-            .channelId = std::make_shared<adb::types::SFID>(channelId_.value()),
+            .channelId = channelId_.value(),
             .selfMute = mute,
             .selfDeaf = deaf
         };

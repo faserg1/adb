@@ -8,7 +8,7 @@ namespace adb::api
      * @brief Button Style
      * @details https://discord.com/developers/docs/interactions/message-components#button-object-button-styles
      */
-    enum ButtonStyle : uint32_t
+    enum class ButtonStyle : uint32_t
     {
         Primary = 1,
         Secondary = 2,
