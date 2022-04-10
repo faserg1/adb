@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <libadb/libadb.hpp>
-#include <libadb/types/chrono.hpp>
+#include <libadb/types/time.hpp>
 #include <libadb/types/snowflake.hpp>
 #include <libadb/types/time.hpp>
 #include <libadb/types/nullable.hpp>

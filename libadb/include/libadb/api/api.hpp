@@ -9,6 +9,7 @@
 
 namespace adb::api
 {
+    class Context;
     class Auth;
     class Gateway;
     class MediaGateway;
@@ -16,6 +17,7 @@ namespace adb::api
     class GuildApi;
     class InteractionsApi;
     class UserApi;
+    class StickerApi;
 
 
     class DiscordApi final
@@ -30,8 +32,10 @@ namespace adb::api
         LIBADB_API std::unique_ptr<GuildApi> CreateGuildApi();
         LIBADB_API std::unique_ptr<InteractionsApi> CreateInteractionsApi();
         LIBADB_API std::unique_ptr<UserApi> CreateUserApi();
+        LIBADB_API std::unique_ptr<StickerApi> CreateStickerApi();
     private:
         const std::string baseUrl_;
         std::shared_ptr<Gateway> gatewayInstance_;
+        std::shared_ptr<Context> context_;
     };
 }

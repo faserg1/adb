@@ -8,6 +8,7 @@
 
 using namespace adb::api;
 using namespace adb::types;
+using namespace adb::resource;
 
 void adb::api::to_json(nlohmann::json& j, const Channel& channel)
 {
@@ -33,13 +34,9 @@ void adb::api::from_json(const nlohmann::json& j, Channel& channel)
     map_from_json(j, "rate_limit_per_user", channel.rateLimitPerUser);
     map_from_json(j, "recipients", channel.recipients);
 
-    std::optional<adb::types::Nullable<std::string>> iconHash;
-    map_from_json(j, "icon", iconHash);
-
-    if (iconHash.has_value() && iconHash.value())
-    {
-        channel.icon = adb::resource::ImageResolver::getGroupDMIcon(*iconHash.value());
-    }
+    map_from_json(j, "icon", channel.icon, [](const nlohmann::json &val) {
+        return ImageResolver::getGroupDMIcon(val.get<std::string>());
+    });
 
     map_from_json(j, "owner_id", channel.ownerId);
     map_from_json(j, "application_id", channel.applicationId);

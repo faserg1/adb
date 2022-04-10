@@ -42,6 +42,7 @@ bool InteractionsApi::message(const adb::types::SFID &interactionId, const std::
     };
     auto data = json.dump();
     auto session = cpr::Session();
+    session.SetUrl(url);
     fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
     auto response = session.Post();
     return response.status_code >= 200 && response.status_code < 300;
@@ -85,7 +86,7 @@ bool InteractionsApi::modal(const adb::types::SFID &interactionId, const std::st
 std::optional<Message> InteractionsApi::editReply(const adb::types::SFID &appId, const std::string &token, const EditMessageParams &params)
 {
     auto url = fmt::format("{}/{}/{}/messages/@original",
-        webhooksUrl_, appId, token);
+        webhooksUrl_, appId.to_string(), token);
     nlohmann::json j = params;
     auto data = j.dump();
     auto session = cpr::Session();

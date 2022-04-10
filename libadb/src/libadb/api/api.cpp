@@ -1,5 +1,6 @@
 #include <libadb/api/api.hpp>
 
+#include <libadb/api/context/context.hpp>
 #include <nlohmann/json.hpp>
 #include <libadb/api/auth/auth.hpp>
 #include <libadb/api/gateway/gateway.hpp>
@@ -9,6 +10,7 @@
 #include <libadb/api/guild/guild-api.hpp>
 #include <libadb/api/interactions/interactions-api.hpp>
 #include <libadb/api/user/user-api.hpp>
+#include <libadb/api/sticker/sticker-api.hpp>
 
 #include <fmt/core.h>
 
@@ -21,7 +23,8 @@ namespace
 }
 
 DiscordApi::DiscordApi(uint8_t version) :
-    baseUrl_(fmt::format("{}/v{}", discordApiBaseUrl, version)) 
+    baseUrl_(fmt::format("{}/v{}", discordApiBaseUrl, version)),
+    context_(std::make_shared<Context>(baseUrl_))
 {
 
 }
@@ -68,4 +71,9 @@ std::unique_ptr<InteractionsApi> DiscordApi::CreateInteractionsApi()
 std::unique_ptr<UserApi> DiscordApi::CreateUserApi()
 {
     return std::unique_ptr<UserApi>(new UserApi(baseUrl_));
+}
+
+std::unique_ptr<StickerApi> DiscordApi::CreateStickerApi()
+{
+    return std::unique_ptr<StickerApi>(new StickerApi(context_));
 }

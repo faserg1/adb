@@ -1,6 +1,7 @@
 #include <libadb/resource/image.hpp>
 #include <cpr/cpr.h>
 #include <fmt/format.h>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <algorithm>
 using namespace adb::resource;
@@ -59,4 +60,9 @@ std::future<std::vector<std::byte>> Image::getImage(ImageFormat format, size_t s
         memcpy(result.data(), response.text.data(), response.text.size());
         return result;
     });
+}
+
+void adb::resource::to_json(nlohmann::json& j, const Image& image)
+{
+    j = image.getName();
 }

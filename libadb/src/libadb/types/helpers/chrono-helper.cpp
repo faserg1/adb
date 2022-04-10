@@ -1,5 +1,6 @@
 #include <libadb/types/helpers/chrono-helper.hpp>
 #include <regex>
+#include <fmt/format.h>
 using namespace adb::types;
 
 namespace
@@ -71,4 +72,27 @@ std::optional<ISO8601Time> adb::types::parseTime(std::string txt)
         time.localZone = lz;
     }
     return time;
+}
+
+std::string adb::types::formatTime(ISO8601Time time)
+{
+    // Template 2017-07-11T17:27:07.299000+00:00
+    std::string totalTime;
+    totalTime += std::format("{}", (int) time.year);
+    if (!time.month.has_value())
+        return totalTime;
+    totalTime += std::format("-{}", (unsigned) time.month.value());
+    if (!time.day.has_value())
+        return totalTime;
+    totalTime += std::format("-{}", (unsigned) time.day.value());
+    if (!time.hours.has_value())
+        return totalTime;
+    totalTime += std::format("T{}", time.hours.value().count());
+    if (!time.minutes.has_value())
+        return totalTime;
+    totalTime += std::format(":{}", time.minutes.value().count());
+    if (!time.seconds.has_value())
+        return totalTime;
+    totalTime += std::format(":{}", time.seconds.value().count());
+    return totalTime;
 }

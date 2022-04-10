@@ -2,6 +2,7 @@
 
 #include <libadb/libadb.hpp>
 #include <libadb/resource/image-format.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <vector>
 #include <future>
@@ -16,6 +17,7 @@ namespace adb::resource
     {
         friend ImageResolver;
     public:
+        LIBADB_API Image(const Image&) = default;
         /**
          * @brief Get image name/hash
          */
@@ -36,6 +38,8 @@ namespace adb::resource
          * @return The future object with image data, throws, if format not supported
          */
         LIBADB_API std::future<std::vector<std::byte>> getImage(ImageFormat format, size_t size = 0) const;
+
+        LIBADB_API Image &operator=(const Image &) = default;
     private:
         Image(std::vector<ImageFormat> supportedFormats, std::string path, std::string name, bool aForGif = false);
     private:
@@ -46,4 +50,6 @@ namespace adb::resource
         /// https://discord.com/developers/docs/reference#image-formatting-image-base-url
         static const std::string cdnBase_;
     };
+
+    LIBADB_API void to_json(nlohmann::json& j, const Image& image);
 }

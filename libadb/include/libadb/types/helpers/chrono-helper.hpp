@@ -31,4 +31,5 @@ namespace adb::types
     };
 
     LIBADB_API std::optional<ISO8601Time> parseTime(std::string time);
+    LIBADB_API std::string formatTime(ISO8601Time time);
 }

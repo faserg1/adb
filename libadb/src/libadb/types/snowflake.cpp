@@ -2,6 +2,11 @@
 #include <nlohmann/json.hpp>
 using namespace adb::types;
 
+SFID::SFID() : id_(0)
+{
+    
+}
+
 SFID::SFID(uint64_t id) : id_(id)
 {
 
@@ -24,6 +29,11 @@ SFID SFID::create()
 SFID::operator uint64_t() const
 {
     return id_;
+}
+
+SFID::operator bool() const
+{
+    return static_cast<bool>(id_);
 }
 
 bool SFID::operator==(const SFID &other) const

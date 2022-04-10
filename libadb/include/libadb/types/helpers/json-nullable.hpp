@@ -45,4 +45,13 @@ namespace adb::types
             value = j.at(key).get<OptType>();
         }
     }
+
+    template <typename OptType, typename Resolver>
+    static void map_from_json(const nlohmann::json &j, const std::string &key, adb::types::Nullable<OptType> &value, Resolver func)
+    {
+        if (j.contains(key) && !j.at(key).is_null())
+        {
+            value = func(j.at(key));
+        }
+    }
 }

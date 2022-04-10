@@ -15,7 +15,7 @@ namespace adb::types
     class SFID
     {
     public:
-        LIBADB_API SFID() = default;
+        LIBADB_API SFID();
         LIBADB_API SFID(uint64_t id);
         LIBADB_API SFID(const std::string &strId);
 
@@ -24,6 +24,7 @@ namespace adb::types
         LIBADB_API static SFID create();
 
         LIBADB_API operator uint64_t() const;
+        LIBADB_API operator bool() const;
         LIBADB_API bool operator==(const SFID &other) const;
         LIBADB_API std::string to_string() const;
     private:

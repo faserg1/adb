@@ -63,6 +63,7 @@ void TestVoice::init()
             act->editReply(appId, token, EditMessageParams
             {
                 .content = std::string {"Channel not choosed!"},
+                .flags = 0 | MessageFlag::EPHEMERAL
             });
             return;
         }
@@ -74,6 +75,7 @@ void TestVoice::init()
                 act->editReply(appId, token, EditMessageParams
                 {
                     .content = std::string {"Connected"},
+                    .flags = 0 | MessageFlag::EPHEMERAL
                 });
                 voiceDataThreadReceiver = std::jthread([this](std::stop_token stop)
                 {
@@ -85,6 +87,7 @@ void TestVoice::init()
                 act->editReply(appId, token, EditMessageParams
                 {
                     .content = std::string {"Connection failed!"},
+                    .flags = 0 | MessageFlag::EPHEMERAL
                 });
             }
         });

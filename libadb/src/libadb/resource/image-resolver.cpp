@@ -66,3 +66,9 @@ Image ImageResolver::getRoleIcon(const adb::types::SFID &roleId, const std::stri
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},
         fmt::format("role-icons/{}/", roleId.to_string()), hash, true);
 }
+
+Image ImageResolver::getGuildScheduledEventCover(const adb::types::SFID &eventId, const std::string &hash)
+{
+    return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},
+        fmt::format("guild-events/{}/", eventId.to_string()), hash, false);
+}

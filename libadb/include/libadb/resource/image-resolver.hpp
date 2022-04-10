@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libadb/libadb.hpp>
+#include <string>
 #include <libadb/types/snowflake.hpp>
 #include <libadb/resource/image.hpp>
 
@@ -26,5 +27,6 @@ namespace adb::resource
         LIBADB_API static Image getUserAvarar(const adb::types::SFID &userId, const std::string &hash);
         LIBADB_API static Image getGuildMemberAvatar(const adb::types::SFID &guildId, const adb::types::SFID &userId, const std::string &hash);
         LIBADB_API static Image getRoleIcon(const adb::types::SFID &roleId, const std::string &hash);
+        LIBADB_API static Image getGuildScheduledEventCover(const adb::types::SFID &eventId, const std::string &hash);
     };
 }
