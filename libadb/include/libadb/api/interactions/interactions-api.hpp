@@ -45,10 +45,19 @@ namespace adb::api
          * @details https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
          * @param interactionId Interaction ID, received via Gateway or webhook
          * @param token Interaction token, received via Gateway or webhook
+         * @param params Responding message (Only flags supported?)
          * @return Was an interaction response successefully promised
          */
-        LIBADB_API bool messageLater(const adb::types::SFID &interactionId, const std::string &token);
+        LIBADB_API bool messageLater(const adb::types::SFID &interactionId, const std::string &token, std::optional<CreateMessageParams> params = {});
 
+        /**
+         * @brief Open modal window
+         * @details https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
+         * @param interactionId Interaction ID, received via Gateway or webhook
+         * @param token Interaction token, received via Gateway or webhook
+         * @param modal Parameters of modal window
+         * @return Was an interaction successefully responded
+         */
         LIBADB_API bool modal(const adb::types::SFID &interactionId, const std::string &token, const adb::api::Modal &modal);
 
         /**

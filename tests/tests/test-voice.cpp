@@ -45,6 +45,9 @@ void TestVoice::init()
 	{
         auto act = api_.CreateInteractionsApi();
 
+        if (msg.type != InteractionType::MESSAGE_COMPONENT)
+            return;
+
         std::string token = msg.token;
         adb::types::SFID id = msg.id;
         adb::types::SFID appId = msg.applicationId;
@@ -52,9 +55,13 @@ void TestVoice::init()
         if (msg.data.has_value())
         {
             auto data = std::static_pointer_cast<InteractionDataComponent>(msg.data.value());
+            if (data->customId != "ts-bridge-choose-channel")
+                return;
             if (data->values.has_value())
                 values = data->values.value();
+            
         }
+
 
         act->messageLater(id, token);
         

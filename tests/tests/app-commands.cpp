@@ -92,25 +92,9 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 
         if (data->name != "duck1")
             return;
-        auto channel = userApi->createDM(msg.guildMember.value().user.value().id);
         CreateMessageParams params {
-            .content = "Hi! You sended a command!"
+            .flags = 0 | MessageFlag::EPHEMERAL
         };
-        channelApi->createMessage(channel.value().id, params);
-        auto textInput = createTextInput(TextInputComponent {
-            .customId = "lol",
-            .style = TextInputStyle::Short,
-            .label = "You know what"
-        });
-        auto actionRow = createActionRow(ActionRowComponent {
-            .components = {textInput}
-        });
-        ixApi->modal(msg.id, msg.token, Modal {
-            .customId = "test-modal",
-            .title = "Get on",
-            .components = {
-                actionRow
-            }
-        });
+        ixApi->messageLater(msg.id, msg.token, params);
     });
 }

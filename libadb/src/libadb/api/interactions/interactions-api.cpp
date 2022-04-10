@@ -48,7 +48,7 @@ bool InteractionsApi::message(const adb::types::SFID &interactionId, const std::
     return response.status_code >= 200 && response.status_code < 300;
 }
 
-bool InteractionsApi::messageLater(const adb::types::SFID &interactionId, const std::string &token)
+bool InteractionsApi::messageLater(const adb::types::SFID &interactionId, const std::string &token, std::optional<CreateMessageParams> params)
 {
     auto url = fmt::format("{}/{}/{}/callback",
         baseUrl_, interactionId.to_string(), token);
@@ -56,11 +56,14 @@ bool InteractionsApi::messageLater(const adb::types::SFID &interactionId, const 
     {
         {"type", InteractionCallbackType::DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE}
     };
+    if (params.has_value())
+        json["data"] = params.value();
+    auto data = json.dump();
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
-    session.SetBody(json.dump());
+    if (params.has_value())
+        fillSessionWithMessage(params.value(), data, session, {TokenBot::getBotAuthTokenHeader()});
     auto response = session.Post();
     return response.status_code >= 200 && response.status_code < 300;
 }
