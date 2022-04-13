@@ -71,5 +71,8 @@ std::string adb::api::to_string(GuildFeature e)
 
 void adb::api::from_string(const std::string &str, GuildFeature &feature)
 {
-    feature = featureMap.find(str)->second;
+    if (auto it = featureMap.find(str); it != featureMap.end())
+        feature = it->second;
+    else
+        feature = GuildFeature::UNKNOWN;
 }

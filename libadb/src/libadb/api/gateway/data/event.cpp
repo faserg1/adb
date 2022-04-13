@@ -67,6 +67,7 @@ namespace
         DEFINE_EVENT_PAIR(VOICE_STATE_UPDATE),
         DEFINE_EVENT_PAIR(VOICE_SERVER_UPDATE),
         DEFINE_EVENT_PAIR(WEBHOOKS_UPDATE),
+        DEFINE_EVENT_PAIR(APPLICATION_COMMAND_PERMISSIONS_UPDATE),
     };
     std::unordered_map<Event, std::string_view> eventMap2
     {
@@ -128,6 +129,7 @@ namespace
         DEFINE_EVENT_PAIR2(VOICE_STATE_UPDATE),
         DEFINE_EVENT_PAIR2(VOICE_SERVER_UPDATE),
         DEFINE_EVENT_PAIR2(WEBHOOKS_UPDATE),
+        DEFINE_EVENT_PAIR2(APPLICATION_COMMAND_PERMISSIONS_UPDATE),
     };
 }
 
@@ -141,5 +143,7 @@ std::string adb::api::to_string(Event e)
 
 Event adb::api::from_string(std::string_view str)
 {
-    return eventMap.find(str)->second;
+    if (auto it = eventMap.find(str); it != eventMap.end())
+        return it->second;
+    return Event::UNKNOWN;
 }

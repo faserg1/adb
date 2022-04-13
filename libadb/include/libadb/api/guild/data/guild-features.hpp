@@ -2,11 +2,13 @@
 
 #include <string>
 #include <libadb/libadb.hpp>
+#include <cstdint>
 
 namespace adb::api
 {
-    enum class GuildFeature
+    enum class GuildFeature : uint64_t
     {
+        UNKNOWN,
         /// guild has access to set an animated guild banner image
         ANIMATED_BANNER,
         /// guild has access to set an animated guild icon

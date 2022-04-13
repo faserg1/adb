@@ -36,6 +36,7 @@ namespace adb::api
     protected:
         virtual void onMessage(const Payload &msg);
         virtual void onDispatch(const Dispatch &dispatch);
+        virtual void onDispatchUnknown(const std::string &eventName, const nlohmann::json &data);
 
         bool sendInternal(const Payload &msg);
     private:

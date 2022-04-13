@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cstdint>
 #include <libadb/libadb.hpp>
 
 namespace adb::api
@@ -9,8 +10,9 @@ namespace adb::api
      * @brief 
      * @details https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events
      */
-    enum class Event
+    enum class Event : uint64_t
     {
+        UNKNOWN,
         /// defines the heartbeat interval
         HELLO,
         /// contains the initial state information
@@ -127,6 +129,8 @@ namespace adb::api
         VOICE_SERVER_UPDATE,
         /// guild channel webhook was created, update, or deleted
         WEBHOOKS_UPDATE,
+        /// [not documented]
+        APPLICATION_COMMAND_PERMISSIONS_UPDATE
     };
 
     LIBADB_API std::string to_string(Event e);

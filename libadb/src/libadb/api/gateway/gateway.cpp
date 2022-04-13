@@ -114,10 +114,18 @@ void Gateway::onMessage(const Payload &msg)
             break;
         case GatewayOpCode::Dispatch:
         {
-            onDispatch({
-                .event = from_string(msg.eventName.value()),
-                .data = msg.data
-            });
+            auto eventType = from_string(msg.eventName.value());
+            if (eventType != Event::UNKNOWN)
+            {
+                onDispatch({
+                    .event = eventType,
+                    .data = msg.data
+                });
+            }
+            else
+            {
+                onDispatchUnknown(msg.eventName.value(), msg.data);
+            }
             if (data_->heartbeat.sequence < msg.sequence.value_or(0))
                 data_->heartbeat.sequence = msg.sequence.value();
             break;
@@ -128,6 +136,11 @@ void Gateway::onMessage(const Payload &msg)
 void Gateway::onDispatch(const Dispatch &dispatch)
 {
     events_->onDispatch(dispatch);
+}
+
+void Gateway::onDispatchUnknown(const std::string &eventName, const nlohmann::json &data)
+{
+    // TODO: 
 }
 
 bool Gateway::sendInternal(const Payload &msg)
