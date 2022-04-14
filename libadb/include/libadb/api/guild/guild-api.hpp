@@ -57,7 +57,15 @@ namespace adb::api
          */
         LIBADB_API bool deleteRole(const adb::types::SFID &guildId,
             const adb::types::SFID &roleId, std::optional<std::string> reason = {});
-
+        /**
+         * @brief Adds a role to a guild member.
+         * @details https://discord.com/developers/docs/resources/guild#add-guild-member-role
+         * @param guildId Guild ID
+         * @param userId User ID, who needs this role
+         * @param roleId Role ID to add
+         * @param reason Reason, that will be displayed in audit log
+         * @return `true`, if succeed 
+         */
         LIBADB_API bool addMemberRole(const adb::types::SFID &guildId, const adb::types::SFID &userId, const adb::types::SFID &roleId,
             std::optional<std::string> reason = {});
         LIBADB_API bool removeMemberRole(const adb::types::SFID &guildId, const adb::types::SFID &userId, const adb::types::SFID &roleId,

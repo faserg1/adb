@@ -3,6 +3,7 @@
 #include <libadb/api/auth/token-bot.hpp>
 #include <libadb/api/utils/fill-reason.hpp>
 #include <libadb/api/utils/message-session.hpp>
+#include <libadb/api/utils/read-response.hpp>
 #include <fmt/core.h>
 #include <cpr/cpr.h>
 #include <algorithm>
@@ -48,9 +49,7 @@ std::vector<Message> ChannelApi::getMessages(adb::types::SFID channelId, std::op
     session.SetParameters(params);
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
     auto response = session.Get();
-    // todo: handle error
-    nlohmann::json jresponse = nlohmann::json::parse(response.text);
-    return jresponse.get<std::vector<Message>>();
+    return readRequestResponse<std::vector<Message>>(response);
 }
 
 bool ChannelApi::createReaction(adb::types::SFID channelId, adb::types::SFID messageId, std::string emoji)
@@ -63,7 +62,7 @@ bool ChannelApi::createReaction(adb::types::SFID channelId, adb::types::SFID mes
         cpr::Header{TokenBot::getBotAuthTokenHeader()},
         cpr::Payload{}
     );
-    return response.status_code == 204;
+    return readCommandResponse(response);
 }
 
 std::optional<Message> ChannelApi::createMessage(adb::types::SFID channelId, const CreateMessageParams &params)
@@ -76,9 +75,7 @@ std::optional<Message> ChannelApi::createMessage(adb::types::SFID channelId, con
     session.SetUrl(url);
     fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
     auto response = session.Post();
-    // todo: handle error
-    nlohmann::json jresponse = nlohmann::json::parse(response.text);
-    return jresponse.get<Message>();
+    return readRequestResponseOpt<Message>(response);
 }
 
 std::optional<Message> ChannelApi::editMessage(adb::types::SFID channelId, adb::types::SFID messageId, const EditMessageParams &params)
@@ -91,9 +88,7 @@ std::optional<Message> ChannelApi::editMessage(adb::types::SFID channelId, adb::
     session.SetUrl(url);
     fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
     auto response = session.Patch();
-    // todo: handle error
-    nlohmann::json jresponse = nlohmann::json::parse(response.text);
-    return jresponse.get<Message>();
+    return readRequestResponseOpt<Message>(response);
 }
 
 bool ChannelApi::deleteMessage(const adb::types::SFID &channelId, const adb::types::SFID &messageId, std::optional<std::string> reason)
@@ -106,7 +101,7 @@ bool ChannelApi::deleteMessage(const adb::types::SFID &channelId, const adb::typ
     fillReason(header, reason);
     session.SetHeader(header);
     auto response = session.Delete();
-    return response.status_code >= 200 && response.status_code < 300;
+    return readCommandResponse(response);
 }
 
 bool ChannelApi::bulkDeleteMessages(SFID channelId, std::vector<SFID> messageIds, std::optional<std::string> reason)
@@ -125,5 +120,5 @@ bool ChannelApi::bulkDeleteMessages(SFID channelId, std::vector<SFID> messageIds
     auto data = j.dump();
     session.SetBody(data);
     auto response = session.Post();
-    return response.status_code >= 200 && response.status_code < 300;
+    return readCommandResponse(response);
 }

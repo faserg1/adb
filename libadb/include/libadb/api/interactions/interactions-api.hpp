@@ -69,6 +69,16 @@ namespace adb::api
          */
         LIBADB_API std::optional<Message> editReply(const adb::types::SFID &appId, const std::string &token, const EditMessageParams &params);
         /**
+         * @brief Fetch all of the guild commands for your application for a specific guild.
+         * @details https://discord.com/developers/docs/interactions/application-commands#get-guild-application-commands
+         * @param appId Application ID
+         * @param guildId Guild ID, from where to fetch commands
+         * @param withLocalization Whether to include full localization dictionaries
+         * (name_localizations and description_localizations) in the returned objects,
+         * instead of the name_localized and description_localized fields. Default false.
+         */
+        LIBADB_API std::vector<ApplicationCommand> getGuildCommands(const adb::types::SFID &appId, const adb::types::SFID &guildId, bool withLocalization = false);
+        /**
          * @brief Create an Application Guild Command
          * @details https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command
          * @param appId Application ID
@@ -77,6 +87,14 @@ namespace adb::api
          * @return true if command created successefully 
          */
         LIBADB_API std::optional<ApplicationCommand> createGuildCommand(const adb::types::SFID &appId, const adb::types::SFID &guildId, const CreateApplicationCommandParams& params);
+        /**
+         * @brief Fetch a guild command for your application.
+         * @details https://discord.com/developers/docs/interactions/application-commands#get-guild-application-commands
+         * @param appId Application ID
+         * @param guildId Guild ID, from where to fetch commands
+         * @param commandId Command ID to fetch
+         */
+        LIBADB_API std::optional<ApplicationCommand> getGuildCommand(const adb::types::SFID &appId, const adb::types::SFID &guildId, const adb::types::SFID &commandId);
         /**
          * @brief Delete an Application Guild Command
          * @details https://discord.com/developers/docs/interactions/application-commands#delete-guild-application-command

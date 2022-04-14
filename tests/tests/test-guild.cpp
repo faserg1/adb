@@ -29,3 +29,9 @@ void checkGuildChannels(DiscordApi &api, std::shared_ptr<Gateway> gateway)
     auto msgChannel = guildApi->createChannel({"918981635918159943"}, params2, "For the sake of SATAN!");
     auto voiceChannel = guildApi->createChannel({"918981635918159943"}, params3, "For the sake of SATAN!");
 }
+
+void checkRoleMemberAdd(adb::api::DiscordApi &api)
+{
+    auto guildApi = api.CreateGuildApi();
+    guildApi->addMemberRole(adb::types::SFID{"918981635918159943"}, adb::types::SFID{"294537448065859584"},adb::types::SFID{"964289645443706950"});
+}

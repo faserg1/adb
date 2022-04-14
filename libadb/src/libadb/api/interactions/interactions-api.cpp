@@ -2,6 +2,7 @@
 #include <libadb/api/interactions/data/interaction-type.hpp>
 #include <libadb/api/auth/token-bot.hpp>
 #include <libadb/api/utils/message-session.hpp>
+#include <libadb/api/utils/read-response.hpp>
 #include <nlohmann/json.hpp>
 #include <fmt/core.h>
 #include <cpr/cpr.h>
@@ -28,7 +29,7 @@ bool InteractionsApi::ack(const adb::types::SFID &interactionId, const std::stri
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
     session.SetBody(json.dump());
     auto response = session.Post();
-    return response.status_code >= 200 && response.status_code < 300;
+    return readCommandResponse(response);
 }
 
 bool InteractionsApi::message(const adb::types::SFID &interactionId, const std::string &token, const CreateMessageParams &params)
@@ -45,7 +46,7 @@ bool InteractionsApi::message(const adb::types::SFID &interactionId, const std::
     session.SetUrl(url);
     fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
     auto response = session.Post();
-    return response.status_code >= 200 && response.status_code < 300;
+    return readCommandResponse(response);
 }
 
 bool InteractionsApi::messageLater(const adb::types::SFID &interactionId, const std::string &token, std::optional<CreateMessageParams> params)
@@ -65,7 +66,7 @@ bool InteractionsApi::messageLater(const adb::types::SFID &interactionId, const 
     if (params.has_value())
         fillSessionWithMessage(params.value(), data, session, {TokenBot::getBotAuthTokenHeader()});
     auto response = session.Post();
-    return response.status_code >= 200 && response.status_code < 300;
+    return readCommandResponse(response);
 }
 
 bool InteractionsApi::modal(const adb::types::SFID &interactionId, const std::string &token, const adb::api::Modal &modal)
@@ -83,7 +84,7 @@ bool InteractionsApi::modal(const adb::types::SFID &interactionId, const std::st
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
     session.SetBody(json.dump());
     auto response = session.Post();
-    return response.status_code >= 200 && response.status_code < 300;
+    return readCommandResponse(response);
 }
 
 std::optional<Message> InteractionsApi::editReply(const adb::types::SFID &appId, const std::string &token, const EditMessageParams &params)
@@ -96,9 +97,20 @@ std::optional<Message> InteractionsApi::editReply(const adb::types::SFID &appId,
     session.SetUrl(url);
     fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
     auto response = session.Patch();
-    // todo: handle error
-    nlohmann::json jresponse = nlohmann::json::parse(response.text);
-    return jresponse.get<Message>();
+    return readRequestResponseOpt<Message>(response);
+}
+
+std::vector<ApplicationCommand> InteractionsApi::getGuildCommands(const adb::types::SFID &appId, const adb::types::SFID &guildId, bool withLocalization)
+{
+    auto url = fmt::format("{}/{}/guilds/{}/commands", appUrl_, appId.to_string(), guildId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    session.SetParameters(cpr::Parameters {
+        cpr::Parameter {"with_localizations", withLocalization ? "true" : "false"}
+    });
+    auto response = session.Get();
+    return readRequestResponse<std::vector<ApplicationCommand>>(response);
 }
 
 std::optional<ApplicationCommand> InteractionsApi::createGuildCommand(const adb::types::SFID &appId, const adb::types::SFID &guildId, const CreateApplicationCommandParams& params)
@@ -111,12 +123,17 @@ std::optional<ApplicationCommand> InteractionsApi::createGuildCommand(const adb:
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
     session.SetBody(j.dump());
     auto response = session.Post();
-    if (response.status_code >= 200 && response.status_code < 300)
-    {
-        nlohmann::json jresponse = nlohmann::json::parse(response.text);
-        return jresponse.get<ApplicationCommand>();
-    }
-    return {};
+    return readRequestResponseOpt<ApplicationCommand>(response);
+}
+
+std::optional<ApplicationCommand> InteractionsApi::getGuildCommand(const adb::types::SFID &appId, const adb::types::SFID &guildId, const adb::types::SFID &commandId)
+{
+    auto url = fmt::format("{}/{}/guilds/{}/commands/{}", appUrl_, appId.to_string(), guildId.to_string(), commandId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    auto response = session.Get();
+    return readRequestResponseOpt<ApplicationCommand>(response);
 }
 
 bool InteractionsApi::deleteGuldCommand(const adb::types::SFID &appId, const adb::types::SFID &guildId, const adb::types::SFID & commandId)
@@ -126,7 +143,7 @@ bool InteractionsApi::deleteGuldCommand(const adb::types::SFID &appId, const adb
     session.SetUrl(url);
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
     auto response = session.Delete();
-    return response.status_code >= 200 && response.status_code < 300;
+    return readCommandResponse(response);
 }
 
 std::optional<std::vector<GuildApplicationCommandPermissions>> InteractionsApi::getGuildCommandPermissions(const adb::types::SFID &appId, const adb::types::SFID &guildId)
@@ -137,12 +154,7 @@ std::optional<std::vector<GuildApplicationCommandPermissions>> InteractionsApi::
     auto contentType = std::pair{"content-type", "application/json"};
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
     auto response = session.Get();
-    if (response.status_code >= 200 && response.status_code < 300)
-    {
-        nlohmann::json jresponse = nlohmann::json::parse(response.text);
-        return jresponse.get<std::vector<GuildApplicationCommandPermissions>>();
-    }
-    return {};
+    return readRequestResponse<std::vector<GuildApplicationCommandPermissions>>(response);
 }
 
 std::optional<GuildApplicationCommandPermissions> InteractionsApi::getCommandPermissions(
@@ -154,12 +166,7 @@ std::optional<GuildApplicationCommandPermissions> InteractionsApi::getCommandPer
     auto contentType = std::pair{"content-type", "application/json"};
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
     auto response = session.Get();
-    if (response.status_code >= 200 && response.status_code < 300)
-    {
-        nlohmann::json jresponse = nlohmann::json::parse(response.text);
-        return jresponse.get<GuildApplicationCommandPermissions>();
-    }
-    return {};
+    return readRequestResponseOpt<GuildApplicationCommandPermissions>(response);
 }
 
 std::optional<GuildApplicationCommandPermissions> InteractionsApi::editCommandPermissions(
@@ -177,12 +184,7 @@ std::optional<GuildApplicationCommandPermissions> InteractionsApi::editCommandPe
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
     session.SetBody(j.dump());
     auto response = session.Put();
-    if (response.status_code >= 200 && response.status_code < 300)
-    {
-        nlohmann::json jresponse = nlohmann::json::parse(response.text);
-        return jresponse.get<GuildApplicationCommandPermissions>();
-    }
-    return {};
+    return readRequestResponseOpt<GuildApplicationCommandPermissions>(response);
 }
 
 std::optional<std::vector<GuildApplicationCommandPermissions>> InteractionsApi::batchEditCommandPermissions(
@@ -202,10 +204,5 @@ std::optional<std::vector<GuildApplicationCommandPermissions>> InteractionsApi::
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
     session.SetBody(j.dump());
     auto response = session.Put();
-    if (response.status_code >= 200 && response.status_code < 300)
-    {
-        nlohmann::json jresponse = nlohmann::json::parse(response.text);
-        return jresponse.get<std::vector<GuildApplicationCommandPermissions>>();
-    }
-    return {};
+    return readRequestResponse<std::vector<GuildApplicationCommandPermissions>>(response);
 }

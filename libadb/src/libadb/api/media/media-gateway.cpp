@@ -90,7 +90,11 @@ MediaGateway::MediaGateway(std::unique_ptr<UserApi> userApi, std::shared_ptr<Gat
     {
         throw std::runtime_error("Gateway should be connected with \"GuildVoiceStates\" intent!");
     }
-    currentUserId_ = userApi->getCurrentUser().id;
+    if (auto user = userApi->getCurrentUser(); user.has_value())
+    {
+        currentUserId_ = user.value().id;
+    }
+    
     subscribe();
     configureClient();
     configureMessageHandler();

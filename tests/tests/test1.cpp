@@ -12,6 +12,7 @@
 #include <libadb/api/interactions/data/button-component.hpp>
 #include <libadb/api/interactions/data/text-input-component.hpp>
 #include <libadb/api/channel/channel-api.hpp>
+#include <libadb/api/error/endpoint-error.hpp>
 #include <libadb/api/guild/guild-api.hpp>
 #include <nlohmann/json.hpp>
 #include <libadb/api/utils/msg-format.hpp>
@@ -92,4 +93,23 @@ void checkSmth(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gat
 	{
 		int i = 0;
 	});
+}
+
+void checkForErrors(adb::api::DiscordApi &api)
+{
+	auto channelApi = api.CreateChannelApi();
+	try
+	{
+		auto ref = adb::api::MessageReference {
+			.messageId = adb::types::SFID{"950751191669821500"}
+		};
+		auto message = channelApi->createMessage({"950751191669821500"}, {
+			.content = "asdsfsd",
+			.messageReference = ref
+		});
+	}
+	catch (adb::api::EndpointError &error)
+	{
+		int i = 0;
+	}
 }

@@ -13,8 +13,8 @@ namespace adb::api
     {
         friend DiscordApi;
     public:
-        LIBADB_API User getCurrentUser();
-        LIBADB_API User getUser(const adb::types::SFID id);
+        LIBADB_API std::optional<User> getCurrentUser();
+        LIBADB_API std::optional<User> getUser(const adb::types::SFID id);
         /**
          * @brief Create a new DM channel with a user.
          * @details https://discord.com/developers/docs/resources/user#create-dm

@@ -98,3 +98,14 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         ixApi->messageLater(msg.id, msg.token, params);
     });
 }
+
+void checkAppCommands2(DiscordApi &api, std::shared_ptr<Gateway> gateway)
+{
+    auto ixApi = api.CreateInteractionsApi();
+    auto commands = ixApi->getGuildCommands(adb::cfg::Secrets::GetAppId(), guildId);
+    for (auto command : commands)
+    {
+        ixApi->deleteGuldCommand(command.applicationId, command.guildId.value(), command.id);
+    }
+    int i = 0;
+}
