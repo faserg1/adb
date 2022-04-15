@@ -100,13 +100,6 @@ void checkForErrors(adb::api::DiscordApi &api)
 	auto channelApi = api.CreateChannelApi();
 	try
 	{
-		auto ref = adb::api::MessageReference {
-			.messageId = adb::types::SFID{"950751191669821500"}
-		};
-		auto message = channelApi->createMessage({"950751191669821500"}, {
-			.content = "asdsfsd",
-			.messageReference = ref
-		});
 	}
 	catch (adb::api::EndpointError &error)
 	{

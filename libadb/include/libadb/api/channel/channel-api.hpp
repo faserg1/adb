@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <libadb/api/channel/data/get-messages.hpp>
+#include <libadb/api/channel/data/followed-channel.hpp>
 #include <libadb/api/message/data/create-message.hpp>
 #include <libadb/api/message/data/edit-message.hpp>
 #include <libadb/api/message/data/message.hpp>
@@ -77,7 +78,13 @@ namespace adb::api
          * @param reason Reason of deleteting messages (for audit log)
          */
         LIBADB_API bool bulkDeleteMessages(adb::types::SFID channelId, std::vector<adb::types::SFID> messageIds, std::optional<std::string> reason = {});
-        
+        /**
+         * @brief Follow a News Channel to send messages to a target channel.
+         * @details https://discord.com/developers/docs/resources/channel#follow-news-channel
+         * @param channelId Channel ID
+         * @param webhookChannelId ID of target channel
+         */
+        LIBADB_API std::optional<FollowedChannel> followNewsChannel(adb::types::SFID channelId, adb::types::SFID webhookChannelId);
     private:
         ChannelApi(const std::string &baseUrl);
     private:

@@ -122,3 +122,20 @@ bool ChannelApi::bulkDeleteMessages(SFID channelId, std::vector<SFID> messageIds
     auto response = session.Post();
     return readCommandResponse(response);
 }
+
+std::optional<FollowedChannel> ChannelApi::followNewsChannel(adb::types::SFID channelId, adb::types::SFID webhookChannelId)
+{
+    auto url = fmt::format("{}/{}/followers",
+        baseUrl_, channelId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto contentType = std::pair{"content-type", "application/json"};
+    session.SetHeader({TokenBot::getBotAuthTokenHeader(), contentType});
+    nlohmann::json j {
+        {"webhook_channel_id", webhookChannelId}
+    };
+    auto data = j.dump();
+    session.SetBody(data);
+    auto response = session.Post();
+    return readRequestResponseOpt<FollowedChannel>(response);
+}

@@ -17,9 +17,9 @@ int main()
 	
 	TestVoice tvoice(api, gateway);
 
-	checkRoleMemberAdd(api);
+	// checkRoleMemberAdd(api);
 
-	//checkForErrors(api);
+	checkForErrors(api);
 
 	// checkAppCommands2(api, gateway);
 	// checkGuildChannels(api, gateway);
