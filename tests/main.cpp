@@ -5,6 +5,7 @@
 
 #include "tests/test1.hpp"
 #include "tests/test-voice.hpp"
+#include "tests/test-channel.hpp"
 #include "tests/test-guild.hpp"
 #include "tests/app-commands.hpp"
 
@@ -18,8 +19,11 @@ int main()
 	TestVoice tvoice(api, gateway);
 
 	// checkRoleMemberAdd(api);
+	// checkGuildMembers(api);
 
-	checkForErrors(api);
+	testPins(api);
+
+	// checkForErrors(api);
 
 	// checkAppCommands2(api, gateway);
 	// checkGuildChannels(api, gateway);

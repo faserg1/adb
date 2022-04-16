@@ -9,6 +9,7 @@
 #include <libadb/api/permissions/role.hpp>
 #include <libadb/api/guild/data/create-guild-channel-params.hpp>
 #include <libadb/api/guild/data/create-guild-role-params.hpp>
+#include <libadb/api/guild/data/guild-member.hpp>
 #include <libadb/libadb.hpp>
 
 namespace adb::api
@@ -30,6 +31,31 @@ namespace adb::api
          */
         LIBADB_API std::optional<Channel> createChannel(const adb::types::SFID &guildId,
             const CreateGuildChannelParams &params, std::optional<std::string> reason = {});
+        /**
+         * @brief Get Guild Member for specefic user
+         * @details https://discord.com/developers/docs/resources/guild#get-guild-member
+         * @param guildId Guild ID
+         * @param userId User ID
+         */
+        LIBADB_API std::optional<GuildMember> getGuildMember(const adb::types::SFID &guildId, const adb::types::SFID &userId);
+        /**
+         * @brief Get the list of Guild Members that are members of the guild.
+         * @details https://discord.com/developers/docs/resources/guild#list-guild-members
+         * @param guildId Guild ID
+         * @param limit max number of members to return (1-1000)
+         * @param after the highest user id in the previous page
+         */
+        LIBADB_API std::vector<GuildMember> listGuildMembers(const adb::types::SFID &guildId,
+            std::optional<uint64_t> limit, std::optional<adb::types::SFID> after);
+        /**
+         * @brief Search for guild members whose username or nickname starts with a provided string.
+         * @details https://discord.com/developers/docs/resources/guild#search-guild-members
+         * @param guildId Guild ID
+         * @param query Query string to match username(s) and nickname(s) against.
+         * @param limit max number of members to return (1-1000)
+         */
+        LIBADB_API std::vector<GuildMember> searchGuildMembers(const adb::types::SFID &guildId,
+            std::string query, std::optional<uint64_t> limit);
         /**
          * @brief Get the Roles of the Guild
          * @details https://discord.com/developers/docs/resources/guild#get-guild-roles

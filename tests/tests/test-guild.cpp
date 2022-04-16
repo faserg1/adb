@@ -5,6 +5,8 @@
 #include <libadb/api/gateway/gateway-events.hpp>
 using namespace adb::api;
 
+auto testGuildId = adb::types::SFID{"918981635918159943"};
+
 void checkGuildChannels(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 {
     auto guildApi = api.CreateGuildApi();
@@ -13,7 +15,7 @@ void checkGuildChannels(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         .name = "Bot Cat",
         .type = ChannelType::GUILD_CATEGORY,
     };
-    auto category = guildApi->createChannel({"918981635918159943"}, params1, "For the sake of SATAN!");
+    auto category = guildApi->createChannel(testGuildId, params1, "For the sake of SATAN!");
     CreateGuildChannelParams params2
     {
         .name = "Bot Msg",
@@ -26,12 +28,20 @@ void checkGuildChannels(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         .type = ChannelType::GUILD_VOICE,
         .parentId = category.value().id
     };
-    auto msgChannel = guildApi->createChannel({"918981635918159943"}, params2, "For the sake of SATAN!");
-    auto voiceChannel = guildApi->createChannel({"918981635918159943"}, params3, "For the sake of SATAN!");
+    auto msgChannel = guildApi->createChannel(testGuildId, params2, "For the sake of SATAN!");
+    auto voiceChannel = guildApi->createChannel(testGuildId, params3, "For the sake of SATAN!");
 }
 
 void checkRoleMemberAdd(adb::api::DiscordApi &api)
 {
     auto guildApi = api.CreateGuildApi();
-    guildApi->addMemberRole(adb::types::SFID{"918981635918159943"}, adb::types::SFID{"294537448065859584"},adb::types::SFID{"964289645443706950"});
+    guildApi->addMemberRole(testGuildId, adb::types::SFID{"294537448065859584"},adb::types::SFID{"964289645443706950"});
+}
+
+void checkGuildMembers(adb::api::DiscordApi &api)
+{
+    auto guildApi = api.CreateGuildApi();
+    auto me = guildApi->getGuildMember(testGuildId, {"294537448065859584"});
+    auto all = guildApi->listGuildMembers(testGuildId, 1000, {});
+    auto search = guildApi->searchGuildMembers(testGuildId, "А", 1000);
 }

@@ -31,6 +31,10 @@ namespace adb::api
         /// that is only viewable by those invited and those with the MANAGE_THREADS permission
         GUILD_PRIVATE_THREAD	= 12,	
         /// a voice channel for hosting events with an audience
-        GUILD_STAGE_VOICE		= 13,	
+        GUILD_STAGE_VOICE		= 13,
+        /// the channel in a hub containing the listed servers
+        GUILD_DIRECTORY         = 14,
+        /// a channel that can only contain threads
+        GUILD_FORUM             = 15,
     };
 }

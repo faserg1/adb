@@ -43,6 +43,55 @@ std::optional<Channel> GuildApi::createChannel(const adb::types::SFID &guildId,
     return readRequestResponseOpt<Channel>(response);
 }
 
+std::optional<GuildMember> GuildApi::getGuildMember(const adb::types::SFID &guildId, const adb::types::SFID &userId)
+{
+    auto url = fmt::format("{}/{}/members/{}",
+        baseUrl_, guildId.to_string(), userId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    session.SetHeader(header);
+    auto response = session.Get();
+    return readRequestResponseOpt<GuildMember>(response);
+}
+
+std::vector<GuildMember> GuildApi::listGuildMembers(const adb::types::SFID &guildId,
+    std::optional<uint64_t> limit, std::optional<adb::types::SFID> after)
+{
+    auto url = fmt::format("{}/{}/members",
+        baseUrl_, guildId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    cpr::Parameters params;
+    if (limit.has_value())
+        params.Add(cpr::Parameter{"limit", std::to_string(limit.value())});
+    if (after.has_value())
+        params.Add(cpr::Parameter{"after", after.value().to_string()});
+    session.SetParameters(params);
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    session.SetHeader(header);
+    auto response = session.Get();
+    return readRequestResponse<std::vector<GuildMember>>(response);
+}
+
+std::vector<GuildMember> GuildApi::searchGuildMembers(const adb::types::SFID &guildId,
+    std::string query, std::optional<uint64_t> limit)
+{
+    auto url = fmt::format("{}/{}/members/search",
+        baseUrl_, guildId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    cpr::Parameters params;
+    if (limit.has_value())
+        params.Add(cpr::Parameter{"limit", std::to_string(limit.value())});
+    params.Add(cpr::Parameter{"query", query});
+    session.SetParameters(params);
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    session.SetHeader(header);
+    auto response = session.Get();
+    return readRequestResponse<std::vector<GuildMember>>(response);
+}
+
 std::vector<Role> GuildApi::getRoles(const adb::types::SFID &guildId)
 {
     auto url = fmt::format("{}/{}/roles",

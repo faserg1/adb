@@ -16,6 +16,31 @@ ChannelApi::ChannelApi(const std::string &baseUrl) :
 
 }
 
+std::optional<Channel> ChannelApi::getChannel(const adb::types::SFID &channelId)
+{
+    auto url = fmt::format("{}/{}",
+        baseUrl_, channelId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    session.SetHeader(header);
+    auto response = session.Get();
+    return readRequestResponseOpt<Channel>(response);
+}
+
+bool ChannelApi::deleteChannel(const adb::types::SFID &channelId, std::optional<std::string> reason)
+{
+    auto url = fmt::format("{}/{}",
+        baseUrl_, channelId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    session.SetHeader(header);
+    fillReason(header, reason);
+    auto response = session.Delete();
+    return readCommandResponse(response);
+}
+
 std::vector<Message> ChannelApi::getMessages(adb::types::SFID channelId, std::optional<GetMessagesOpt> opt, std::optional<uint8_t> limit)
 {
     auto url = fmt::format("{}/{}/messages",
@@ -50,6 +75,18 @@ std::vector<Message> ChannelApi::getMessages(adb::types::SFID channelId, std::op
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
     auto response = session.Get();
     return readRequestResponse<std::vector<Message>>(response);
+}
+
+std::optional<Message> ChannelApi::getMessage(const adb::types::SFID &channelId, const adb::types::SFID &messageId)
+{
+    auto url = fmt::format("{}/{}/messages/{}",
+        baseUrl_, channelId.to_string(), messageId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    session.SetHeader(header);
+    auto response = session.Get();
+    return readRequestResponseOpt<Message>(response);
 }
 
 bool ChannelApi::createReaction(adb::types::SFID channelId, adb::types::SFID messageId, std::string emoji)
@@ -138,4 +175,45 @@ std::optional<FollowedChannel> ChannelApi::followNewsChannel(adb::types::SFID ch
     session.SetBody(data);
     auto response = session.Post();
     return readRequestResponseOpt<FollowedChannel>(response);
+}
+
+std::vector<Message> ChannelApi::getPinnedMessages(const adb::types::SFID &channelId)
+{
+    auto url = fmt::format("{}/{}/pins",
+        baseUrl_, channelId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    session.SetHeader(header);
+    auto response = session.Get();
+    return readRequestResponse<std::vector<Message>>(response);
+}
+
+bool ChannelApi::pinMessage(const adb::types::SFID &channelId, const adb::types::SFID &messageId, std::optional<std::string> reason)
+{
+    auto url = fmt::format("{}/{}/pins/{}",
+        baseUrl_, channelId.to_string(), messageId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto contentType = std::pair{"content-type", "application/json"};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType};
+    fillReason(header, reason);
+    session.SetHeader(header);
+    // Empty body
+    session.SetBody("{}");
+    auto response = session.Put();
+    return readCommandResponse(response);
+}
+
+bool ChannelApi::unpinMessage(const adb::types::SFID &channelId, const adb::types::SFID &messageId, std::optional<std::string> reason)
+{
+    auto url = fmt::format("{}/{}/pins/{}",
+        baseUrl_, channelId.to_string(), messageId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    fillReason(header, reason);
+    session.SetHeader(header);
+    auto response = session.Delete();
+    return readCommandResponse(response);
 }

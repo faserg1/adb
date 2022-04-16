@@ -10,3 +10,4 @@ namespace adb::api
 
 void checkGuildChannels(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);
 void checkRoleMemberAdd(adb::api::DiscordApi &api);
+void checkGuildMembers(adb::api::DiscordApi &api);

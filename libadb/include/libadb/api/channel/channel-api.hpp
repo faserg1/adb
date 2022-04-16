@@ -23,14 +23,34 @@ namespace adb::api
         
     public:
         /**
+         * @brief Get a channel by ID. If the channel is a thread, a thread member object is included in the returned result.
+         * @details https://discord.com/developers/docs/resources/channel#get-channel
+         * @param channelId Channel ID
+         */
+        LIBADB_API std::optional<Channel> getChannel(const adb::types::SFID &channelId);
+        /**
+         * @brief Delete a channel, or close a private message.
+         * @details https://discord.com/developers/docs/resources/channel#deleteclose-channel
+         * @param channelId Channel ID to delete
+         * @param reason Reason of deleteting channel (for audit log)
+         */
+        LIBADB_API bool deleteChannel(const adb::types::SFID &channelId, std::optional<std::string> reason = {});
+        /**
          * @brief Get array of messages from the channel
          * @details https://discord.com/developers/docs/resources/channel#get-channel-messages
          * @param channelId Channel, where to get messages
          * @param opt Options, where in the channel get messages
          * @param limit Limit of messages, 1-100, default: 50
-         * @return 
          */
         LIBADB_API std::vector<Message> getMessages(adb::types::SFID channelId, std::optional<GetMessagesOpt> opt, std::optional<uint8_t> limit);
+        /**
+         * @brief Returns a specific message in the channel.
+         * If operating on a guild channel, this endpoint requires the READ_MESSAGE_HISTORY permission to be present on the current user. 
+         * @details https://discord.com/developers/docs/resources/channel#get-channel-message
+         * @param channelId Channel ID
+         * @param messageId Message ID
+         */
+        LIBADB_API std::optional<Message> getMessage(const adb::types::SFID &channelId, const adb::types::SFID &messageId);
         /**
          * @brief Create a reaction for the message.
          * This endpoint requires the 'READ_MESSAGE_HISTORY' permission to be present on the current user.
@@ -85,6 +105,28 @@ namespace adb::api
          * @param webhookChannelId ID of target channel
          */
         LIBADB_API std::optional<FollowedChannel> followNewsChannel(adb::types::SFID channelId, adb::types::SFID webhookChannelId);
+        /**
+         * @brief Returns all pinned messages in the channel
+         * @details https://discord.com/developers/docs/resources/channel#get-pinned-messages
+         * @param channelId Channel ID
+         */
+        LIBADB_API std::vector<Message> getPinnedMessages(const adb::types::SFID &channelId);
+        /**
+         * @brief Pin a message in a channel. 
+         * @details https://discord.com/developers/docs/resources/channel#pin-message
+         * @param channelId Channel ID
+         * @param messageId Message ID to pin
+         * @param reason reason (for audit log)
+         */
+        LIBADB_API bool pinMessage(const adb::types::SFID &channelId, const adb::types::SFID &messageId, std::optional<std::string> reason = {});
+        /**
+         * @brief Unpin a message in a channel. 
+         * @details https://discord.com/developers/docs/resources/channel#unpin-message
+         * @param channelId Channel ID
+         * @param messageId Message ID to unpin
+         * @param reason reason (for audit log)
+         */
+        LIBADB_API bool unpinMessage(const adb::types::SFID &channelId, const adb::types::SFID &messageId, std::optional<std::string> reason = {});
     private:
         ChannelApi(const std::string &baseUrl);
     private:
