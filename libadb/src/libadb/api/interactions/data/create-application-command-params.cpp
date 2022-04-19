@@ -2,6 +2,7 @@
 #include <nlohmann/json.hpp>
 #include <libadb/types/helpers/json-enum.hpp>
 #include <libadb/types/helpers/json-optional.hpp>
+#include <libadb/types/helpers/json-nullable.hpp>
 using namespace adb::api;
 using namespace adb::types;
 
@@ -12,6 +13,8 @@ void adb::api::to_json(nlohmann::json& j, const CreateApplicationCommandParams& 
         {"name", params.name},
         {"description", params.description}
     };
+    map_to_json(j, "name_localizations", params.nameLocalizations);
+    map_to_json(j, "description_localizations", params.descriptionLocalizations);
     map_to_json(j, "options", params.options);
     map_to_json(j, "default_permission", params.defaultPermission);
     map_to_json(j, "type", params.type);
@@ -21,6 +24,8 @@ void adb::api::from_json(const nlohmann::json& j, CreateApplicationCommandParams
 {
     j.at("name").get_to(params.name);
     j.at("description").get_to(params.description);
+    map_from_json(j, "name_localizations", params.nameLocalizations);
+    map_from_json(j, "description_localizations", params.descriptionLocalizations);
     map_from_json(j, "options", params.options);
     map_from_json(j, "default_permission", params.defaultPermission);
     map_from_json(j, "type", params.type);

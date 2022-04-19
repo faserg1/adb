@@ -44,6 +44,7 @@ void TestVoice::init()
     subs_.emplace_back(gateway_->events()->subscribe<adb::api::Interaction>(adb::api::Event::INTERACTION_CREATE, [this](auto ev, auto &msg)
 	{
         auto act = api_.CreateInteractionsApi();
+        
 
         if (msg.type != InteractionType::MESSAGE_COMPONENT)
             return;
@@ -52,13 +53,15 @@ void TestVoice::init()
         adb::types::SFID id = msg.id;
         adb::types::SFID appId = msg.applicationId;
         std::vector<std::string> values;
-        if (msg.data.has_value())
+
+        auto data = adb::api::getInteractionData<InteractionDataComponent>(msg);
+
+        if (data.has_value())
         {
-            auto data = std::static_pointer_cast<InteractionDataComponent>(msg.data.value());
-            if (data->customId != "ts-bridge-choose-channel")
+            if (data.value()->customId != "ts-bridge-choose-channel")
                 return;
-            if (data->values.has_value())
-                values = data->values.value();
+            if (data.value()->values.has_value())
+                values = data.value()->values.value();
             
         }
 

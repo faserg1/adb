@@ -2,8 +2,11 @@
 
 #include <string>
 #include <variant>
+#include <optional>
+#include <unordered_map>
 
 #include <libadb/libadb.hpp>
+#include <libadb/resource/localization-map.hpp>
 #include <nlohmann/json_fwd.hpp>
 
 namespace adb::api
@@ -16,6 +19,8 @@ namespace adb::api
     {
         /// 1-100 character choice name
         std::string name;
+        /// Localization dictionary for the `name` field. Values follow the same restrictions as `name`
+        std::optional<adb::resource::LocalizationMap> nameLocalizations;
         /// value of the choice, up to 100 characters if string
         std::variant<std::string, int64_t, long double> value;
     };

@@ -12,8 +12,14 @@ How to build? Well...
 
     cmake . -DCMAKE_TOOLCHAIN_FILE:STRING=path/to/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=your-target-triplet
     cmake --build .
+    cmake --install .
 
 Now library will be in build folder. And don't forget libadb/include folder!
+
+# Looking for examples?
+
+Check out tests folder =)
+Sometimes it updates while I am testing out new features implementations.
 
 # Secrets
 

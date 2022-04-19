@@ -19,6 +19,8 @@ void adb::api::to_json(nlohmann::json& j, const ApplicationCommand& command)
     map_to_json(j, "guild_id", command.guildId);
     map_to_json(j, "options", command.options);
     map_to_json(j, "default_permission", command.defaultPermission);
+    map_to_json(j, "name_localizations", command.nameLocalizations);
+    map_to_json(j, "description_localizations", command.descriptionLocalizations);
 }
 
 void adb::api::from_json(const nlohmann::json& j, ApplicationCommand& command)
@@ -32,4 +34,6 @@ void adb::api::from_json(const nlohmann::json& j, ApplicationCommand& command)
     map_from_json(j, "guild_id", command.guildId);
     map_from_json(j, "options", command.options);
     map_from_json(j, "default_permission", command.defaultPermission);
+    map_from_json(j, "name_localizations", command.nameLocalizations);
+    map_from_json(j, "description_localizations", command.descriptionLocalizations);
 }

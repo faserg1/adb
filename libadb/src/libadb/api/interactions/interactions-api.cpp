@@ -69,6 +69,28 @@ bool InteractionsApi::messageLater(const adb::types::SFID &interactionId, const 
     return readCommandResponse(response);
 }
 
+bool InteractionsApi::autocomplete(const adb::types::SFID &interactionId, const std::string &token, std::vector<ApplicationCommandOptionChoice> choices)
+{
+    auto url = fmt::format("{}/{}/{}/callback",
+        baseUrl_, interactionId.to_string(), token);
+    auto data = nlohmann::json
+    {
+        {"choices", choices}
+    };
+    auto json = nlohmann::json
+    {
+        {"type", InteractionCallbackType::APPLICATION_COMMAND_AUTOCOMPLETE_RESULT},
+        {"data", data}
+    };
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    auto contentType = std::pair{"content-type", "application/json"};
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetBody(json.dump());
+    auto response = session.Post();
+    return readCommandResponse(response);
+}
+
 bool InteractionsApi::modal(const adb::types::SFID &interactionId, const std::string &token, const adb::api::Modal &modal)
 {
     auto url = fmt::format("{}/{}/{}/callback",

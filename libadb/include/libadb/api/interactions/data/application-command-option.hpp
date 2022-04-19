@@ -7,9 +7,11 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <libadb/libadb.hpp>
+#include <libadb/resource/localization-map.hpp>
 #include <libadb/api/interactions/data/application-command-option-type.hpp>
 #include <libadb/api/interactions/data/application-command-option-choice.hpp>
 #include <libadb/api/channel/data/channel-type.hpp>
+#include <libadb/types/nullable.hpp>
 
 namespace adb::api
 {
@@ -23,8 +25,12 @@ namespace adb::api
         ApplicationCommandOptionType type;
         /// 1-32 character name
         std::string name;
+        /// Localization dictionary for the name field. Values follow the same restrictions as name
+        std::optional<adb::types::Nullable<adb::resource::LocalizationMap>> nameLocalizations;
         /// 1-100 character description
         std::string description;
+        /// Localization dictionary for the description field. Values follow the same restrictions as description
+        std::optional<adb::types::Nullable<adb::resource::LocalizationMap>> descriptionLocalizations;
         /// if the parameter is required or optional (default false)
         /// @note if true, this command option must be listed before command optionds having false
         std::optional<bool> required;

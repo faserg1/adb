@@ -44,4 +44,7 @@ void checkGuildMembers(adb::api::DiscordApi &api)
     auto me = guildApi->getGuildMember(testGuildId, {"294537448065859584"});
     auto all = guildApi->listGuildMembers(testGuildId, 1000, {});
     auto search = guildApi->searchGuildMembers(testGuildId, "А", 1000);
+
+    auto roles = guildApi->getRoles(testGuildId);
+    int i = 0;
 }

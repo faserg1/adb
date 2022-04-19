@@ -10,3 +10,4 @@ namespace adb::api
 
 void checkAppCommands(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);
 void checkAppCommands2(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);
+void checkAppCommands3(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);

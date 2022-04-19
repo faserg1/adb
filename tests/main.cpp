@@ -21,11 +21,13 @@ int main()
 	// checkRoleMemberAdd(api);
 	// checkGuildMembers(api);
 
-	testPins(api);
+	// testPins(api);
 
 	// checkForErrors(api);
 
-	// checkAppCommands2(api, gateway);
+	// checkAppCommands(api, gateway);
+	checkAppCommands2(api, gateway);
+	// checkAppCommands3(api, gateway);
 	// checkGuildChannels(api, gateway);
 
 	gateway->connect();

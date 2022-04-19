@@ -21,7 +21,8 @@ void adb::api::from_json(const nlohmann::json& j, Interaction& interaction)
         j.at("data").get_to(*data);
         interaction.data = data;
     }
-    else if (interaction.type == InteractionType::APPLICATION_COMMAND)
+    else if (interaction.type == InteractionType::APPLICATION_COMMAND ||
+            interaction.type == InteractionType::APPLICATION_COMMAND_AUTOCOMPLETE)
     {
         auto data = std::make_shared<InteractionDataApplicationCommand>();
         j.at("data").get_to(*data);
@@ -65,4 +66,44 @@ void adb::api::from_json(const nlohmann::json& j, Interaction& interaction)
         adb::resource::from_string(str, locale);
         interaction.guildLocale = locale;
     }
+}
+
+template<>
+std::optional<std::shared_ptr<InteractionDataApplicationCommand>>
+    adb::api::getInteractionData<InteractionDataApplicationCommand>(const Interaction& interaction)
+{
+    if (!interaction.data.has_value())
+        return {};
+    if (interaction.type != InteractionType::APPLICATION_COMMAND &&
+        interaction.type != InteractionType::APPLICATION_COMMAND_AUTOCOMPLETE)
+        return {};
+    if (!interaction.data.value())
+        return nullptr;
+    return std::static_pointer_cast<InteractionDataApplicationCommand>(interaction.data.value());
+}
+
+template<>
+std::optional<std::shared_ptr<InteractionDataComponent>>
+    adb::api::getInteractionData<InteractionDataComponent>(const Interaction& interaction)
+{
+    if (!interaction.data.has_value())
+        return {};
+    if (interaction.type != InteractionType::MESSAGE_COMPONENT)
+        return {};
+    if (!interaction.data.value())
+        return nullptr;
+    return std::static_pointer_cast<InteractionDataComponent>(interaction.data.value());
+}
+
+template<>
+std::optional<std::shared_ptr<InteractionDataModal>>
+    adb::api::getInteractionData<InteractionDataModal>(const Interaction& interaction)
+{
+    if (!interaction.data.has_value())
+        return {};
+    if (interaction.type != InteractionType::MODAL_SUBMIT)
+        return {};
+    if (!interaction.data.value())
+        return nullptr;
+    return std::static_pointer_cast<InteractionDataModal>(interaction.data.value());
 }

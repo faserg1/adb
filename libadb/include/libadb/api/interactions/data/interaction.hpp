@@ -52,4 +52,18 @@ namespace adb::api
     LIBADB_API void to_json(nlohmann::json& j, const Interaction& interaction);
     LIBADB_API void from_json(const nlohmann::json& j, Interaction& interaction);
 
+    template<InteractionDataBase Data>
+    std::optional<std::shared_ptr<Data>> getInteractionData(const Interaction& interaction);
+
+    template<>
+    LIBADB_API std::optional<std::shared_ptr<InteractionDataApplicationCommand>>
+        getInteractionData<InteractionDataApplicationCommand>(const Interaction& interaction);
+
+    template<>
+    LIBADB_API std::optional<std::shared_ptr<InteractionDataComponent>>
+        getInteractionData<InteractionDataComponent>(const Interaction& interaction);
+
+    template<>
+    LIBADB_API std::optional<std::shared_ptr<InteractionDataModal>>
+        getInteractionData<InteractionDataModal>(const Interaction& interaction);
 }

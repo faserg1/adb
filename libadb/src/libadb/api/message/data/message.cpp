@@ -8,7 +8,7 @@ using namespace adb::types;
 
 void adb::api::to_json(nlohmann::json& j, const Message& msg)
 {
-
+    // TODO: Save for cache
 }
 
 void adb::api::from_json(const nlohmann::json& j, Message& msg)
@@ -25,8 +25,7 @@ void adb::api::from_json(const nlohmann::json& j, Message& msg)
     }
     j.at("content").get_to(msg.content);
     j.at("timestamp").get_to(msg.timestamp);
-    if (j.contains("edited_timestamp"))
-        j.at("edited_timestamp").get_to(msg.editedTimestamp);
+    map_from_json(j, "edited_timestamp", msg.editedTimestamp);
     j.at("tts").get_to(msg.tts);
     j.at("mention_everyone").get_to(msg.mentionEveryone);
     j.at("mentions").get_to(msg.mentions);
@@ -34,7 +33,6 @@ void adb::api::from_json(const nlohmann::json& j, Message& msg)
     map_from_json(j, "mention_channels", msg.mentionChannels);
     j.at("attachments").get_to(msg.attachments);
     j.at("embeds").get_to(msg.embeds);
-    j.at("mention_roles").get_to(msg.mentionRoles);
     map_from_json(j, "reactions", msg.reactions);
     map_from_json(j, "nonce", msg.nonce);
     j.at("pinned").get_to(msg.pinned);

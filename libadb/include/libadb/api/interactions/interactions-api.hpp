@@ -8,6 +8,7 @@
 #include <libadb/api/interactions/data/modal.hpp>
 #include <libadb/api/interactions/data/create-application-command-params.hpp>
 #include <libadb/api/interactions/data/application-command.hpp>
+#include <libadb/api/interactions/data/application-command-option-choice.hpp>
 #include <libadb/api/interactions/data/guild-application-command-permissions.hpp>
 #include <libadb/libadb.hpp>
 
@@ -49,7 +50,15 @@ namespace adb::api
          * @return Was an interaction response successefully promised
          */
         LIBADB_API bool messageLater(const adb::types::SFID &interactionId, const std::string &token, std::optional<CreateMessageParams> params = {});
-
+        /**
+         * @brief Autocomplete for application commands
+         * @details https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
+         * @param interactionId Interaction ID, received via Gateway or webhook
+         * @param token Interaction token, received via Gateway or webhook
+         * @param choices autocomplete choices (max of 25 choices)
+         * @return Was an interaction successefully responded
+         */
+        LIBADB_API bool autocomplete(const adb::types::SFID &interactionId, const std::string &token, std::vector<ApplicationCommandOptionChoice> choices);
         /**
          * @brief Open modal window
          * @details https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
