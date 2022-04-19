@@ -30,7 +30,9 @@ void adb::api::from_json(const nlohmann::json& j, Interaction& interaction)
     }
     else if (interaction.type == InteractionType::MODAL_SUBMIT)
     {
-        // todo: 
+        auto data = std::make_shared<InteractionDataModal>();
+        j.at("data").get_to(*data);
+        interaction.data = data;
     }
     map_from_json(j, "guild_id", interaction.guildId);
     map_from_json(j, "channel_id", interaction.guildId);
