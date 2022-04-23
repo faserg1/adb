@@ -9,6 +9,7 @@
 #include <libadb/api/interactions/data/application-command-type.hpp>
 #include <libadb/api/interactions/data/resolved-data.hpp>
 #include <libadb/api/interactions/data/interaction-data-command-option.hpp>
+#include <libadb/api/interactions/event/component-value.hpp>
 #include <libadb/libadb.hpp>
 
 namespace adb::api
@@ -56,7 +57,7 @@ namespace adb::api
         /// the custom_id of the component
         std::optional<std::string> customId;
         /// the values submitted by the user
-        std::optional<std::vector<MessageComponent>> components;
+        std::optional<std::vector<ComponentValue>> components;
     };
 
     LIBADB_API void to_json(nlohmann::json& j, const InteractionDataApplicationCommand& appCommand);
