@@ -35,7 +35,7 @@ void adb::api::from_json(const nlohmann::json& j, Interaction& interaction)
         interaction.data = data;
     }
     map_from_json(j, "guild_id", interaction.guildId);
-    map_from_json(j, "channel_id", interaction.guildId);
+    map_from_json(j, "channel_id", interaction.channelId);
     map_from_json(j, "member", interaction.guildMember);
     map_from_json(j, "user", interaction.user);
 
