@@ -1,5 +1,6 @@
 #include <libadb/api/gateway/gateway.hpp>
 #include <libadb/api/gateway/gateway-events.hpp>
+#include <libadb/api/context/context.hpp>
 #include <libadb/api/gateway/data/payload.hpp>
 #include <libadb/api/gateway/data/identity.hpp>
 #include <libadb/api/gateway/data/hello.hpp>
@@ -35,8 +36,9 @@ struct Gateway::GatewayData
     
 };
 
-Gateway::Gateway(const std::string &gatewayUrl, Intents requiredIntents) :
-    gatewayUrl_(gatewayUrl), data_(std::make_unique<GatewayData>()), events_(GatewayEvents::create()), requiredIntents_(requiredIntents)
+Gateway::Gateway(std::shared_ptr<Context> context, const std::string &gatewayUrl, Intents requiredIntents) :
+    context_(context), gatewayUrl_(gatewayUrl),
+    data_(std::make_unique<GatewayData>()), events_(GatewayEvents::create()), requiredIntents_(requiredIntents)
 {
     configureClient();
     configureMessageHandler();
@@ -183,7 +185,7 @@ void Gateway::stopHeartbeat()
 void Gateway::identify()
 {
     Identity identity {
-        .token = std::string(cfg::Secrets::GetBotToken()),
+        .token = context_->getSecrets().botToken,
         .properties = {
             .os = "linux",
             .browser = "adb",

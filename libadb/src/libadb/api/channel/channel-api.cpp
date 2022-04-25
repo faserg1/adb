@@ -1,4 +1,5 @@
 #include <libadb/api/channel/channel-api.hpp>
+#include <libadb/api/context/context.hpp>
 #include <nlohmann/json.hpp>
 #include <libadb/api/auth/token-bot.hpp>
 #include <libadb/api/utils/fill-reason.hpp>
@@ -10,8 +11,8 @@
 using namespace adb::api;
 using namespace adb::types;
 
-ChannelApi::ChannelApi(const std::string &baseUrl) :
-    baseUrl_(baseUrl + "/channels")
+ChannelApi::ChannelApi(std::shared_ptr<Context> context) :
+    context_(context), baseUrl_(context->getBaseUrl() + "/channels")
 {
 
 }
@@ -22,7 +23,7 @@ std::optional<Channel> ChannelApi::getChannel(const adb::types::SFID &channelId)
         baseUrl_, channelId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     session.SetHeader(header);
     auto response = session.Get();
     return readRequestResponseOpt<Channel>(response);
@@ -34,7 +35,7 @@ bool ChannelApi::deleteChannel(const adb::types::SFID &channelId, std::optional<
         baseUrl_, channelId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     session.SetHeader(header);
     fillReason(header, reason);
     auto response = session.Delete();
@@ -72,7 +73,7 @@ std::vector<Message> ChannelApi::getMessages(adb::types::SFID channelId, std::op
         params.Add(cpr::Parameter("limit", std::to_string(limit.value())));
     }
     session.SetParameters(params);
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_)});
     auto response = session.Get();
     return readRequestResponse<std::vector<Message>>(response);
 }
@@ -83,7 +84,7 @@ std::optional<Message> ChannelApi::getMessage(const adb::types::SFID &channelId,
         baseUrl_, channelId.to_string(), messageId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     session.SetHeader(header);
     auto response = session.Get();
     return readRequestResponseOpt<Message>(response);
@@ -96,7 +97,7 @@ bool ChannelApi::createReaction(adb::types::SFID channelId, adb::types::SFID mes
         baseUrl_, channelId.to_string(), messageId.to_string(), encodedEmoji);
     auto response = cpr::Put(
         cpr::Url{url},
-        cpr::Header{TokenBot::getBotAuthTokenHeader()},
+        cpr::Header{TokenBot::getBotAuthTokenHeader(context_)},
         cpr::Payload{}
     );
     return readCommandResponse(response);
@@ -110,7 +111,7 @@ std::optional<Message> ChannelApi::createMessage(adb::types::SFID channelId, con
     auto data = j.dump();
     auto session = cpr::Session();
     session.SetUrl(url);
-    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
+    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader(context_)});
     auto response = session.Post();
     return readRequestResponseOpt<Message>(response);
 }
@@ -123,7 +124,7 @@ std::optional<Message> ChannelApi::editMessage(adb::types::SFID channelId, adb::
     auto data = j.dump();
     auto session = cpr::Session();
     session.SetUrl(url);
-    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
+    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader(context_)});
     auto response = session.Patch();
     return readRequestResponseOpt<Message>(response);
 }
@@ -134,7 +135,7 @@ bool ChannelApi::deleteMessage(const adb::types::SFID &channelId, const adb::typ
         baseUrl_, channelId.to_string(), messageId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    cpr::Header header{TokenBot::getBotAuthTokenHeader()};
+    cpr::Header header{TokenBot::getBotAuthTokenHeader(context_)};
     fillReason(header, reason);
     session.SetHeader(header);
     auto response = session.Delete();
@@ -148,7 +149,7 @@ bool ChannelApi::bulkDeleteMessages(SFID channelId, std::vector<SFID> messageIds
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    cpr::Header header{TokenBot::getBotAuthTokenHeader(), contentType};
+    cpr::Header header{TokenBot::getBotAuthTokenHeader(context_), contentType};
     fillReason(header, reason);
     session.SetHeader(header);
     nlohmann::json j {
@@ -167,7 +168,7 @@ std::optional<FollowedChannel> ChannelApi::followNewsChannel(adb::types::SFID ch
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader({TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetHeader({TokenBot::getBotAuthTokenHeader(context_), contentType});
     nlohmann::json j {
         {"webhook_channel_id", webhookChannelId}
     };
@@ -183,7 +184,7 @@ std::vector<Message> ChannelApi::getPinnedMessages(const adb::types::SFID &chann
         baseUrl_, channelId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     session.SetHeader(header);
     auto response = session.Get();
     return readRequestResponse<std::vector<Message>>(response);
@@ -196,7 +197,7 @@ bool ChannelApi::pinMessage(const adb::types::SFID &channelId, const adb::types:
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType};
     fillReason(header, reason);
     session.SetHeader(header);
     // Empty body
@@ -211,7 +212,7 @@ bool ChannelApi::unpinMessage(const adb::types::SFID &channelId, const adb::type
         baseUrl_, channelId.to_string(), messageId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     fillReason(header, reason);
     session.SetHeader(header);
     auto response = session.Delete();

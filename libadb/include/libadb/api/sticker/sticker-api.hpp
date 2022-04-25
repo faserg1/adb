@@ -14,6 +14,6 @@ namespace adb::api
     private:
         StickerApi(std::shared_ptr<Context> context);
     private:
-        std::shared_ptr<Context> context_;
+        const std::shared_ptr<Context> context_;
     };
 }

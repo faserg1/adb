@@ -15,6 +15,7 @@
 namespace adb::api
 {
     class DiscordApi;
+    class Context;
 
     /**
      * @brief Interactions API
@@ -154,8 +155,10 @@ namespace adb::api
         LIBADB_API std::optional<std::vector<GuildApplicationCommandPermissions>> batchEditCommandPermissions(const adb::types::SFID &appId, const adb::types::SFID &guildId,
             const std::vector<GuildApplicationCommandPermissions> &permissions);
     private:
-        InteractionsApi(const std::string &baseUrl);
+        InteractionsApi(std::shared_ptr<Context> context);
     private:
+        const std::shared_ptr<Context> context_;
+
         const std::string baseUrl_;
         const std::string webhooksUrl_;
         const std::string appUrl_;

@@ -1,4 +1,5 @@
 #include <libadb/api/gateway/gateway-retrive.hpp>
+#include <libadb/api/context/context.hpp>
 #include <libadb/api/auth/token-bot.hpp>
 #include <stdexcept>
 #include <cpr/cpr.h>
@@ -6,8 +7,8 @@
 #include <fmt/core.h>
 using namespace adb::api;
 
-GatewayRetrive::GatewayRetrive(const std::string &baseUrl) :
-    baseGatewayUrl_(baseUrl + "/gateway")
+GatewayRetrive::GatewayRetrive(std::shared_ptr<Context> context) :
+    context_(context), baseGatewayUrl_(context->getBaseUrl() + "/gateway")
 {
     
 }
@@ -15,7 +16,7 @@ GatewayRetrive::GatewayRetrive(const std::string &baseUrl) :
 GatewayBotRetriveData GatewayRetrive::retriveBotGateway(std::optional<GatewayRetriveQuery> queryOpt)
 {
     auto requestUrl = fmt::format("{}/bot", baseGatewayUrl_);
-    auto response = cpr::Get(cpr::Url{requestUrl}, cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    auto response = cpr::Get(cpr::Url{requestUrl}, cpr::Header{TokenBot::getBotAuthTokenHeader(context_)});
     if (response.status_code < 200 || response.status_code >= 300)
     {
         throw std::runtime_error(response.status_line);

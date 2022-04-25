@@ -10,7 +10,7 @@
 #include <libadb/api/interactions/data/text-input-component.hpp>
 #include <libadb/api/interactions/data/button-component.hpp>
 #include <libadb/api/interactions/data/action-row-component.hpp>
-#include <libadb/cfg/secrets.hpp>
+#include "../cfg/secrets.hpp"
 using namespace adb::api;
 
 static std::vector<std::unique_ptr<adb::types::Subscription>> cmdSubs;
@@ -59,7 +59,7 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         .options = subGroup
     };
 
-    auto cmd4 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), guildId, commandParams4);
+    auto cmd4 = ixApi->createGuildCommand(Secrets::getSecrets().appId, guildId, commandParams4);
 
     cmdSubs.emplace_back(gateway->events()->subscribe<adb::api::Interaction>(adb::api::Event::INTERACTION_CREATE, [&api](auto ev, auto &msg)
 	{
@@ -94,7 +94,7 @@ void checkAppCommands(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 void checkAppCommands2(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 {
     auto ixApi = api.CreateInteractionsApi();
-    auto commands = ixApi->getGuildCommands(adb::cfg::Secrets::GetAppId(), guildId);
+    auto commands = ixApi->getGuildCommands(Secrets::getSecrets().appId, guildId);
     for (auto command : commands)
     {
         ixApi->deleteGuldCommand(command.applicationId, command.guildId.value(), command.id);
@@ -114,6 +114,6 @@ void checkAppCommands3(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         .type = ApplicationCommandType::MESSAGE
     };
 
-    auto cmd5 = ixApi->createGuildCommand(adb::cfg::Secrets::GetAppId(), guildId, commandParams5);
+    auto cmd5 = ixApi->createGuildCommand(Secrets::getSecrets().appId, guildId, commandParams5);
     int i = 0;
 }

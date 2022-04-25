@@ -37,8 +37,6 @@ target_link_libraries(libadb PRIVATE Opus::opus)
 
 target_link_libraries(libadb PRIVATE ${USOCKETS_LIBRARY})
 
-target_secrets(libadb)
-
 set(ADB_PROJECT_CONFIG ${PROJECT_BINARY_DIR}/adb-config.cmake)
 
 set(targets_export_name libadb-targets)

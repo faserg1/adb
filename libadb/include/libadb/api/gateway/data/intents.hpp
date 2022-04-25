@@ -5,6 +5,10 @@
 
 namespace adb::api
 {
+    /**
+     * @brief Gateway Intents
+     * @details https://discord.com/developers/docs/topics/gateway#gateway-intents
+     */
     enum class Intent : uint64_t
     {
         Guilds = (1 << 0),
@@ -26,4 +30,22 @@ namespace adb::api
     };
 
     ADB_ENUM_FLAGS_OPERATORS(Intent, Intents, uint64_t)
+
+    constexpr const Intents AllIntents = 0 | 
+        Intent::Guilds |
+        Intent::GuildMembers |
+        Intent::GuildBans |
+        Intent::GuildEmojiAndStickers |
+        Intent::GuildIntegrations |
+        Intent::GuildWebhooks |
+        Intent::GuildInvites |
+        Intent::GuildVoiceStates |
+        Intent::GuildPresences |
+        Intent::GuildMessages |
+        Intent::GuildMessageReactions |
+        Intent::GuildMessageTyping |
+        Intent::DirectMessages |
+        Intent::DirectMessageReactions |
+        Intent::DirectMessageTyping |
+        Intent::GuildShelduleEvent;
 }

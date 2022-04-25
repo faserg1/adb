@@ -9,6 +9,7 @@
 
 namespace adb::api
 {
+    class Context;
     class DiscordApi;
     class GatewayEvents;
 
@@ -40,7 +41,7 @@ namespace adb::api
 
         bool sendInternal(const Payload &msg);
     private:
-        Gateway(const std::string &gatewayUrl, Intents requiredIntents);
+        Gateway(std::shared_ptr<Context> context, const std::string &gatewayUrl, Intents requiredIntents);
 
         void configureClient();
         void configureMessageHandler();
@@ -50,6 +51,7 @@ namespace adb::api
 
         void identify();
     private:
+        const std::shared_ptr<Context> context_;
         const std::string gatewayUrl_;
         std::unique_ptr<GatewayData> data_;
         std::shared_ptr<GatewayEvents> events_;

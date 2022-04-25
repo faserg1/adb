@@ -5,6 +5,7 @@
 
 #include <libadb/libadb.hpp>
 #include <libadb/types/snowflake.hpp>
+#include <libadb/cfg/secrets.hpp>
 
 
 namespace adb::api
@@ -23,7 +24,7 @@ namespace adb::api
     class DiscordApi final
     {
     public:
-        LIBADB_API DiscordApi(uint8_t version = 9);
+        LIBADB_API DiscordApi(const adb::cfg::SecretsData &secrets, uint8_t version = 9);
 
         LIBADB_API std::unique_ptr<Auth> CreateAuth();
         LIBADB_API std::shared_ptr<Gateway> GetGateway();
@@ -34,7 +35,6 @@ namespace adb::api
         LIBADB_API std::unique_ptr<UserApi> CreateUserApi();
         LIBADB_API std::unique_ptr<StickerApi> CreateStickerApi();
     private:
-        const std::string baseUrl_;
         std::shared_ptr<Gateway> gatewayInstance_;
         std::shared_ptr<Context> context_;
     };

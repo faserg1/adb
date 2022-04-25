@@ -9,6 +9,8 @@
 namespace adb::api
 {
     class DiscordApi;
+    class Context;
+
     class UserApi
     {
         friend DiscordApi;
@@ -24,9 +26,10 @@ namespace adb::api
         LIBADB_API std::optional<Channel> createDM(const adb::types::SFID recipientId);
 
     private:
-        UserApi(const std::string &baseUrl);
+        UserApi(std::shared_ptr<Context> context);
 
     private:
-        std::string baseUrl_;
+        const std::shared_ptr<Context> context_;
+        const std::string baseUrl_;
     }; 
 }

@@ -1,4 +1,5 @@
 #include <libadb/api/guild/guild-api.hpp>
+#include <libadb/api/context/context.hpp>
 #include <libadb/api/auth/token-bot.hpp>
 #include <libadb/api/utils/fill-reason.hpp>
 #include <libadb/api/auth/token-bot.hpp>
@@ -8,7 +9,8 @@
 #include <cpr/cpr.h>
 using namespace adb::api;
 
-GuildApi::GuildApi(const std::string &baseUrl) : baseUrl_(baseUrl  + "/guilds")
+GuildApi::GuildApi(std::shared_ptr<Context> context) :
+    context_(context), baseUrl_(context->getBaseUrl()  + "/guilds")
 {
 
 }
@@ -19,7 +21,7 @@ std::vector<Channel> GuildApi::getChannels(const adb::types::SFID &guildId) cons
         baseUrl_, guildId.to_string());
     auto response = cpr::Get(
         cpr::Url{url},
-        cpr::Header{TokenBot::getBotAuthTokenHeader()},
+        cpr::Header{TokenBot::getBotAuthTokenHeader(context_)},
         cpr::Payload{}
     );
     return readRequestResponse<std::vector<Channel>>(response);
@@ -33,7 +35,7 @@ std::optional<Channel> GuildApi::createChannel(const adb::types::SFID &guildId,
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType};
     fillReason(header, reason);
     session.SetHeader(header);
     nlohmann::json j = params;
@@ -49,7 +51,7 @@ std::optional<GuildMember> GuildApi::getGuildMember(const adb::types::SFID &guil
         baseUrl_, guildId.to_string(), userId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     session.SetHeader(header);
     auto response = session.Get();
     return readRequestResponseOpt<GuildMember>(response);
@@ -68,7 +70,7 @@ std::vector<GuildMember> GuildApi::listGuildMembers(const adb::types::SFID &guil
     if (after.has_value())
         params.Add(cpr::Parameter{"after", after.value().to_string()});
     session.SetParameters(params);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     session.SetHeader(header);
     auto response = session.Get();
     return readRequestResponse<std::vector<GuildMember>>(response);
@@ -86,7 +88,7 @@ std::vector<GuildMember> GuildApi::searchGuildMembers(const adb::types::SFID &gu
         params.Add(cpr::Parameter{"limit", std::to_string(limit.value())});
     params.Add(cpr::Parameter{"query", query});
     session.SetParameters(params);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     session.SetHeader(header);
     auto response = session.Get();
     return readRequestResponse<std::vector<GuildMember>>(response);
@@ -98,7 +100,7 @@ std::vector<Role> GuildApi::getRoles(const adb::types::SFID &guildId)
         baseUrl_, guildId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     session.SetHeader(header);
     auto response = session.Get();
     return readRequestResponse<std::vector<Role>>(response);
@@ -112,7 +114,7 @@ std::optional<Role> GuildApi::createRole(const adb::types::SFID &guildId,
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType};
     fillReason(header, reason);
     session.SetHeader(header);
     nlohmann::json j = params;
@@ -129,7 +131,7 @@ bool GuildApi::deleteRole(const adb::types::SFID &guildId,
         baseUrl_, guildId.to_string(), roleId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     fillReason(header, reason);
     session.SetHeader(header);
     auto response = session.Delete();
@@ -144,7 +146,7 @@ bool GuildApi::addMemberRole(const adb::types::SFID &guildId, const adb::types::
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType};
     fillReason(header, reason);
     session.SetHeader(header);
     // Empty body
@@ -160,7 +162,7 @@ bool GuildApi::removeMemberRole(const adb::types::SFID &guildId, const adb::type
         baseUrl_, guildId.to_string(), userId.to_string(), roleId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader()};
+    auto header = cpr::Header{TokenBot::getBotAuthTokenHeader(context_)};
     fillReason(header, reason);
     session.SetHeader(header);
     auto response = session.Delete();

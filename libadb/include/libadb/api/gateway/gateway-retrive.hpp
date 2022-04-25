@@ -2,6 +2,7 @@
 
 #include <string>
 #include <optional>
+#include <memory>
 #include <libadb/libadb.hpp>
 #include <libadb/api/gateway/data/gateway-retrive-data.hpp>
 #include <libadb/api/gateway/data/retrive-query.hpp>
@@ -9,6 +10,7 @@
 namespace adb::api
 {
     class DiscordApi;
+    class Context;
 
     class GatewayRetrive
     {
@@ -21,8 +23,10 @@ namespace adb::api
          */
         LIBADB_API GatewayBotRetriveData retriveBotGateway(std::optional<GatewayRetriveQuery> query);
     private:
-        GatewayRetrive(const std::string &baseUrl);
+        GatewayRetrive(std::shared_ptr<Context> context);
     private:
+        const std::shared_ptr<Context> context_;
+
         const std::string baseGatewayUrl_;
     };
 }

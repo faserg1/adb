@@ -5,6 +5,7 @@
 namespace adb::api
 {
     class GatewayEvents;
+    class Context;
 
     class Interactions
     {

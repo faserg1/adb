@@ -15,6 +15,7 @@
 namespace adb::api
 {
     class DiscordApi;
+    class Context;
 
     class GuildApi
     {
@@ -97,8 +98,9 @@ namespace adb::api
         LIBADB_API bool removeMemberRole(const adb::types::SFID &guildId, const adb::types::SFID &userId, const adb::types::SFID &roleId,
             std::optional<std::string> reason = {});
     private:
-        GuildApi(const std::string &baseUrl);
+        GuildApi(std::shared_ptr<Context> context);
     private:
-        std::string baseUrl_;
+        const std::shared_ptr<Context> context_;
+        const std::string baseUrl_;
     };
 }

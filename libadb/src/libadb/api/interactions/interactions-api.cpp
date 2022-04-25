@@ -1,4 +1,5 @@
 #include <libadb/api/interactions/interactions-api.hpp>
+#include <libadb/api/context/context.hpp>
 #include <libadb/api/interactions/data/interaction-type.hpp>
 #include <libadb/api/auth/token-bot.hpp>
 #include <libadb/api/utils/message-session.hpp>
@@ -9,8 +10,9 @@
 #include <algorithm>
 using namespace adb::api;
 
-InteractionsApi::InteractionsApi(const std::string &baseUrl) :
-    baseUrl_(baseUrl  + "/interactions"), webhooksUrl_(baseUrl  + "/webhooks"), appUrl_(baseUrl  + "/applications")
+InteractionsApi::InteractionsApi(std::shared_ptr<Context> context) :
+    context_(context), baseUrl_(context->getBaseUrl()  + "/interactions"),
+    webhooksUrl_(context_->getBaseUrl()  + "/webhooks"), appUrl_(context->getBaseUrl()  + "/applications")
 {
 
 }
@@ -26,7 +28,7 @@ bool InteractionsApi::ack(const adb::types::SFID &interactionId, const std::stri
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType});
     session.SetBody(json.dump());
     auto response = session.Post();
     return readCommandResponse(response);
@@ -44,7 +46,7 @@ bool InteractionsApi::message(const adb::types::SFID &interactionId, const std::
     auto data = json.dump();
     auto session = cpr::Session();
     session.SetUrl(url);
-    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
+    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader(context_)});
     auto response = session.Post();
     return readCommandResponse(response);
 }
@@ -64,7 +66,7 @@ bool InteractionsApi::messageLater(const adb::types::SFID &interactionId, const 
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
     if (params.has_value())
-        fillSessionWithMessage(params.value(), data, session, {TokenBot::getBotAuthTokenHeader()});
+        fillSessionWithMessage(params.value(), data, session, {TokenBot::getBotAuthTokenHeader(context_)});
     auto response = session.Post();
     return readCommandResponse(response);
 }
@@ -85,7 +87,7 @@ bool InteractionsApi::autocomplete(const adb::types::SFID &interactionId, const 
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType});
     session.SetBody(json.dump());
     auto response = session.Post();
     return readCommandResponse(response);
@@ -103,7 +105,7 @@ bool InteractionsApi::modal(const adb::types::SFID &interactionId, const std::st
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType});
     session.SetBody(json.dump());
     auto response = session.Post();
     return readCommandResponse(response);
@@ -117,7 +119,7 @@ std::optional<Message> InteractionsApi::editReply(const adb::types::SFID &appId,
     auto data = j.dump();
     auto session = cpr::Session();
     session.SetUrl(url);
-    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader()});
+    fillSessionWithMessage(params, data, session, {TokenBot::getBotAuthTokenHeader(context_)});
     auto response = session.Patch();
     return readRequestResponseOpt<Message>(response);
 }
@@ -127,7 +129,7 @@ std::vector<ApplicationCommand> InteractionsApi::getGuildCommands(const adb::typ
     auto url = fmt::format("{}/{}/guilds/{}/commands", appUrl_, appId.to_string(), guildId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_)});
     session.SetParameters(cpr::Parameters {
         cpr::Parameter {"with_localizations", withLocalization ? "true" : "false"}
     });
@@ -142,7 +144,7 @@ std::optional<ApplicationCommand> InteractionsApi::createGuildCommand(const adb:
     session.SetUrl(url);
     nlohmann::json j = params;
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType});
     session.SetBody(j.dump());
     auto response = session.Post();
     return readRequestResponseOpt<ApplicationCommand>(response);
@@ -153,7 +155,7 @@ std::optional<ApplicationCommand> InteractionsApi::getGuildCommand(const adb::ty
     auto url = fmt::format("{}/{}/guilds/{}/commands/{}", appUrl_, appId.to_string(), guildId.to_string(), commandId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_)});
     auto response = session.Get();
     return readRequestResponseOpt<ApplicationCommand>(response);
 }
@@ -163,7 +165,7 @@ bool InteractionsApi::deleteGuldCommand(const adb::types::SFID &appId, const adb
     auto url = fmt::format("{}/{}/guilds/{}/commands/{}", appUrl_, appId.to_string(), guildId.to_string(), commandId.to_string());
     auto session = cpr::Session();
     session.SetUrl(url);
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader()});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_)});
     auto response = session.Delete();
     return readCommandResponse(response);
 }
@@ -174,7 +176,7 @@ std::optional<std::vector<GuildApplicationCommandPermissions>> InteractionsApi::
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType});
     auto response = session.Get();
     return readRequestResponse<std::vector<GuildApplicationCommandPermissions>>(response);
 }
@@ -186,7 +188,7 @@ std::optional<GuildApplicationCommandPermissions> InteractionsApi::getCommandPer
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType});
     auto response = session.Get();
     return readRequestResponseOpt<GuildApplicationCommandPermissions>(response);
 }
@@ -203,7 +205,7 @@ std::optional<GuildApplicationCommandPermissions> InteractionsApi::editCommandPe
     };
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType});
     session.SetBody(j.dump());
     auto response = session.Put();
     return readRequestResponseOpt<GuildApplicationCommandPermissions>(response);
@@ -223,7 +225,7 @@ std::optional<std::vector<GuildApplicationCommandPermissions>> InteractionsApi::
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
-    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(), contentType});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType});
     session.SetBody(j.dump());
     auto response = session.Put();
     return readRequestResponse<std::vector<GuildApplicationCommandPermissions>>(response);
