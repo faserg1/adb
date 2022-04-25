@@ -6,6 +6,7 @@
 #include <libadb/api/gateway/gateway.hpp>
 #include <libadb/api/gateway/gateway-events.hpp>
 #include <libadb/api/interactions/interactions-api.hpp>
+#include <libadb/api/interactions/interactions.hpp>
 #include <libadb/api/interactions/data/interaction.hpp>
 #include <libadb/api/interactions/data/text-input-component.hpp>
 #include <libadb/api/interactions/data/button-component.hpp>
@@ -116,4 +117,13 @@ void checkAppCommands3(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 
     auto cmd5 = ixApi->createGuildCommand(Secrets::getSecrets().appId, guildId, commandParams5);
     int i = 0;
+}
+
+void checkAppCommands4(DiscordApi &api, std::shared_ptr<Gateway> gateway)
+{
+    Interactions ix(gateway->events());
+    cmdSubs.emplace_back(ix.subscribeToCommand("cfg", {"role-add"}, [](auto &ix, auto &data, auto &lastOptions)
+    {
+        auto options = lastOptions.value_or(std::vector<InteractionDataCommandOption>{});
+    }));
 }
