@@ -42,7 +42,7 @@ std::unique_ptr<adb::types::Subscription> Interactions::subscribeToCommand(const
             currentSub++;
             currentOptions = currentOption->options.has_value() ? &currentOption->options.value() : nullptr;
         }
-        if (!currentOptions && currentSub != subCommandPath.end())
+        if (!currentOption || currentSub != subCommandPath.end())
             return;
         subscriber(interaction, *data, currentOption->options);
     }));
