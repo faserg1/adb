@@ -55,6 +55,16 @@ std::strong_ordering SFID::operator<=>(const SFID &other) const
     return id_ <=> other.id_;
 }
 
+bool SFID::operator==(const SFID &other) const
+{
+    return id_ == other.id_;
+}
+
+bool SFID::operator!=(const SFID &other) const
+{
+    return id_ != other.id_;
+}
+
 void adb::types::to_json(nlohmann::json& j, const SFID& id)
 {
     j = id.to_string();
@@ -62,5 +72,5 @@ void adb::types::to_json(nlohmann::json& j, const SFID& id)
 
 void adb::types::from_json(const nlohmann::json& j, SFID& id)
 {
-    id = j.get<std::string>();
+    id = SFID{j.get<std::string>()};
 }

@@ -22,9 +22,9 @@ using namespace adb::cfg;
 #endif
 
 adb::cfg::SecretsData Secrets::data_ = {
-    .appId = ADB_APP_ID,
+    .appId = adb::types::SFID{ADB_APP_ID},
     .publicKey = ADB_PUBLIC_KEY,
-    .clientId = ADB_CLIENT_ID,
+    .clientId = adb::types::SFID{ADB_CLIENT_ID},
     .clientSecret = ADB_CLIENT_SECRET,
     .botToken = ADB_BOT_TOKEN
 };

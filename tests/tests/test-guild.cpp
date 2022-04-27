@@ -41,7 +41,7 @@ void checkRoleMemberAdd(adb::api::DiscordApi &api)
 void checkGuildMembers(adb::api::DiscordApi &api)
 {
     auto guildApi = api.CreateGuildApi();
-    auto me = guildApi->getGuildMember(testGuildId, {"294537448065859584"});
+    auto me = guildApi->getGuildMember(testGuildId, adb::types::SFID{"294537448065859584"});
     auto all = guildApi->listGuildMembers(testGuildId, 1000, {});
     auto search = guildApi->searchGuildMembers(testGuildId, "А", 1000);
 

@@ -17,17 +17,19 @@ namespace adb::types
     {
     public:
         LIBADB_API SFID();
-        LIBADB_API SFID(uint64_t id);
-        LIBADB_API SFID(const std::string &strId);
+        LIBADB_API explicit SFID(uint64_t id);
+        LIBADB_API explicit SFID(const std::string &strId);
 
         LIBADB_API SFID(const SFID &other) = default;
 
         LIBADB_API static SFID create(uint8_t workerId = 0, uint8_t processId = 0);
 
         LIBADB_API explicit operator uint64_t() const;
-        LIBADB_API operator bool() const;
+        LIBADB_API explicit operator bool() const;
         LIBADB_API std::string to_string() const;
         LIBADB_API std::strong_ordering operator<=>(const SFID &other) const;
+        LIBADB_API bool operator==(const SFID &other) const;
+        LIBADB_API bool operator!=(const SFID &other) const;
     private:
         union
         {
