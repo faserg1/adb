@@ -1,4 +1,5 @@
 #include <libadb/api/interactions/data/application-command-permission.hpp>
+#include <libadb/types/helpers/json-enum.hpp>
 #include <nlohmann/json.hpp>
 using namespace adb::api;
 using namespace adb::types;

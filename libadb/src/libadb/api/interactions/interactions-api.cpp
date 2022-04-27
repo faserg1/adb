@@ -225,6 +225,7 @@ std::optional<std::vector<GuildApplicationCommandPermissions>> InteractionsApi::
     auto session = cpr::Session();
     session.SetUrl(url);
     auto contentType = std::pair{"content-type", "application/json"};
+    // TODO: Client bearer token
     session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_), contentType});
     session.SetBody(j.dump());
     auto response = session.Put();

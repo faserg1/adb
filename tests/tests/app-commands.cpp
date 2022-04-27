@@ -127,3 +127,47 @@ void checkAppCommands4(DiscordApi &api, std::shared_ptr<Gateway> gateway)
         auto options = lastOptions.value_or(std::vector<InteractionDataCommandOption>{});
     }));
 }
+
+void checkAppCommands5(DiscordApi &api, std::shared_ptr<Gateway> gateway)
+{
+    auto ixApi = api.CreateInteractionsApi();
+    auto commandParams5 = CreateApplicationCommandParams {
+        .name = "adb_zero",
+        .description = "testing",
+        .defaultPermission = false,
+        .type = ApplicationCommandType::CHAT_INPUT,
+    };
+     auto commandParams6 = CreateApplicationCommandParams {
+        .name = "adb_one",
+        .description = "testing",
+        .defaultPermission = false,
+        .type = ApplicationCommandType::CHAT_INPUT,
+    };
+    auto appId = Secrets::getSecrets().appId;
+    auto cmd5 = ixApi->createGuildCommand(appId, guildId, commandParams5);
+    auto cmd6 = ixApi->createGuildCommand(appId, guildId, commandParams6);
+    auto commands = {cmd5.value().id, cmd6.value().id};
+    std::vector<GuildApplicationCommandPermissions> permissions;
+    adb::types::SFID roleId{"964307674101608549"};
+    std::transform(commands.begin(), commands.end(), std::back_inserter(permissions), [guildId = guildId, roleId, appId](auto &id) -> GuildApplicationCommandPermissions
+    {
+        std::vector<ApplicationCommandPermission> cmdPermissions
+        {
+            ApplicationCommandPermission
+            {
+                .id = roleId,
+                .type = ApplicationCommandPermissionType::ROLE,
+                .permission = true
+            }
+        };
+        return GuildApplicationCommandPermissions
+        {
+            .id = id,
+            .applicationId = appId,
+            .guildId = guildId,
+            .permissions = cmdPermissions
+        };
+    });
+    ixApi->batchEditCommandPermissions(appId, guildId, permissions);
+    int i = 0;
+}

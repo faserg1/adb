@@ -12,3 +12,4 @@ void checkAppCommands(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gatew
 void checkAppCommands2(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);
 void checkAppCommands3(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);
 void checkAppCommands4(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);
+void checkAppCommands5(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);
