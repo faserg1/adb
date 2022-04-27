@@ -7,6 +7,13 @@ using namespace adb::api;
 
 auto testGuildId = adb::types::SFID{"918981635918159943"};
 
+void checkGuild(adb::api::DiscordApi &api)
+{
+    auto guildApi = api.CreateGuildApi();
+    auto guild = guildApi->getGuild(testGuildId);
+    int i = 0;
+}
+
 void checkGuildChannels(DiscordApi &api, std::shared_ptr<Gateway> gateway)
 {
     auto guildApi = api.CreateGuildApi();

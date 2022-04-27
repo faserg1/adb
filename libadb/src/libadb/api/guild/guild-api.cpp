@@ -15,6 +15,18 @@ GuildApi::GuildApi(std::shared_ptr<Context> context) :
 
 }
 
+std::optional<Guild> GuildApi::getGuild(const adb::types::SFID &guildId, bool withCounst) const
+{
+    auto url = fmt::format("{}/{}",
+        baseUrl_, guildId.to_string());
+    auto session = cpr::Session();
+    session.SetUrl(cpr::Url{url});
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_)});
+    session.SetParameters(cpr::Parameters{cpr::Parameter{"with_counts", withCounst ? "true" : "false"}});
+    auto response = session.Get();
+    return readRequestResponseOpt<Guild>(response);
+}
+
 std::vector<Channel> GuildApi::getChannels(const adb::types::SFID &guildId) const
 {
     auto url = fmt::format("{}/{}/channels",

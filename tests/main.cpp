@@ -33,10 +33,12 @@ int main()
 	// checkAppCommands(api, gateway);
 	// checkAppCommands2(api, gateway);
 	// checkAppCommands3(api, gateway);
-	checkAppCommands4(api, gateway);
+	// checkAppCommands4(api, gateway);
 	// checkGuildChannels(api, gateway);
 
-	checkRate(api, gateway);
+	// checkRate(api, gateway);
+
+	checkGuild(api);
 
 	gateway->connect();
 	gateway->run();

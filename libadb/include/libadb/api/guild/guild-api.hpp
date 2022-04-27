@@ -7,6 +7,7 @@
 
 #include <libadb/api/channel/data/channel.hpp>
 #include <libadb/api/permissions/role.hpp>
+#include <libadb/api/guild/data/guild.hpp>
 #include <libadb/api/guild/data/create-guild-channel-params.hpp>
 #include <libadb/api/guild/data/create-guild-role-params.hpp>
 #include <libadb/api/guild/data/guild-member.hpp>
@@ -21,6 +22,13 @@ namespace adb::api
     {
         friend DiscordApi;
     public:
+        /**
+         * @brief Returns the guild object for the given id.
+         * @details https://discord.com/developers/docs/resources/guild#get-guild
+         * @param guildId Guild ID
+         * @param withCounst when true, will return approximate member and presence counts for the guild
+         */
+        LIBADB_API std::optional<Guild> getGuild(const adb::types::SFID &guildId, bool withCounst = false) const;
         LIBADB_API std::vector<Channel> getChannels(const adb::types::SFID &guildId) const;
         /**
          * @brief Create a Channel in the Guild
