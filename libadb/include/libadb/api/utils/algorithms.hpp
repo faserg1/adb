@@ -38,29 +38,29 @@ namespace adb::api
 
     template<template<class, class...> class ContainerType, class EntityType, class ...ContainerArgs>
     requires Container<ContainerType<EntityType, ContainerArgs...>> && Entity<EntityType>
-    ContainerType<EntityType, ContainerArgs...>::iterator findIterByName(ContainerType<EntityType, ContainerArgs...> &container, const std::string &name)
+    ContainerType<EntityType, ContainerArgs...>::iterator findIterById(ContainerType<EntityType, ContainerArgs...> &container, const adb::types::SFID &id)
     {
-        return std::find_if(container.begin(), container.end(), [&name](const auto &entity)
+        return std::find_if(container.begin(), container.end(), [&id](const auto &entity)
         {
-            return entity.name == name;
+            return entity.id == id;
         });
     }
 
     template<template<class, class...> class ContainerType, class EntityType, class ...ContainerArgs>
     requires Container<ContainerType<EntityType, ContainerArgs...>> && Entity<EntityType>
-    ContainerType<EntityType, ContainerArgs...>::const_iterator findIterByName(const ContainerType<EntityType, ContainerArgs...> &container, const std::string &name)
+    ContainerType<EntityType, ContainerArgs...>::const_iterator findIterById(const ContainerType<EntityType, ContainerArgs...> &container, const adb::types::SFID &id)
     {
-        return std::find_if(container.begin(), container.end(), [&name](const auto &entity)
+        return std::find_if(container.begin(), container.end(), [&id](const auto &entity)
         {
-            return entity.name == name;
+            return entity.id == id;
         });
     }
 
     template<template<class, class...> class ContainerType, class EntityType, class ...ContainerArgs>
     requires Container<ContainerType<EntityType, ContainerArgs...>> && Entity<EntityType>
-    EntityType *findByName(ContainerType<EntityType, ContainerArgs...> &container, const std::string &name)
+    EntityType *findById(ContainerType<EntityType, ContainerArgs...> &container, const adb::types::SFID &id)
     {
-        auto result = findIterByName(container, name);
+        auto result = findIterById(container, id);
         if (result == container.end())
             return nullptr;
         return &(*result);
@@ -68,9 +68,51 @@ namespace adb::api
 
     template<template<class, class...> class ContainerType, class EntityType, class ...ContainerArgs>
     requires Container<ContainerType<EntityType, ContainerArgs...>> && Entity<EntityType>
-    EntityType *const findByName(const ContainerType<EntityType, ContainerArgs...> &container, const std::string &name)
+    EntityType *const findById(const ContainerType<EntityType, ContainerArgs...> &container, const adb::types::SFID &id)
     {
-        auto result = findIterByName(container, name);
+        auto result = findIterById(container, id);
+        if (result == container.end())
+            return nullptr;
+        return &(*result);
+    }
+
+    // By customId
+
+    template<template<class, class...> class ContainerType, class ObjectType, class ...ContainerArgs>
+    requires Container<ContainerType<ObjectType, ContainerArgs...>> && ObjectWithCustomId<ObjectType>
+    ContainerType<ObjectType, ContainerArgs...>::iterator findIterByCustomId(ContainerType<ObjectType, ContainerArgs...> &container, const std::string &customId)
+    {
+        return std::find_if(container.begin(), container.end(), [&customId](const auto &object)
+        {
+            return object.customId == customId;
+        });
+    }
+
+    template<template<class, class...> class ContainerType, class ObjectType, class ...ContainerArgs>
+    requires Container<ContainerType<ObjectType, ContainerArgs...>> && ObjectWithCustomId<ObjectType>
+    ContainerType<ObjectType, ContainerArgs...>::const_iterator findIterByCustomId(const ContainerType<ObjectType, ContainerArgs...> &container, const std::string &customId)
+    {
+        return std::find_if(container.begin(), container.end(), [&customId](const auto &object)
+        {
+            return object.customId == customId;
+        });
+    }
+
+    template<template<class, class...> class ContainerType, class ObjectType, class ...ContainerArgs>
+    requires Container<ContainerType<ObjectType, ContainerArgs...>> && ObjectWithCustomId<ObjectType>
+    ObjectType *findByCustomId(ContainerType<ObjectType, ContainerArgs...> &container, const std::string &customId)
+    {
+        auto result = findIterByCustomId(container, customId);
+        if (result == container.end())
+            return nullptr;
+        return &(*result);
+    }
+
+    template<template<class, class...> class ContainerType, class ObjectType, class ...ContainerArgs>
+    requires Container<ContainerType<ObjectType, ContainerArgs...>> && ObjectWithCustomId<ObjectType>
+    ObjectType *const findByCustomId(const ContainerType<ObjectType, ContainerArgs...> &container, const std::string &customId)
+    {
+        auto result = findIterByCustomId(container, customId);
         if (result == container.end())
             return nullptr;
         return &(*result);
