@@ -6,8 +6,8 @@
       "name": "curl",
       "features": ["openssl"]
     },
+    "hfsm2",
     "cpr",
-    "toml11",
     "fmt",
     "nlohmann-json",
     "usockets",

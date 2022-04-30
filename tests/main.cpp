@@ -41,8 +41,7 @@ int main()
 
 	// checkGuild(api);
 
-	gateway->connect();
-	gateway->run();
+	gateway->runUnlessStopped();
 	
 	return 0;
 }

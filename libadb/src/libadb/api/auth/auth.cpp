@@ -1,18 +1,33 @@
 #include <libadb/api/auth/auth.hpp>
+#include <libadb/api/auth/token-bot.hpp>
 #include <libadb/api/context/context.hpp>
 #include <libadb/cfg/secrets.hpp>
+#include <libadb/api/utils/read-response.hpp>
 #include <fmt/core.h>
+#include <cpr/cpr.h>
 using namespace adb::api;
 using namespace std::string_literals;
 
 Auth::Auth(std::shared_ptr<Context> context) :
     context_(context),
+    baseUrl_(context->getBaseUrl() + "/oauth2"s),
     // https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-urls
-    authUrl_(context->getBaseUrl() + "/oauth2/authorize"s),
-    tokenUrl_(context->getBaseUrl() + "/oauth2/token"s),
-    revokeUrl_(context->getBaseUrl() + "/oauth2/token/revoke"s)
+    authUrl_(authUrl_ + "/authorize"s),
+    tokenUrl_(authUrl_ + "/token"s),
+    revokeUrl_(authUrl_ + "/token/revoke"s)
 {
     
+}
+
+std::optional<Application> Auth::getCurrentApplicationInfo()
+{
+    auto url = fmt::format("{}/applications/@me",
+        baseUrl_);
+    auto session = cpr::Session();
+    session.SetUrl(url);
+    session.SetHeader(cpr::Header{TokenBot::getBotAuthTokenHeader(context_)});
+    auto response = session.Get();
+    return readRequestResponseOpt<Application>(response);
 }
 
 std::string Auth::getBotAuthUrl(Permissions permissions, std::optional<adb::types::SFID> guildId, bool disableGuildSelect)

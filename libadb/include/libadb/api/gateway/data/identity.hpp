@@ -5,7 +5,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <libadb/libadb.hpp>
 #include <libadb/api/gateway/data/intents.hpp>
-
+#include <libadb/api/gateway/data/shard.hpp>
 namespace adb::api
 {
     /**
@@ -14,8 +14,11 @@ namespace adb::api
      */
     struct IdentityConnectionProperties
     {
+        /// your operating system
         std::string os;
+        /// your library name
         std::string browser;
+        /// your library name
         std::string device;
     };
 
@@ -29,10 +32,14 @@ namespace adb::api
         std::string token;
         /// connection properties
         IdentityConnectionProperties properties;
+        /// whether this connection supports compression of packets
         std::optional<bool> compress;
+        /// value between 50 and 250, total number of members where the gateway will stop sending offline members in the guild member list
         std::optional<uint8_t> largeThresgold;
-        // shard
+        /// used for Guild Sharding
+        std::optional<ShardInfo> shard;
         // presence
+        /// the Gateway Intents you wish to receive
         Intents intents;
     };
 

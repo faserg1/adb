@@ -3,7 +3,6 @@ find_package(Threads REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(cpr CONFIG REQUIRED)
-find_package(toml11 CONFIG REQUIRED)
 find_package(websocketpp CONFIG REQUIRED)
 find_package(date CONFIG REQUIRED)
 # Here OpenSSL find_package need to be configured to ignore system paths
@@ -13,6 +12,7 @@ find_package(Boost REQUIRED COMPONENTS random system)
 
 find_path(USOCKETS_INCLUDE_DIRS "libusockets.h")
 find_path(UWEBSOCKETS_INCLUDE_DIRS "uwebsockets/App.h")
+find_path(HFSM2_INCLUDE_DIRS "hfsm2/machine.hpp")
 
 find_library(USOCKETS_LIBRARY NAMES uSockets REQUIRED)
 

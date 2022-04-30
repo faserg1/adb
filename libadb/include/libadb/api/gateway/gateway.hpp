@@ -12,6 +12,7 @@ namespace adb::api
     class Context;
     class DiscordApi;
     class GatewayEvents;
+    class GatewayController;
 
     struct Payload;
     struct Dispatch;
@@ -23,39 +24,30 @@ namespace adb::api
     class Gateway
     {
         friend DiscordApi;
-        struct GatewayData;
+        friend GatewayController;
     public:
         LIBADB_API ~Gateway();
 
-        LIBADB_API bool connect();
-        LIBADB_API void run();
+        LIBADB_API void start();
+        LIBADB_API void stop();
+
+        LIBADB_API void runUnlessStopped();
+
         LIBADB_API bool send(const Payload &msg);
 
-        Intents getIntents() { return requiredIntents_; }
+        LIBADB_API Intents getIntents();
 
         LIBADB_API std::shared_ptr<GatewayEvents> events() const;
     protected:
         virtual void onMessage(const Payload &msg);
         virtual void onDispatch(const Dispatch &dispatch);
         virtual void onDispatchUnknown(const std::string &eventName, const nlohmann::json &data);
-
-        bool sendInternal(const Payload &msg);
     private:
         Gateway(std::shared_ptr<Context> context, const std::string &gatewayUrl, Intents requiredIntents);
-
-        void configureClient();
-        void configureMessageHandler();
-
-        void startHeartbeat(uint64_t intervalms);
-        void stopHeartbeat();
-
-        void identify();
     private:
         const std::shared_ptr<Context> context_;
-        const std::string gatewayUrl_;
-        std::unique_ptr<GatewayData> data_;
+        
+        std::unique_ptr<GatewayController> controller_;
         std::shared_ptr<GatewayEvents> events_;
-
-        Intents requiredIntents_;
     };
 }

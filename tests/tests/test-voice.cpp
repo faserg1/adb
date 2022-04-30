@@ -11,6 +11,7 @@
 #include <libadb/api/message/data/message.hpp>
 #include <libadb/api/channel/channel-api.hpp>
 #include <libadb/api/guild/guild-api.hpp>
+#include <libadb/api/guild/event/guild-create.hpp>
 #include <libadb/api/interactions/interactions-api.hpp>
 #include <libadb/api/interactions/data/action-row-component.hpp>
 #include <libadb/api/interactions/data/select-menu-component.hpp>
@@ -32,6 +33,10 @@ TestVoice::~TestVoice() = default;
 
 void TestVoice::init()
 {
+    subs_.emplace_back(gateway_->events()->subscribe<adb::api::GuildCreate>(adb::api::Event::GUILD_CREATE, [this](auto ev, auto &msg)
+	{
+        int i = 0;
+    }));
     subs_.emplace_back(gateway_->events()->subscribe<adb::api::Message>(adb::api::Event::MESSAGE_CREATE, [this](auto ev, auto &msg)
 	{
         if (msg.author.bot && msg.author.bot.value())
