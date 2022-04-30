@@ -12,16 +12,47 @@ namespace adb::api
     using Config = hfsm2::Config::ContextT<GatewayController*>;
     using Machine = hfsm2::MachineT<Config>;
 
+    /* Main states */
+
+    struct Disconnected;
+    struct Connected;
+
+    /* Inner Head States */
+
+    struct Connecting;
+    struct Reconnecting;
+
+    /* Inner States */
+
+    struct WebSocketOpen;
+    struct WebSocketStop;
+    struct HeartbeatStart;
+    struct HeartbeatStop;
+    struct Handshake;
+    struct Auth;
+    struct Resuming;
+
     using FSM = Machine::PeerRoot<
-        struct Disconnected,
-        struct Connected,
-        Machine::Composite<
-            struct Connecting,
-            struct WebSocketOpen,
-            struct Handshake,
-            struct HearbeatStart,
-            struct Auth
-        >
+        /* Main states */
+        Disconnected,
+        Connected,
+
+        /* Head transition states */
+        Connecting,
+        Reconnecting,
+
+        /* Transition states */
+
+        WebSocketOpen,
+        WebSocketStop,
+
+        HeartbeatStart,
+        HeartbeatStop,
+
+        Handshake,
+        Auth,
+        Resuming
+        
         /*Machine::Composite<
             struct Disconnecting,
             struct HeartbeatStop
@@ -36,6 +67,9 @@ namespace adb::api
     enum class FSMEventType
     {
         Payload,
+
+        ThreadHeartbeatStop,
+        ThreadWebsocketStop,
 
         GatewayUserRequest_None,
         GatewayUserRequest_Connect,

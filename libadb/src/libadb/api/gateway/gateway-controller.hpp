@@ -51,16 +51,17 @@ namespace adb::api
         void startWebSocket();
         void stopWebSocket();
 
+        void onStop();
+
         void setHeartbeatInterval(uint64_t interval);
         void startHeartbeat();
         void stopHeartbeat();
 
         void identity();
         void saveSessionInfo(const Ready &ready);
+        void resume();
 
         void scheduleUpdate();
-
-        void resume();
     private:
         void configureClient();
         void configureMessageHandler();

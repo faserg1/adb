@@ -5,6 +5,7 @@
 #include <libadb/api/gateway/data/dispatch.hpp>
 #include <libadb/api/gateway/data/ready.hpp>
 #include <libadb/api/gateway/data/identity.hpp>
+#include <libadb/api/gateway/data/resume.hpp>
 #include <nlohmann/json.hpp>
 using namespace adb::api;
 
@@ -60,7 +61,6 @@ void GatewayController::stop()
     fsm_->instance.react(FSMEvent {
         .type = FSMEventType::GatewayUserRequest_Disconnect
     });
-    onStop_.notify();
 }
 
 void GatewayController::runUnlessStopped()
@@ -89,7 +89,19 @@ void GatewayController::stopWebSocket()
 {
     webSocket_.client.stop();
     webSocket_.runThread.request_stop();
-    webSocket_.runThread.join();
+    auto thread = std::thread([this]()
+    {
+        webSocket_.runThread.join();
+        fsm_->instance.react(FSMEvent {
+            .type = FSMEventType::ThreadWebsocketStop
+        });
+    });
+    thread.detach();
+}
+
+void GatewayController::onStop()
+{
+    onStop_.notify();
 }
 
 void GatewayController::setHeartbeatInterval(uint64_t interval)
@@ -124,7 +136,14 @@ void GatewayController::startHeartbeat()
 void GatewayController::stopHeartbeat()
 {
     heartbeat_.thread.request_stop();
-    heartbeat_.thread.join();
+    auto thread = std::thread([this]()
+    {
+        heartbeat_.thread.join();
+        fsm_->instance.react(FSMEvent {
+            .type = FSMEventType::ThreadHeartbeatStop
+        });
+    });
+    thread.detach();
 }
 
 void GatewayController::identity()
@@ -147,6 +166,19 @@ void GatewayController::identity()
 void GatewayController::saveSessionInfo(const Ready &ready)
 {
     sessionId_ = ready.sessionId;
+}
+
+void GatewayController::resume()
+{
+    Resume resume {
+        .token = token_,
+        .sessionId = sessionId_,
+        .seq = heartbeat_.sequence
+    };
+    sendInternal({
+        .op = GatewayOpCode::Resume,
+        .data = resume
+    });
 }
 
 void GatewayController::scheduleUpdate()
