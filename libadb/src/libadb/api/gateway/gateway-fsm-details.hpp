@@ -12,7 +12,8 @@ namespace adb::api
     {
         void entryGuard(FullControl& control) noexcept
         {
-            control.context()->onStop();
+            if (auto *context = control.context())
+                context->onStop();
         } 
 
         void react(const FSMEvent &event, FullControl& control) noexcept
@@ -30,7 +31,7 @@ namespace adb::api
         {
             if (event.type == FSMEventType::GatewayRequest_Reconnect)
             {
-                // todo: reconnect
+                control.changeTo<Reconnecting>();
             }
         }
     };
@@ -41,9 +42,9 @@ namespace adb::api
         {
             auto plan = control.plan();
 
-            plan.change<WebSocketOpen, Handshake>();
-            plan.change<Handshake, HeartbeatStart>();
-            plan.change<HeartbeatStart, Auth>();
+            plan.change<ConnectingWebSocketOpen, ConnectingHandshake>();
+            plan.change<ConnectingHandshake, ConnectingHeartbeatStart>();
+            plan.change<ConnectingHeartbeatStart, Auth>();
         }
 
         void planSucceeded(FullControl& control) noexcept
@@ -184,10 +185,8 @@ namespace adb::api
             if (event.payload->op != GatewayOpCode::Dispatch)
                 return;
             auto eventType = from_string(event.payload->eventName.value());
-            if (eventType == Event::READY)
+            if (eventType == Event::RESUMED)
             {
-                auto ready = event.payload->data.get<Ready>();
-                control.context()->saveSessionInfo(ready);
                 control.succeed();
             }
             else if (eventType == Event::INVALID_SESSION)
@@ -213,10 +212,10 @@ namespace adb::api
             auto plan = control.plan();
 
             plan.change<HeartbeatStop, WebSocketStop>();
-            plan.change<WebSocketStop, WebSocketOpen>();
-            plan.change<WebSocketOpen, Handshake>();
-            plan.change<Handshake, HeartbeatStart>();
-            plan.change<HeartbeatStart, Resuming>();
+            plan.change<WebSocketStop, ReconnectingWebSocketOpen>();
+            plan.change<ReconnectingWebSocketOpen, ReconnectingHandshake>();
+            plan.change<ReconnectingHandshake, ReconnectingHeartbeatStart>();
+            plan.change<ReconnectingHeartbeatStart, Resuming>();
         }
 
         void planSucceeded(FullControl& control) noexcept
@@ -230,4 +229,12 @@ namespace adb::api
             control.changeTo<Disconnected>();
         }
     };
+
+    struct ConnectingWebSocketOpen : WebSocketOpen {};
+    struct ConnectingHandshake : Handshake {};
+    struct ConnectingHeartbeatStart : HeartbeatStart {};
+
+    struct ReconnectingWebSocketOpen : WebSocketOpen {};
+    struct ReconnectingHandshake : Handshake {};
+    struct ReconnectingHeartbeatStart : HeartbeatStart {};
 }

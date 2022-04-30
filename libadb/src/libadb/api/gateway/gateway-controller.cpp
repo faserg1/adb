@@ -12,7 +12,10 @@ using namespace adb::api;
 struct GatewayController::FSMData
 {
     FSM::Instance instance;
-    FSMData(GatewayController *controller) : instance(controller) {}
+    FSMData(GatewayController *controller)
+    {
+        instance.setContext(controller);
+    }
 };
 
 GatewayController::GatewayController(const std::string &gatewayUrl, const std::string &token, Intents requiredIntents) :
@@ -138,7 +141,7 @@ void GatewayController::stopHeartbeat()
     heartbeat_.thread.request_stop();
     auto thread = std::thread([this]()
     {
-        heartbeat_.thread.join();
+        heartbeat_.thread.detach();
         fsm_->instance.react(FSMEvent {
             .type = FSMEventType::ThreadHeartbeatStop
         });

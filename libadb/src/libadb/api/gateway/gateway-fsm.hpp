@@ -3,6 +3,8 @@
 #include <libadb/api/gateway/data/opcode.hpp>
 
 #define HFSM2_ENABLE_PLANS
+#define HFSM2_ENABLE_LOG_INTERFACE
+#define HFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #include <hfsm2/machine.hpp>
 
 namespace adb::api
@@ -33,26 +35,27 @@ namespace adb::api
     struct Resuming;
 
     using FSM = Machine::PeerRoot<
-        /* Main states */
         Disconnected,
         Connected,
 
-        /* Head transition states */
-        Connecting,
-        Reconnecting,
-
-        /* Transition states */
-
-        WebSocketOpen,
-        WebSocketStop,
-
-        HeartbeatStart,
-        HeartbeatStop,
-
-        Handshake,
-        Auth,
-        Resuming
+        Machine::Composite<
+            Connecting,
+            struct ConnectingWebSocketOpen,
+            struct ConnectingHandshake,
+            struct ConnectingHeartbeatStart,
+            Auth
+        >,
         
+        Machine::Composite<
+            Reconnecting,
+            HeartbeatStop,
+            WebSocketStop,
+            struct ReconnectingWebSocketOpen,
+            struct ReconnectingHandshake,
+            struct ReconnectingHeartbeatStart,
+            Resuming
+        >
+
         /*Machine::Composite<
             struct Disconnecting,
             struct HeartbeatStop
