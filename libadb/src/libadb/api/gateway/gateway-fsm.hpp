@@ -23,6 +23,7 @@ namespace adb::api
 
     struct Connecting;
     struct Reconnecting;
+    struct Disconnecting;
 
     /* Inner States */
 
@@ -48,23 +49,19 @@ namespace adb::api
         
         Machine::Composite<
             Reconnecting,
-            HeartbeatStop,
-            WebSocketStop,
+            struct ReconnectingHeartbeatStop,
+            struct ReconnectingWebSocketStop,
             struct ReconnectingWebSocketOpen,
             struct ReconnectingHandshake,
             struct ReconnectingHeartbeatStart,
             Resuming
-        >
+        >,
 
-        /*Machine::Composite<
-            struct Disconnecting,
-            struct HeartbeatStop
-        >,*/
-        /*Machine::Composite<
-            struct Resuming,
-            struct Connecting,
-            struct Resuming
-        >*/
+        Machine::Composite<
+            Disconnecting,
+            struct DisconnectingHeartbeatStop,
+            struct DisconnectingWebSocketStop
+        >
     >;
 
     enum class FSMEventType

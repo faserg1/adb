@@ -29,7 +29,9 @@ namespace adb::api
     {
         void react(const FSMEvent& event, FullControl& control) noexcept
         {
-            if (event.type == FSMEventType::GatewayRequest_Reconnect)
+            if (event.type == FSMEventType::GatewayRequest_Reconnect ||
+                event.type == FSMEventType::WebSocketEventType_LostHeartbeat ||
+                event.type == FSMEventType::WebSocketEventType_Close)
             {
                 control.changeTo<Reconnecting>();
             }
@@ -54,8 +56,7 @@ namespace adb::api
 
         void planFailed(FullControl& control) noexcept
         {
-            // todo normal disconnecting
-            control.changeTo<Disconnected>();
+            control.changeTo<Disconnecting>();
         }
     };
 
@@ -211,8 +212,8 @@ namespace adb::api
         {
             auto plan = control.plan();
 
-            plan.change<HeartbeatStop, WebSocketStop>();
-            plan.change<WebSocketStop, ReconnectingWebSocketOpen>();
+            plan.change<ReconnectingHeartbeatStop, ReconnectingWebSocketStop>();
+            plan.change<ReconnectingWebSocketStop, ReconnectingWebSocketOpen>();
             plan.change<ReconnectingWebSocketOpen, ReconnectingHandshake>();
             plan.change<ReconnectingHandshake, ReconnectingHeartbeatStart>();
             plan.change<ReconnectingHeartbeatStart, Resuming>();
@@ -226,6 +227,27 @@ namespace adb::api
         void planFailed(FullControl& control) noexcept
         {
             // todo normal disconnecting
+            control.changeTo<Disconnecting>();
+        }
+    };
+
+    struct Disconnecting : FSM::State
+    {
+        void enter(PlanControl& control) noexcept
+        {
+            auto plan = control.plan();
+
+            plan.change<DisconnectingHeartbeatStop, DisconnectingWebSocketStop>();
+        }
+
+        void planSucceeded(FullControl& control) noexcept
+        {
+            control.changeTo<Disconnected>();
+        }
+
+        void planFailed(FullControl& control) noexcept
+        {
+            // how it could fail?
             control.changeTo<Disconnected>();
         }
     };
@@ -235,6 +257,11 @@ namespace adb::api
     struct ConnectingHeartbeatStart : HeartbeatStart {};
 
     struct ReconnectingWebSocketOpen : WebSocketOpen {};
+    struct ReconnectingWebSocketStop : WebSocketStop {};
     struct ReconnectingHandshake : Handshake {};
     struct ReconnectingHeartbeatStart : HeartbeatStart {};
+    struct ReconnectingHeartbeatStop : HeartbeatStop {};
+
+    struct DisconnectingHeartbeatStop : HeartbeatStop {};
+    struct DisconnectingWebSocketStop : WebSocketStop {};
 }
