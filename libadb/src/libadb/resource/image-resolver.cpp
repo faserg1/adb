@@ -61,6 +61,24 @@ Image ImageResolver::getGuildMemberAvatar(const adb::types::SFID &guildId, const
         fmt::format("guilds/{}/users/{}/avatars/", guildId.to_string(), userId.to_string()), hash, true);
 }
 
+Image ImageResolver::getApplicationIcon(const adb::types::SFID &appId, const std::string &hash)
+{
+    return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},
+        fmt::format("team-icons/{}/", appId.to_string()), hash, true);
+}
+
+Image ImageResolver::getApplicationCover(const adb::types::SFID &appId, const std::string &hash)
+{
+    return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},
+        fmt::format("app-icons/{}/", appId.to_string()), hash, true);
+}
+
+Image ImageResolver::getTeamIcon(const adb::types::SFID &teamId, const std::string &hash)
+{
+    return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},
+        fmt::format("app-icons/{}/", teamId.to_string()), hash, true);
+}
+
 Image ImageResolver::getRoleIcon(const adb::types::SFID &roleId, const std::string &hash)
 {
     return Image({ImageFormat::PNG, ImageFormat::JPEG, ImageFormat::WebP},

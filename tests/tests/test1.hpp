@@ -10,3 +10,4 @@ namespace adb::api
 
 void checkSmth(adb::api::DiscordApi &api, std::shared_ptr<adb::api::Gateway> gateway);
 void checkForErrors(adb::api::DiscordApi &api);
+void checkCurrentApp(adb::api::DiscordApi &api);

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <libadb/api/api.hpp>
+#include <libadb/api/auth/auth.hpp>
 #include <libadb/api/gateway/gateway.hpp>
 #include <libadb/api/gateway/gateway-events.hpp>
 #include <libadb/api/message/data/message.hpp>
@@ -105,4 +106,10 @@ void checkForErrors(adb::api::DiscordApi &api)
 	{
 		int i = 0;
 	}
+}
+
+void checkCurrentApp(adb::api::DiscordApi &api)
+{
+	auto auth = api.CreateAuth();
+	auto app = auth->getCurrentApplicationInfo();
 }

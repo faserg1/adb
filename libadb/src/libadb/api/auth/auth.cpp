@@ -12,9 +12,9 @@ Auth::Auth(std::shared_ptr<Context> context) :
     context_(context),
     baseUrl_(context->getBaseUrl() + "/oauth2"s),
     // https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-urls
-    authUrl_(authUrl_ + "/authorize"s),
-    tokenUrl_(authUrl_ + "/token"s),
-    revokeUrl_(authUrl_ + "/token/revoke"s)
+    authUrl_(baseUrl_ + "/authorize"s),
+    tokenUrl_(baseUrl_ + "/token"s),
+    revokeUrl_(baseUrl_ + "/token/revoke"s)
 {
     
 }

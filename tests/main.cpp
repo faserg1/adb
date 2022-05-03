@@ -41,6 +41,8 @@ int main()
 
 	// checkGuild(api);
 
+	checkCurrentApp(api);
+
 	gateway->runUnlessStopped();
 	
 	return 0;

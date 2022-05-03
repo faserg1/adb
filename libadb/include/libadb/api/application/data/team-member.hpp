@@ -11,7 +11,7 @@
 namespace adb::api
 {
     /**
-     * @brief 
+     * @brief Team Member
      * @details https://discord.com/developers/docs/topics/teams#data-models-team-member-object
      */
     struct TeamMember
