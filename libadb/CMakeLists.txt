@@ -8,12 +8,6 @@ set_property(TARGET libadb PROPERTY CXX_STANDARD_REQUIRED 20)
 
 target_compile_definitions(libadb PRIVATE LIBADB_EXPORTS)
 
-target_include_directories(libadb PRIVATE
-    ${USOCKETS_INCLUDE_DIRS}
-    ${UWEBSOCKETS_INCLUDE_DIRS}
-    ${HFSM2_INCLUDE_DIRS}
-)
-
 target_include_directories(libadb PUBLIC
     "$<BUILD_INTERFACE:${ROOT_INCLUDE_DIR}>"
     "$<INSTALL_INTERFACE:include>"
@@ -33,8 +27,6 @@ target_link_libraries(libadb PRIVATE websocketpp::websocketpp)
 
 target_link_libraries(libadb PRIVATE unofficial-sodium::sodium)
 target_link_libraries(libadb PRIVATE Opus::opus)
-
-target_link_libraries(libadb PRIVATE ${USOCKETS_LIBRARY})
 
 set(ADB_PROJECT_CONFIG ${PROJECT_BINARY_DIR}/adb-config.cmake)
 

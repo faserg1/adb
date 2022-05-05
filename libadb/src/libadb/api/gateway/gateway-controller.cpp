@@ -1,5 +1,5 @@
 #include <libadb/api/gateway/gateway-controller.hpp>
-#include <libadb/api/gateway/gateway-fsm-details.hpp>
+#include <libadb/api/gateway/gateway-fsm.hpp>
 #include <libadb/api/gateway/gateway.hpp>
 #include <libadb/api/gateway/data/payload.hpp>
 #include <libadb/api/gateway/data/dispatch.hpp>
@@ -11,10 +11,9 @@ using namespace adb::api;
 
 struct GatewayController::FSMData
 {
-    FSM::Instance instance;
-    FSMData(GatewayController *controller)
+    std::shared_ptr<StateMachine> machine;
+    FSMData(GatewayController *controller) : machine(createStateMachine(controller))
     {
-        instance.setContext(controller);
     }
 };
 
@@ -54,16 +53,12 @@ void GatewayController::setDispatchFunction(DispatchCallback onDispatch)
 void GatewayController::start()
 {
     onStop_.reset();
-    fsm_->instance.react(FSMEvent {
-        .type = FSMEventType::GatewayUserRequest_Connect
-    });
+    processEvent(fsm_->machine, StateMachineEventType::RequestConnect);
 }
 
 void GatewayController::stop()
 {
-    fsm_->instance.react(FSMEvent {
-        .type = FSMEventType::GatewayUserRequest_Disconnect
-    });
+    processEvent(fsm_->machine, StateMachineEventType::RequestDisconnect);
 }
 
 void GatewayController::runUnlessStopped()
@@ -95,9 +90,9 @@ void GatewayController::stopWebSocket()
     auto thread = std::thread([this]()
     {
         webSocket_.runThread.join();
-        fsm_->instance.react(FSMEvent {
+        /*fsm_->instance.react(FSMEvent {
             .type = FSMEventType::ThreadWebsocketStop
-        });
+        });*/
     });
     thread.detach();
 }
@@ -127,9 +122,7 @@ void GatewayController::startHeartbeat()
             heartbeat_.lostHearbeat++;
             if (heartbeat_.lostHearbeat > 3)
             {
-                fsm_->instance.react(FSMEvent {
-                    .type = FSMEventType::WebSocketEventType_LostHeartbeat
-                });
+                processEvent(fsm_->machine, StateMachineEventType::LostHeartbeat);
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(heartbeat_.interval));
         }
@@ -142,9 +135,7 @@ void GatewayController::stopHeartbeat()
     auto thread = std::thread([this]()
     {
         heartbeat_.thread.detach();
-        fsm_->instance.react(FSMEvent {
-            .type = FSMEventType::ThreadHeartbeatStop
-        });
+        processEvent(fsm_->machine, StateMachineEventType::HeartbeatStop);
     });
     thread.detach();
 }
@@ -188,7 +179,7 @@ void GatewayController::scheduleUpdate()
 {
     auto thread = std::thread([this]()
     {
-        fsm_->instance.update();
+        //fsm_->instance.update();
     });
     thread.detach();
 }
@@ -206,24 +197,15 @@ void GatewayController::configureClient()
     });
     webSocket_.client.set_open_handler([this](auto con)
     {
-        fsm_->instance.react(FSMEvent
-        {
-            .type = FSMEventType::WebSocketEventType_Open
-        });
+        processEvent(fsm_->machine, StateMachineEventType::WebSocketOpen);
     });
     webSocket_.client.set_fail_handler([this](auto con)
     {
-        fsm_->instance.react(FSMEvent
-        {
-            .type = FSMEventType::WebSocketEventType_Fail
-        });
+        processEvent(fsm_->machine, StateMachineEventType::WebSocketFail);
     });
     webSocket_.client.set_close_handler([this](auto con)
     {
-        fsm_->instance.react(FSMEvent
-        {
-            .type = FSMEventType::WebSocketEventType_Close
-        });
+        processEvent(fsm_->machine, StateMachineEventType::WebSocketClose);
     });
 }
 
@@ -239,16 +221,13 @@ void GatewayController::configureMessageHandler()
 
 void GatewayController::onMessage(const Payload &payload)
 {
-    fsm_->instance.react(FSMEvent
-    {
-        .type = FSMEventType::Payload,
-        .payload = &payload
-    });
+    
     handleMessage(payload);
 }
 
 void GatewayController::handleMessage(const Payload &payload)
 {
+    processEvent(fsm_->machine, StateMachineEventType::Payload, &payload);
     switch (payload.op)
     {
         case GatewayOpCode::HeartbeatACK:
@@ -256,10 +235,10 @@ void GatewayController::handleMessage(const Payload &payload)
             break;
         case GatewayOpCode::Reconnect:
         {
-            fsm_->instance.react(FSMEvent
+            /*fsm_->instance.react(FSMEvent
             {
                 .type = FSMEventType::GatewayRequest_Reconnect,
-            });
+            });*/
             break;
         }
         case GatewayOpCode::Dispatch:

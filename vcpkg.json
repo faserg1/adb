@@ -6,12 +6,10 @@
       "name": "curl",
       "features": ["openssl"]
     },
-    "hfsm2",
+    "bext-sml",
     "cpr",
     "fmt",
     "nlohmann-json",
-    "usockets",
-    "uwebsockets",
     "websocketpp",
     "openssl",
     "boost-random",
