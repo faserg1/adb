@@ -14,6 +14,7 @@ namespace adb::api
         RequestDisconnect,
         WebSocketOpen,
         WebSocketClose,
+        WebSocketStop,
         WebSocketFail,
         LostHeartbeat,
         HeartbeatStart,

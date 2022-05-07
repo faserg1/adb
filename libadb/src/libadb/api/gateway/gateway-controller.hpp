@@ -60,8 +60,6 @@ namespace adb::api
         void identity();
         void saveSessionInfo(const Ready &ready);
         void resume();
-
-        void scheduleUpdate();
     private:
         void configureClient();
         void configureMessageHandler();

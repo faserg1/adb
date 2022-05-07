@@ -7,7 +7,7 @@
 namespace adb::api
 {
     /**
-     * @brief 
+     * @brief Gateway Event
      * @details https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events
      */
     enum class Event : uint64_t
@@ -23,6 +23,8 @@ namespace adb::api
         RECONNECT,
         /// failure response to Identify or Resume or invalid active session
         INVALID_SESSION,
+        /// application command permission was updated
+        APPLICATION_COMMAND_PERMISSIONS_UPDATE,
         /// new guild channel created
         CHANNEL_CREATE,
         /// channel was updated
@@ -129,8 +131,6 @@ namespace adb::api
         VOICE_SERVER_UPDATE,
         /// guild channel webhook was created, update, or deleted
         WEBHOOKS_UPDATE,
-        /// [not documented]
-        APPLICATION_COMMAND_PERMISSIONS_UPDATE
     };
 
     LIBADB_API std::string to_string(Event e);

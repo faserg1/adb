@@ -90,9 +90,7 @@ void GatewayController::stopWebSocket()
     auto thread = std::thread([this]()
     {
         webSocket_.runThread.join();
-        /*fsm_->instance.react(FSMEvent {
-            .type = FSMEventType::ThreadWebsocketStop
-        });*/
+        processEvent(fsm_->machine, StateMachineEventType::WebSocketStop);
     });
     thread.detach();
 }
@@ -173,15 +171,6 @@ void GatewayController::resume()
         .op = GatewayOpCode::Resume,
         .data = resume
     });
-}
-
-void GatewayController::scheduleUpdate()
-{
-    auto thread = std::thread([this]()
-    {
-        //fsm_->instance.update();
-    });
-    thread.detach();
 }
 
 void GatewayController::configureClient()
