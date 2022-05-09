@@ -95,6 +95,12 @@ void GatewayController::stopWebSocket()
     thread.detach();
 }
 
+bool GatewayController::isWebSocketOpened()
+{
+    auto state = webSocket_.connection->get_state();
+    return state == decltype(state)::open;
+}
+
 void GatewayController::onStop()
 {
     onStop_.notify();

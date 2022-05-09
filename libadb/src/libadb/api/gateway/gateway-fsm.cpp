@@ -67,6 +67,16 @@ namespace adb::api
         controller->stopWebSocket();
     };
 
+    const auto webSocketOpenedGuard = [](GatewayController *controller) -> bool
+    {
+        return controller->isWebSocketOpened();
+    };
+
+    const auto webSocketClosedGuard = [](GatewayController *controller) -> bool
+    {
+        return !controller->isWebSocketOpened();
+    };
+
     const auto heartbeatStart = [](GatewayController *controller)
     {
         controller->startHeartbeat();
@@ -125,7 +135,8 @@ namespace adb::api
             return make_transition_table
             (
                 sReconnecting + on_entry<_> / (heartbeatStop, webSocketStop),
-                *sReconnecting + event<WebSocketCloseEvent> = sWebSocketStop,
+                *sReconnecting + event<WebSocketCloseEvent> [webSocketOpenedGuard] = sWebSocketStop,
+                sReconnecting [webSocketClosedGuard] = sWebSocketStop,
                 sWebSocketStop + on_entry<_> / (webSocketStart),
                 sWebSocketStop + event<WebSocketOpenEvent> = sWebSocketOpen,
                 sWebSocketOpen + event<Hello> / (onHello, heartbeatStart, tryResume) = sHandshake,
@@ -145,7 +156,8 @@ namespace adb::api
             return make_transition_table
             (
                 sDisconnecting + on_entry<_> / (heartbeatStop, webSocketStop),
-                *sDisconnecting + event<WebSocketCloseEvent> = X,
+                *sDisconnecting + event<WebSocketCloseEvent> [webSocketOpenedGuard] = X,
+                sDisconnecting [webSocketClosedGuard] = X,
                 X + on_entry<_> / process(DisconnectingDone{})
             );
         }
@@ -163,6 +175,7 @@ namespace adb::api
                 *sDisconnected + event<RequestConnectEvent> = state<StateCompositeConnecting>,
                 state<StateCompositeConnecting> + event<ConnectingDone> = sConnected,
                 sConnected + event<ReconnectEvent> = state<StateCompositeReconnecting>,
+                sConnected + event<WebSocketCloseEvent> = state<StateCompositeReconnecting>,
                 state<StateCompositeReconnecting> + event<ReconnectingDone> = sConnected,
                 sConnected + event<RequestDisconnectEvent> = state<StateCompositeDisconnecting>,
                 state<StateCompositeDisconnecting> + event<DisconnectingDone> = sDisconnected

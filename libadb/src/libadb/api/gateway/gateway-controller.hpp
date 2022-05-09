@@ -50,6 +50,7 @@ namespace adb::api
         bool connect();
         void startWebSocket();
         void stopWebSocket();
+        bool isWebSocketOpened();
 
         void onStop();
 
