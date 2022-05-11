@@ -18,8 +18,8 @@ struct GatewayController::FSMData
 };
 
 GatewayController::GatewayController(const std::string &gatewayUrl, const std::string &token, Intents requiredIntents) :
-    fsm_(std::make_unique<FSMData>(this)),
-    gatewayUrl_(gatewayUrl), token_(token), requiredIntents_(requiredIntents)
+    gatewayUrl_(gatewayUrl), token_(token), requiredIntents_(requiredIntents),
+    fsm_(std::make_unique<FSMData>(this))
 {
     configureClient();
     configureMessageHandler();

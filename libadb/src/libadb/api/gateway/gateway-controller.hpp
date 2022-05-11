@@ -70,7 +70,6 @@ namespace adb::api
         bool sendInternal(const Payload &msg);
         
     private:
-        std::unique_ptr<FSMData> fsm_;
         struct Connection
         {
             WebSocketClient client;
@@ -85,13 +84,15 @@ namespace adb::api
             std::atomic<uint64_t> lostHearbeat = 0;
         } heartbeat_;
 
-        AwaitableEvent onStop_;
-
         std::string sessionId_;
         const std::string gatewayUrl_;
         const std::string token_;
         const Intents requiredIntents_;
 
         DispatchCallback dispatchCallback_;
+        AwaitableEvent onStop_;
+
+        // State machine should be initialized last
+        std::unique_ptr<FSMData> fsm_;
     };
 }
