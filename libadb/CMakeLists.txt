@@ -6,7 +6,10 @@ file(GLOB_RECURSE LIBADB_SOURCES *.cpp *.hpp *.h)
 add_library(libadb SHARED ${LIBADB_SOURCES})
 set_property(TARGET libadb PROPERTY CXX_STANDARD_REQUIRED 20)
 
-target_compile_definitions(libadb PRIVATE LIBADB_EXPORTS)
+target_compile_definitions(libadb PRIVATE
+    LIBADB_EXPORTS
+    LOGURU_USE_FMTLIB=1
+)
 
 target_include_directories(libadb PUBLIC
     "$<BUILD_INTERFACE:${ROOT_INCLUDE_DIR}>"

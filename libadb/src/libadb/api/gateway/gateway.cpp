@@ -63,7 +63,7 @@ void Gateway::onMessage(const Payload &msg)
     {
         case GatewayOpCode::Dispatch:
         {
-            LOG_F(INFO, "Gateway dispatch: %s", msg.eventName.value());
+            LOG_F(INFO, "Gateway dispatch: {}", msg.eventName.value());
             auto eventType = from_string(msg.eventName.value());
             if (eventType != Event::UNKNOWN)
             {

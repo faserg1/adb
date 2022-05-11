@@ -8,7 +8,7 @@ bool adb::api::checkEndpointError(const nlohmann::json &errorMsg)
     if (errorMsg.contains("code") && errorMsg.contains("message"))
     {
         const auto error = errorMsg.get<adb::api::Error>();
-        LOG_F(ERROR, error.message.c_str());
+        LOG_F(ERROR, "Code: {}, Message: \"{}\"",  static_cast<uint64_t>(error.code), error.message);
         throw adb::api::EndpointError(error);
         return true;
     }

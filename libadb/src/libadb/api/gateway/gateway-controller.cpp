@@ -6,6 +6,7 @@
 #include <libadb/api/gateway/data/ready.hpp>
 #include <libadb/api/gateway/data/identity.hpp>
 #include <libadb/api/gateway/data/resume.hpp>
+#include <libadb/misc/logging.hpp>
 #include <nlohmann/json.hpp>
 #include <loguru/loguru.hpp>
 using namespace adb::api;
@@ -35,7 +36,7 @@ bool GatewayController::connect()
     if (ec)
     {
         auto msg = ec.message();
-        LOG_F(ERROR, "WebSocket connection create error: %s", msg);
+        LOG_F(ERROR, "WebSocket connection create error: {}", msg);
         return false;
     }
     webSocket_.connection = webSocket_.client.connect(con);
@@ -45,6 +46,13 @@ bool GatewayController::connect()
 
 void GatewayController::disconnect()
 {
+    LOG_SCOPE_FUNCTION(INFO);
+    
+    if (!isWebSocketOpened() || isWebSocketStopped())
+    {
+        LOG_F(1, "Already disconnected");
+        return;
+    }
     LOG_F(INFO, "Disconnecting from gateway");
     webSocket_.client.close(webSocket_.connection, websocketpp::close::status::normal, "Disconnecting");
 }
@@ -238,6 +246,7 @@ void GatewayController::onMessage(const Payload &payload)
 
 void GatewayController::handleMessage(const Payload &payload)
 {
+    VLOG_F(vDEBUG, "Gateway payload received, code: {}, event {}", static_cast<uint64_t>(payload.op), payload.eventName.value_or(""));
     processEvent(fsm_->machine, StateMachineEventType::Payload, &payload);
     switch (payload.op)
     {
@@ -264,10 +273,12 @@ bool GatewayController::sendInternal(const Payload &msg)
 {
     nlohmann::json jsObj = msg;
     WebSocketError ec;
+    VLOG_F(vDEBUG, "Gateway payload send, code: {}, event {}", static_cast<uint64_t>(msg.op), msg.eventName.value_or(""));
     webSocket_.client.send(webSocket_.connection, jsObj.dump(), WebSocketOpcode::text, ec);
     if (ec)
     {
         auto msg = ec.message();
+        LOG_F(ERROR, "{}", msg);
         return false;
     }
     return true;

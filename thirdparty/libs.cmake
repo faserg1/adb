@@ -29,3 +29,7 @@ if (WIN32)
 endif (WIN32)
 
 add_library(thirdparty_libs STATIC ${THIRDPARTY_SOURCE})
+target_compile_definitions(thirdparty_libs PRIVATE
+    LOGURU_USE_FMTLIB=1
+)
+target_link_libraries(thirdparty_libs PRIVATE fmt::fmt)
