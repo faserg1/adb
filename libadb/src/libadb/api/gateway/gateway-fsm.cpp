@@ -5,6 +5,7 @@
 #include <libadb/api/gateway/data/dispatch.hpp>
 #include <libadb/api/gateway/data/hello.hpp>
 #include <libadb/api/gateway/data/ready.hpp>
+#include <boost/sml.hpp>
 #include <iostream>
 #include <queue>
 #include <fmt/format.h>
@@ -107,6 +108,11 @@ namespace adb::api
         controller->saveSessionInfo(ready);
     };
 
+    const auto doStop = [](GatewayController *controller)
+    {
+        controller->onStop();
+    };
+
     class StateCompositeConnecting
     {
     public:
@@ -178,7 +184,8 @@ namespace adb::api
                 sConnected + event<WebSocketCloseEvent> = state<StateCompositeReconnecting>,
                 state<StateCompositeReconnecting> + event<ReconnectingDone> = sConnected,
                 sConnected + event<RequestDisconnectEvent> = state<StateCompositeDisconnecting>,
-                state<StateCompositeDisconnecting> + event<DisconnectingDone> = sDisconnected
+                state<StateCompositeDisconnecting> + event<DisconnectingDone> = sDisconnected,
+                sDisconnected + on_entry<_> / doStop
             );
         }
     };

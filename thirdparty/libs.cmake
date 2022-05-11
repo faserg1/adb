@@ -10,7 +10,5 @@ find_package(date CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS random system)
 
-find_path(UWEBSOCKETS_INCLUDE_DIRS "uwebsockets/App.h")
-
 find_package(unofficial-sodium CONFIG REQUIRED)
 find_package(Opus CONFIG REQUIRED)

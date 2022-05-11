@@ -216,7 +216,6 @@ void GatewayController::configureMessageHandler()
 
 void GatewayController::onMessage(const Payload &payload)
 {
-    
     handleMessage(payload);
 }
 

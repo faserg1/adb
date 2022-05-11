@@ -40,7 +40,9 @@ void AwaitableEvent::wait()
     if (!data_)
         return;
     std::unique_lock lk(data_->m);
-    data_->cv.wait(lk, [this](){return data_->done;});
+    while (!data_->done) {
+        data_->cv.wait(lk, [this](){return data_->done;});
+    }
     data_->done = false;
     lk.unlock();
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <libadb/api/gateway/data/opcode.hpp>
-#include <boost/sml.hpp>
 #include <memory>
 namespace adb::api
 {
