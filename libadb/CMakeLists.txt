@@ -18,8 +18,14 @@ target_include_directories(libadb PRIVATE
 )
 
 target_include_directories(libadb PRIVATE
-    ${LOGURU_INCLUDE_DIRS}
+    ${BEXT_SML_INCLUDE_DIRS}
 )
+
+if (WIN32)
+    target_include_directories(libadb PRIVATE
+        ${LOGURU_INCLUDE_DIRS}
+    )
+endif()
 
 target_link_libraries(libadb PRIVATE thirdparty_libs)
 target_link_libraries(libadb PRIVATE date::date date::date-tz)
@@ -27,6 +33,9 @@ target_link_libraries(libadb PRIVATE Boost::boost Boost::system Boost::random)
 target_link_libraries(libadb PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 target_link_libraries(libadb PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 target_link_libraries(libadb PRIVATE fmt::fmt)
+if (!WIN32)
+    target_link_libraries(libadb PRIVATE loguru)
+endif(!WIN32)
 target_link_libraries(libadb PRIVATE cpr::cpr)
 target_link_libraries(libadb PRIVATE websocketpp::websocketpp)
 
