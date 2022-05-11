@@ -19,6 +19,7 @@ find_package(unofficial-sodium CONFIG REQUIRED)
 find_package(Opus CONFIG REQUIRED)
 
 set(THIRDPARTY_SOURCE
+    ${ADB_THIRDPARTY_DIR}/empty.cpp
 )
 
 if (WIN32)
