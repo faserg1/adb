@@ -7,6 +7,7 @@
 #include <libadb/api/gateway/data/identity.hpp>
 #include <libadb/api/gateway/data/resume.hpp>
 #include <nlohmann/json.hpp>
+#include <loguru/loguru.hpp>
 using namespace adb::api;
 
 struct GatewayController::FSMData
@@ -34,10 +35,18 @@ bool GatewayController::connect()
     if (ec)
     {
         auto msg = ec.message();
+        LOG_F(ERROR, "WebSocket connection create error: %s", msg);
         return false;
     }
     webSocket_.connection = webSocket_.client.connect(con);
+    LOG_F(INFO, "WebSocket connection retrived.");
     return true;
+}
+
+void GatewayController::disconnect()
+{
+    LOG_F(INFO, "Disconnecting from gateway");
+    webSocket_.client.close(webSocket_.connection, websocketpp::close::status::normal, "Disconnecting");
 }
 
 bool GatewayController::send(const Payload &msg)
@@ -65,6 +74,7 @@ void GatewayController::runUnlessStopped()
 {
     start();
     onStop_.wait();
+    LOG_F(INFO, "runUnlessStopped done");
 }
 
 Intents GatewayController::getIntents()
@@ -97,8 +107,15 @@ void GatewayController::stopWebSocket()
 
 bool GatewayController::isWebSocketOpened()
 {
+    if (!webSocket_.connection)
+        return false;
     auto state = webSocket_.connection->get_state();
     return state == decltype(state)::open;
+}
+
+bool GatewayController::isWebSocketStopped()
+{
+    return webSocket_.client.stopped();
 }
 
 void GatewayController::onStop()
@@ -229,10 +246,7 @@ void GatewayController::handleMessage(const Payload &payload)
             break;
         case GatewayOpCode::Reconnect:
         {
-            /*fsm_->instance.react(FSMEvent
-            {
-                .type = FSMEventType::GatewayRequest_Reconnect,
-            });*/
+            processEvent(fsm_->machine, StateMachineEventType::RequestReconnect);
             break;
         }
         case GatewayOpCode::Dispatch:

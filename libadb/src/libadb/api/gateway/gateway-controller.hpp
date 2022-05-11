@@ -48,9 +48,13 @@ namespace adb::api
         /* For states */
 
         bool connect();
+        void disconnect();
         void startWebSocket();
         void stopWebSocket();
+        // connection
         bool isWebSocketOpened();
+        // client
+        bool isWebSocketStopped();
 
         void onStop();
 

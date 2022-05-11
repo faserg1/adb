@@ -8,7 +8,7 @@
 #include <libadb/api/gateway/data/dispatch.hpp>
 #include <libadb/cfg/secrets.hpp>
 #include <nlohmann/json.hpp>
-#include <iostream>
+#include <loguru/loguru.hpp>
 using namespace adb::api;
 
 Gateway::Gateway(std::shared_ptr<Context> context, const std::string &gatewayUrl, Intents requiredIntents) :
@@ -63,8 +63,7 @@ void Gateway::onMessage(const Payload &msg)
     {
         case GatewayOpCode::Dispatch:
         {
-            // simple logging
-            std::cout << "[Gateway] Dispatch event: " << msg.eventName.value() << std::endl; 
+            LOG_F(INFO, "Gateway dispatch: %s", msg.eventName.value());
             auto eventType = from_string(msg.eventName.value());
             if (eventType != Event::UNKNOWN)
             {

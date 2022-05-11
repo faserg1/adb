@@ -10,5 +10,13 @@ find_package(date CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS random system)
 
+find_path(LOGURU_INCLUDE_DIRS "loguru/loguru.cpp")
+
 find_package(unofficial-sodium CONFIG REQUIRED)
 find_package(Opus CONFIG REQUIRED)
+
+set(THIRDPARTY_SOURCE
+    ${LOGURU_INCLUDE_DIRS}/loguru/loguru.cpp
+)
+
+add_library(thirdparty_libs STATIC ${THIRDPARTY_SOURCE})

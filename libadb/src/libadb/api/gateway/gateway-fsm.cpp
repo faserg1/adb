@@ -6,7 +6,7 @@
 #include <libadb/api/gateway/data/hello.hpp>
 #include <libadb/api/gateway/data/ready.hpp>
 #include <boost/sml.hpp>
-#include <iostream>
+#include <loguru/loguru.hpp>
 #include <queue>
 #include <fmt/format.h>
 using namespace adb::api;
@@ -27,6 +27,7 @@ namespace adb::api
     /* Inner States */
 
     auto sWebSocketOpen = boost::sml::state<class WebSocketOpen>;
+    auto sWebSocketClose = boost::sml::state<class WebSocketClose>;
     auto sWebSocketStop = boost::sml::state<class WebSocketStop>;
     auto sHeartbeatStart = boost::sml::state<class HeartbeatStart>;
     auto sHeartbeatStop = boost::sml::state<class HeartbeatStop>;
@@ -41,6 +42,7 @@ namespace adb::api
     
     struct WebSocketOpenEvent {};
     struct WebSocketCloseEvent {};
+    struct WebSocketStopEvent {};
     struct WebSocketFailEvent {};
 
     struct LostHeartbeatEvent {};
@@ -53,9 +55,16 @@ namespace adb::api
     struct ReconnectingDone {};
     struct DisconnectingDone {};
 
+    /* WebSocket */
+
     const auto webSocketConnect = [](GatewayController *controller)
     {
         controller->connect();
+    };
+
+    const auto webSocketDisconnect = [](GatewayController *controller)
+    {
+        controller->disconnect();
     };
 
     const auto webSocketStart = [](GatewayController *controller)
@@ -73,10 +82,12 @@ namespace adb::api
         return controller->isWebSocketOpened();
     };
 
-    const auto webSocketClosedGuard = [](GatewayController *controller) -> bool
+    const auto webSocketStoppedGuard = [](GatewayController *controller) -> bool
     {
-        return !controller->isWebSocketOpened();
+        return controller->isWebSocketStopped();
     };
+
+    /* Heartbeat */
 
     const auto heartbeatStart = [](GatewayController *controller)
     {
@@ -87,6 +98,8 @@ namespace adb::api
     {
         controller->stopHeartbeat();
     };
+
+    /* Ident */
 
     const auto tryAuth = [](GatewayController *controller)
     {
@@ -107,6 +120,8 @@ namespace adb::api
     {
         controller->saveSessionInfo(ready);
     };
+
+    /* Misc */
 
     const auto doStop = [](GatewayController *controller)
     {
@@ -140,10 +155,11 @@ namespace adb::api
 
             return make_transition_table
             (
-                sReconnecting + on_entry<_> / (heartbeatStop, webSocketStop),
-                *sReconnecting + event<WebSocketCloseEvent> [webSocketOpenedGuard] = sWebSocketStop,
-                sReconnecting [webSocketClosedGuard] = sWebSocketStop,
-                sWebSocketStop + on_entry<_> / (webSocketStart),
+                *sReconnecting + on_entry<_> / (heartbeatStop, webSocketDisconnect),
+                sReconnecting + event<WebSocketCloseEvent> / (webSocketStop) = sWebSocketClose,
+                sReconnecting [!webSocketOpenedGuard && webSocketStoppedGuard] = sWebSocketStop,
+                sWebSocketClose + event<WebSocketStopEvent> = sWebSocketStop,
+                sWebSocketStop + on_entry<_> / (webSocketConnect, webSocketStart),
                 sWebSocketStop + event<WebSocketOpenEvent> = sWebSocketOpen,
                 sWebSocketOpen + event<Hello> / (onHello, heartbeatStart, tryResume) = sHandshake,
                 sHandshake + event<ResumedEvent> = X,
@@ -161,9 +177,10 @@ namespace adb::api
 
             return make_transition_table
             (
-                sDisconnecting + on_entry<_> / (heartbeatStop, webSocketStop),
-                *sDisconnecting + event<WebSocketCloseEvent> [webSocketOpenedGuard] = X,
-                sDisconnecting [webSocketClosedGuard] = X,
+                *sDisconnecting + on_entry<_> / (heartbeatStop, webSocketDisconnect),
+                sDisconnecting + event<WebSocketCloseEvent> / (webSocketStop) = sWebSocketClose,
+                sDisconnecting [!webSocketOpenedGuard && webSocketStoppedGuard] = X,
+                sWebSocketClose + event<WebSocketStopEvent> = X,
                 X + on_entry<_> / process(DisconnectingDone{})
             );
         }
@@ -195,31 +212,31 @@ namespace adb::api
         struct my_logger {
             template <class SM, class TEvent>
             void log_process_event(const TEvent&) {
-                std::cout << fmt::format("[{}][process_event] {}",
+                LOG_F(INFO, fmt::format("[{}][process_event] {}",
                     boost::sml::aux::get_type_name<SM>(),
-                    boost::sml::aux::get_type_name<TEvent>()) << std::endl;
+                    boost::sml::aux::get_type_name<TEvent>()).c_str());
             }
 
             template <class SM, class TGuard, class TEvent>
             void log_guard(const TGuard&, const TEvent&, bool result) {
-                std::cout << fmt::format("[{}][guard] {} {} {}",
+                LOG_F(INFO, fmt::format("[{}][guard] {} {} {}",
                     boost::sml::aux::get_type_name<SM>(),
                     boost::sml::aux::get_type_name<TGuard>(),
-                    boost::sml::aux::get_type_name<TEvent>(), (result ? "[OK]" : "[Reject]")) << std::endl;
+                    boost::sml::aux::get_type_name<TEvent>(), (result ? "[OK]" : "[Reject]")).c_str());
             }
 
             template <class SM, class TAction, class TEvent>
             void log_action(const TAction&, const TEvent&) {
-                std::cout << fmt::format("[{}][action] {} {}",
+                LOG_F(INFO, fmt::format("[{}][action] {} {}",
                     boost::sml::aux::get_type_name<SM>(),
                     boost::sml::aux::get_type_name<TAction>(),
-                    boost::sml::aux::get_type_name<TEvent>()) << std::endl;
+                    boost::sml::aux::get_type_name<TEvent>()).c_str());
             }
 
             template <class SM, class TSrcState, class TDstState>
             void log_state_change(const TSrcState& src, const TDstState& dst) {
-                std::cout << fmt::format("[{}][transition] {} -> {}",
-                    boost::sml::aux::get_type_name<SM>(), src.c_str(), dst.c_str()) << std::endl;
+                LOG_F(INFO, fmt::format("[{}][transition] {} -> {}",
+                    boost::sml::aux::get_type_name<SM>(), src.c_str(), dst.c_str()).c_str());
             }
         };
     public:
@@ -245,11 +262,17 @@ namespace adb::api
         case StateMachineEventType::RequestDisconnect:
             machine->machine.process_event(RequestDisconnectEvent{});
             break;
+        case StateMachineEventType::RequestReconnect:
+            machine->machine.process_event(ReconnectEvent{});
+            break;
         case StateMachineEventType::WebSocketOpen:
             machine->machine.process_event(WebSocketOpenEvent{});
             break;
         case StateMachineEventType::WebSocketClose:
             machine->machine.process_event(WebSocketCloseEvent{});
+            break;
+        case StateMachineEventType::WebSocketStop:
+            machine->machine.process_event(WebSocketStopEvent{});
             break;
         case StateMachineEventType::WebSocketFail:
             machine->machine.process_event(WebSocketFailEvent{});

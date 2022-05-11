@@ -11,6 +11,7 @@ namespace adb::api
     {
         RequestConnect,
         RequestDisconnect,
+        RequestReconnect,
         WebSocketOpen,
         WebSocketClose,
         WebSocketStop,

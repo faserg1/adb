@@ -17,6 +17,11 @@ target_include_directories(libadb PRIVATE
     ${ROOT_SRC_DIR}
 )
 
+target_include_directories(libadb PRIVATE
+    ${LOGURU_INCLUDE_DIRS}
+)
+
+target_link_libraries(libadb PRIVATE thirdparty_libs)
 target_link_libraries(libadb PRIVATE date::date date::date-tz)
 target_link_libraries(libadb PRIVATE Boost::boost Boost::system Boost::random)
 target_link_libraries(libadb PRIVATE OpenSSL::SSL OpenSSL::Crypto)
