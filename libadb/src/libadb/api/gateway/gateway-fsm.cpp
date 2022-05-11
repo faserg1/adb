@@ -158,6 +158,7 @@ namespace adb::api
                 *sReconnecting + on_entry<_> / (heartbeatStop, webSocketDisconnect),
                 sReconnecting + event<WebSocketCloseEvent> / (webSocketStop) = sWebSocketClose,
                 sReconnecting [!webSocketOpenedGuard && webSocketStoppedGuard] = sWebSocketStop,
+                sReconnecting [!webSocketOpenedGuard && !webSocketStoppedGuard] / (webSocketStop) = sWebSocketClose,
                 sWebSocketClose + event<WebSocketStopEvent> = sWebSocketStop,
                 sWebSocketStop + on_entry<_> / (webSocketConnect, webSocketStart),
                 sWebSocketStop + event<WebSocketOpenEvent> = sWebSocketOpen,
@@ -180,6 +181,7 @@ namespace adb::api
                 *sDisconnecting + on_entry<_> / (heartbeatStop, webSocketDisconnect),
                 sDisconnecting + event<WebSocketCloseEvent> / (webSocketStop) = sWebSocketClose,
                 sDisconnecting [!webSocketOpenedGuard && webSocketStoppedGuard] = X,
+                sDisconnecting [!webSocketOpenedGuard && !webSocketStoppedGuard] / (webSocketStop) = sWebSocketClose,
                 sWebSocketClose + event<WebSocketStopEvent> = X,
                 X + on_entry<_> / process(DisconnectingDone{})
             );

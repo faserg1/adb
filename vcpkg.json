@@ -7,7 +7,12 @@
       "features": ["openssl"]
     },
     "bext-sml",
-    "loguru",
+    {
+      "name": "loguru",
+      "features": [
+          "fmt"
+      ]
+    },
     "cpr",
     "fmt",
     "nlohmann-json",
