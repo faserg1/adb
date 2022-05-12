@@ -156,10 +156,11 @@ namespace adb::api
             return make_transition_table
             (
                 *sReconnecting + on_entry<_> / (heartbeatStop, webSocketDisconnect),
-                sReconnecting + event<WebSocketCloseEvent> / (webSocketStop) = sWebSocketClose,
+                sReconnecting + event<WebSocketCloseEvent> [!webSocketOpenedGuard] / (webSocketStop) = sWebSocketClose,
                 sReconnecting [!webSocketOpenedGuard && webSocketStoppedGuard] = sWebSocketStop,
                 sReconnecting [!webSocketOpenedGuard && !webSocketStoppedGuard] / (webSocketStop) = sWebSocketClose,
                 sWebSocketClose + event<WebSocketStopEvent> = sWebSocketStop,
+                sWebSocketClose [webSocketStoppedGuard] = sWebSocketStop,
                 sWebSocketStop + on_entry<_> / (webSocketConnect, webSocketStart),
                 sWebSocketStop + event<WebSocketOpenEvent> = sWebSocketOpen,
                 sWebSocketOpen + event<Hello> / (onHello, heartbeatStart, tryResume) = sHandshake,
@@ -183,6 +184,7 @@ namespace adb::api
                 sDisconnecting [!webSocketOpenedGuard && webSocketStoppedGuard] = X,
                 sDisconnecting [!webSocketOpenedGuard && !webSocketStoppedGuard] / (webSocketStop) = sWebSocketClose,
                 sWebSocketClose + event<WebSocketStopEvent> = X,
+                sWebSocketClose [webSocketStoppedGuard] = X,
                 X + on_entry<_> / process(DisconnectingDone{})
             );
         }

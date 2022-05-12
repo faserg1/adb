@@ -11,7 +11,12 @@
       "name": "loguru",
       "features": [
           "fmt"
-      ]
+      ],
+      "platform": "!windows"
+    },
+    {
+      "name": "loguru",
+      "platform": "windows"
     },
     "cpr",
     "fmt",

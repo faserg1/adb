@@ -92,17 +92,25 @@ Intents GatewayController::getIntents()
 
 void GatewayController::startWebSocket()
 {
-    webSocket_.runThread = std::jthread([this](std::stop_token token)
+    LOG_F(INFO, "Attempt to run WebSocket");
+    auto thread = std::jthread([this](std::stop_token token)
     {
         while (!token.stop_requested())
         {
             webSocket_.client.run();
         }
     });
+    webSocket_.runThread.swap(thread);
+    if (thread.joinable())
+    {
+        thread.request_stop();
+        thread.detach();
+    }
 }
 
 void GatewayController::stopWebSocket()
 {
+    LOG_F(INFO, "Stopping WebSocket");
     webSocket_.client.stop();
     webSocket_.runThread.request_stop();
     auto thread = std::thread([this]()
@@ -138,6 +146,7 @@ void GatewayController::setHeartbeatInterval(uint64_t interval)
 
 void GatewayController::startHeartbeat()
 {
+    LOG_F(INFO, "Starting hearbeat");
     heartbeat_.lostHearbeat.store(0);
     heartbeat_.thread = std::jthread([this](std::stop_token token)
     {
@@ -160,6 +169,7 @@ void GatewayController::startHeartbeat()
 
 void GatewayController::stopHeartbeat()
 {
+    LOG_F(INFO, "Stopping hearbeat");
     heartbeat_.thread.request_stop();
     auto thread = std::thread([this]()
     {
