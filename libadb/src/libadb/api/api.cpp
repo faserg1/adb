@@ -13,6 +13,7 @@
 #include <libadb/api/sticker/sticker-api.hpp>
 
 #include <fmt/core.h>
+#include <loguru/loguru.hpp>
 
 using namespace adb::api;
 
@@ -26,6 +27,7 @@ DiscordApi::DiscordApi(const adb::cfg::SecretsData &secrets, uint8_t version) :
     context_(std::make_shared<Context>(fmt::format("{}/v{}", discordApiBaseUrl, version)))
 {
     context_->overrideSecrets(secrets);
+    loguru::g_stderr_verbosity = 9;
 }
 
 std::unique_ptr<Auth> DiscordApi::CreateAuth()

@@ -95,10 +95,13 @@ void GatewayController::startWebSocket()
     LOG_F(INFO, "Attempt to run WebSocket");
     auto thread = std::jthread([this](std::stop_token token)
     {
+        VLOG_F(vDEBUG, "WebSocket run stop requested: {}", token.stop_requested());
         while (!token.stop_requested())
         {
             webSocket_.client.run();
         }
+        VLOG_F(vDEBUG, "WebSocket thread end");
+        processEvent(fsm_->machine, StateMachineEventType::WebSocketStop);
     });
     webSocket_.runThread.swap(thread);
     if (thread.joinable())
@@ -111,14 +114,8 @@ void GatewayController::startWebSocket()
 void GatewayController::stopWebSocket()
 {
     LOG_F(INFO, "Stopping WebSocket");
-    webSocket_.client.stop();
     webSocket_.runThread.request_stop();
-    auto thread = std::thread([this]()
-    {
-        webSocket_.runThread.join();
-        processEvent(fsm_->machine, StateMachineEventType::WebSocketStop);
-    });
-    thread.detach();
+    webSocket_.client.stop();
 }
 
 bool GatewayController::isWebSocketOpened()
@@ -148,7 +145,7 @@ void GatewayController::startHeartbeat()
 {
     LOG_F(INFO, "Starting hearbeat");
     heartbeat_.lostHearbeat.store(0);
-    heartbeat_.thread = std::jthread([this](std::stop_token token)
+    auto heartbeatThread = std::jthread([this](std::stop_token token)
     {
         while (!token.stop_requested())
         {
@@ -160,27 +157,30 @@ void GatewayController::startHeartbeat()
             heartbeat_.lostHearbeat++;
             if (heartbeat_.lostHearbeat > 3)
             {
+                LOG_F(WARNING, "Heartbeat lost");
                 processEvent(fsm_->machine, StateMachineEventType::LostHeartbeat);
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(heartbeat_.interval));
         }
+        VLOG_F(vDEBUG, "Heartbeat thread end");
+        processEvent(fsm_->machine, StateMachineEventType::HeartbeatStop);
     });
+    heartbeat_.thread.swap(heartbeatThread);
+    if (heartbeatThread.joinable())
+    {
+        heartbeatThread.detach();
+    }
 }
 
 void GatewayController::stopHeartbeat()
 {
     LOG_F(INFO, "Stopping hearbeat");
     heartbeat_.thread.request_stop();
-    auto thread = std::thread([this]()
-    {
-        heartbeat_.thread.detach();
-        processEvent(fsm_->machine, StateMachineEventType::HeartbeatStop);
-    });
-    thread.detach();
 }
 
 void GatewayController::identity()
 {
+    LOG_F(INFO, "Sending identity info");
     Identity identity {
         .token = token_,
         .properties = {
@@ -198,11 +198,13 @@ void GatewayController::identity()
 
 void GatewayController::saveSessionInfo(const Ready &ready)
 {
+    LOG_F(INFO, "Saving session: {}", ready.sessionId);
     sessionId_ = ready.sessionId;
 }
 
 void GatewayController::resume()
 {
+    LOG_F(INFO, "Sending resume info");
     Resume resume {
         .token = token_,
         .sessionId = sessionId_,
