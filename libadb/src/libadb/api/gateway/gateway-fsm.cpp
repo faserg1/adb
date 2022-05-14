@@ -8,6 +8,7 @@
 #include <boost/sml.hpp>
 #include <loguru/loguru.hpp>
 #include <queue>
+#include <thread>
 #include <fmt/format.h>
 using namespace adb::api;
 
@@ -15,25 +16,31 @@ namespace adb::api
 {
     /* Main states */
 
-    auto sConnected = boost::sml::state<class Connected>;
-    auto sDisconnected = boost::sml::state<class Disconnected>;
+    auto sConnected = boost::sml::state<struct Connected>;
+    auto sDisconnected = boost::sml::state<struct Disconnected>;
 
     /* Inner Head States */
 
-    auto sConnecting = boost::sml::state<class Connecting>;
-    auto sReconnecting = boost::sml::state<class Reconnecting>;
-    auto sDisconnecting = boost::sml::state<class Disconnecting>;
+    struct Reconnecting
+    {
+        uint64_t attemt = 0;
+        static const uint64_t maxAttempts = 5;
+    };
+
+    auto sConnecting = boost::sml::state<struct Connecting>;
+    auto sReconnecting = boost::sml::state<struct Reconnecting>;
+    auto sDisconnecting = boost::sml::state<struct Disconnecting>;
 
     /* Inner States */
 
-    auto sWebSocketOpen = boost::sml::state<class WebSocketOpen>;
-    auto sWebSocketClose = boost::sml::state<class WebSocketClose>;
-    auto sWebSocketStop = boost::sml::state<class WebSocketStop>;
-    auto sHeartbeatStart = boost::sml::state<class HeartbeatStart>;
-    auto sHeartbeatStop = boost::sml::state<class HeartbeatStop>;
-    auto sHandshake = boost::sml::state<class Handshake>;
-    auto sAuth = boost::sml::state<class Auth>;
-    auto sResuming = boost::sml::state<class Resuming>;
+    auto sWebSocketOpen = boost::sml::state<struct WebSocketOpen>;
+    auto sWebSocketClose = boost::sml::state<struct WebSocketClose>;
+    auto sWebSocketStop = boost::sml::state<struct WebSocketStop>;
+    auto sHeartbeatStart = boost::sml::state<struct HeartbeatStart>;
+    auto sHeartbeatStop = boost::sml::state<struct HeartbeatStop>;
+    auto sHandshake = boost::sml::state<struct Handshake>;
+    auto sAuth = boost::sml::state<struct Auth>;
+    auto sResuming = boost::sml::state<struct Resuming>;
 
     /* Events */
 
@@ -50,9 +57,12 @@ namespace adb::api
     
     struct ReconnectEvent {};
     struct ResumedEvent {};
+    struct InvalidSessionEvent {};
 
     struct ConnectingDone {};
+    struct ConnectingFailed {};
     struct ReconnectingDone {};
+    struct ReconnectingFailed {};
     struct DisconnectingDone {};
 
     /* WebSocket */
@@ -106,6 +116,16 @@ namespace adb::api
         controller->identity();
     };
 
+    const auto tryAuthLater = [](GatewayController *controller)
+    {
+        std::thread([controller]
+        {
+            // wait 1-5 seconds, and then identify
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            controller->identity();
+        }).detach();
+    };
+
     const auto tryResume = [](GatewayController *controller)
     {
         controller->resume();
@@ -128,6 +148,29 @@ namespace adb::api
         controller->onStop();
     };
 
+    /* Reconnect */
+
+    const auto reconnectAttemptIncrement = [](Reconnecting &reconnecting)
+    {
+        reconnecting.attemt++;
+    };
+
+    const auto reconnectAttemptReset = [](Reconnecting &reconnecting)
+    {
+        reconnecting.attemt = 0;
+    };
+
+    const auto reconnectAttemptCheckGuard = [](Reconnecting &reconnecting) -> bool
+    {
+        return reconnecting.attemt < reconnecting.maxAttempts;
+    };
+
+    const auto reconnectAttemptCheckFail = [](Reconnecting &reconnecting)
+    {
+        LOG_F(ERROR, "To many reconnects ({})! Disconnecting.", reconnecting.attemt);
+        reconnecting.attemt = 0;
+    };
+
     class StateCompositeConnecting
     {
     public:
@@ -137,11 +180,13 @@ namespace adb::api
 
             return make_transition_table
             (
-                sConnecting + on_entry<_> / (webSocketConnect, webSocketStart),
+                sConnecting + on_entry<_> / (webSocketStart, webSocketConnect),
                 *sConnecting + event<WebSocketOpenEvent> = sWebSocketOpen,
                 sWebSocketOpen + event<Hello> / (onHello, heartbeatStart, tryAuth) = sHandshake,
                 sHandshake + event<Ready> / (onReady) = X,
-                X + on_entry<_> / process(ConnectingDone{})
+                X + on_entry<_> [webSocketOpenedGuard] / process(ConnectingDone{}),
+                state<_> + unexpected_event<WebSocketCloseEvent> / (process(ConnectingFailed{}), []{LOG_F(ERROR, "Connection failed!");}) = X,
+                state<_> + unexpected_event<InvalidSessionEvent> / (process(ConnectingFailed{}), []{LOG_F(ERROR, "Connection failed!");}) = X
             );
         }
     };
@@ -155,17 +200,20 @@ namespace adb::api
 
             return make_transition_table
             (
-                *sReconnecting + on_entry<_> / (heartbeatStop, webSocketDisconnect),
-                sReconnecting + event<WebSocketCloseEvent> [!webSocketOpenedGuard] / (webSocketStop) = sWebSocketClose,
-                sReconnecting [!webSocketOpenedGuard && webSocketStoppedGuard] = sWebSocketStop,
-                sReconnecting [!webSocketOpenedGuard && !webSocketStoppedGuard] / (webSocketStop) = sWebSocketClose,
-                sWebSocketClose + event<WebSocketStopEvent> = sWebSocketStop,
-                sWebSocketClose [webSocketStoppedGuard] = sWebSocketStop,
-                sWebSocketStop + on_entry<_> / (webSocketConnect, webSocketStart),
-                sWebSocketStop + event<WebSocketOpenEvent> = sWebSocketOpen,
+                *sReconnecting + on_entry<_> [reconnectAttemptCheckGuard] / (reconnectAttemptIncrement, heartbeatStop, webSocketDisconnect),
+                sReconnecting [!reconnectAttemptCheckGuard] / (process(ReconnectingFailed{}), reconnectAttemptCheckFail) = X,
+                sReconnecting + event<WebSocketCloseEvent> [!webSocketOpenedGuard] = sWebSocketClose,
+                sReconnecting [!webSocketOpenedGuard && !webSocketStoppedGuard] = sWebSocketClose,
+                sWebSocketClose + on_entry<_> / (webSocketConnect),
+                sWebSocketClose + event<WebSocketOpenEvent> = sWebSocketOpen,
                 sWebSocketOpen + event<Hello> / (onHello, heartbeatStart, tryResume) = sHandshake,
                 sHandshake + event<ResumedEvent> = X,
-                X + on_entry<_> / process(ReconnectingDone{})
+                sHandshake + event<InvalidSessionEvent> / tryAuthLater = sAuth,
+                sAuth + event<Ready> / (onReady) = X,
+                X + on_entry<_> [webSocketOpenedGuard] / (reconnectAttemptReset, process(ReconnectingDone{})),
+                // count attempts?
+                state<_> + unexpected_event<WebSocketCloseEvent> / []{LOG_F(ERROR, "Unexpected close!");} = sReconnecting,
+                state<_> + unexpected_event<ReconnectEvent> / []{LOG_F(ERROR, "Attempt to reconnect again");} = sReconnecting
             );
         }
     };
@@ -201,9 +249,12 @@ namespace adb::api
             (
                 *sDisconnected + event<RequestConnectEvent> = state<StateCompositeConnecting>,
                 state<StateCompositeConnecting> + event<ConnectingDone> = sConnected,
+                state<StateCompositeConnecting> + event<ConnectingFailed> = state<StateCompositeDisconnecting>,
                 sConnected + event<ReconnectEvent> = state<StateCompositeReconnecting>,
                 sConnected + event<WebSocketCloseEvent> = state<StateCompositeReconnecting>,
+                sConnected + event<LostHeartbeatEvent> = state<StateCompositeReconnecting>,
                 state<StateCompositeReconnecting> + event<ReconnectingDone> = sConnected,
+                state<StateCompositeReconnecting> + event<ReconnectingFailed> = state<StateCompositeDisconnecting>,
                 sConnected + event<RequestDisconnectEvent> = state<StateCompositeDisconnecting>,
                 state<StateCompositeDisconnecting> + event<DisconnectingDone> = sDisconnected,
                 sDisconnected + on_entry<_> / doStop
@@ -314,6 +365,11 @@ namespace adb::api
         {
             auto hello = payload.data.get<Hello>();
             machine->machine.process_event(hello);
+            break;
+        }
+        case GatewayOpCode::InvalidSession:
+        {
+            machine->machine.process_event(InvalidSessionEvent{});
             break;
         }
         case GatewayOpCode::Reconnect:

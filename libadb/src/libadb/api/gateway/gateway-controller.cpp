@@ -41,6 +41,20 @@ bool GatewayController::connect()
     }
     webSocket_.connection = webSocket_.client.connect(con);
     LOG_F(INFO, "WebSocket connection retrived.");
+    // !!!TESTCODE!!! this will try disconnect by failure
+    if constexpr (false)
+    {
+        auto static reconnected = false;
+        if (reconnected)
+            return true;
+        reconnected = true;
+        std::thread([this]
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            webSocket_.client.close(webSocket_.connection, websocketpp::close::status::internal_endpoint_error, "Disconnecting");
+        }).detach();
+    }
+    
     return true;
 }
 
@@ -93,6 +107,7 @@ Intents GatewayController::getIntents()
 void GatewayController::startWebSocket()
 {
     LOG_F(INFO, "Attempt to run WebSocket");
+    webSocket_.client.start_perpetual();
     auto thread = std::jthread([this](std::stop_token token)
     {
         VLOG_F(vDEBUG, "WebSocket run stop requested: {}", token.stop_requested());
@@ -115,6 +130,7 @@ void GatewayController::stopWebSocket()
 {
     LOG_F(INFO, "Stopping WebSocket");
     webSocket_.runThread.request_stop();
+    webSocket_.client.stop_perpetual();
     webSocket_.client.stop();
 }
 
